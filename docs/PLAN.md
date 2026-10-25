@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 3 — Thème, navigation, langue** (écrite, en cours de test)
+👉 **Étape en cours : 5 — Hors ligne et synchronisation** (préparation des comptes Expo et PowerSync)
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 
@@ -34,6 +34,8 @@ Dans le plan plus bas, une case cochée = une étape terminée et validée.
 4. **Vendeurs : un profil + un code PIN, sans e-mail.** Le propriétaire se connecte une fois sur chaque appareil de la boutique ; les vendeurs changent d'utilisateur avec leur PIN, même hors ligne. Les droits sont appliqués par l'application. Un vendeur avec son propre compte sur son propre téléphone = V2 (la base le permet déjà).
 5. **Connexion du propriétaire : e-mail + mot de passe.** Gratuit. Le code par SMS ou WhatsApp (payant à chaque envoi) viendra plus tard si besoin.
 6. **Stock affiché à 0 : la vente reste possible, avec un avertissement** (réglable par le propriétaire). Les produits **périmés** restent bloqués ; le propriétaire peut forcer, avec une trace.
+7. **Android : un fichier APK à télécharger depuis le site de Boutik, sans Play Store pour l'instant** (décidé par Ernest le 25/10/2026, pour éviter les 25 $). Les mises à jour du code arrivent à distance (EAS Update) ; quand un nouvel APK est nécessaire, l'appli prévient. Sur iPhone : la version web installable (PWA). Play Store et App Store restent possibles plus tard.
+8. **Plusieurs rôles dans l'équipe d'une boutique** (demandé par Ernest le 25/10/2026) : propriétaire, caissier, vendeur, gestionnaire de stock, compteur d'inventaire. Le détail des droits sera fixé à l'étape 7.
 
 Changements par rapport à l'ordre conseillé dans le cahier des charges :
 
@@ -177,14 +179,14 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 
 - [x] **1. Outils et dépôt Git** — suppression du dépôt Git vide du dossier personnel, réglages Git, extensions VS Code, Expo Go sur le téléphone.
 - [x] **2. Création du projet** — projet Expo en TypeScript, avec Expo Router, pour Android, iOS et le web ; premier écran sur le téléphone et dans le navigateur ; explication de chaque dossier.
-- [ ] **3. Thème, navigation, langue** — fichier de thème « Vert Commerce » (clair et sombre), gros boutons, champs et cartes, onglets en bas sur téléphone et menu sur le côté sur grand écran, traductions, affichage « 32 000 FCFA », premiers tests automatiques.
+- [x] **3. Thème, navigation, langue** — fichier de thème « Vert Commerce » (clair et sombre), gros boutons, champs et cartes, onglets en bas sur téléphone et menu sur le côté sur grand écran, traductions, affichage « 32 000 FCFA », premiers tests automatiques.
 
 ### Phase 2 — Les données et le hors-ligne
 
-- [ ] **4. La base Supabase** — le compte, toutes les tables, la sécurité par boutique (RLS), un test automatique qui prouve que la boutique B ne voit rien de la boutique A.
+- [x] **4. La base Supabase** — le compte, toutes les tables, la sécurité par boutique (RLS), un test automatique qui prouve que la boutique B ne voit rien de la boutique A.
 - [ ] **5. Hors ligne et synchronisation** — premier development build Android, base locale, PowerSync, règles de synchronisation par boutique (avec leur test), bandeau « En ligne / X en attente », premier vrai test en coupant internet, petit essai de la version web hors ligne.
 - [ ] **6. Comptes et boutique** — inscription et connexion du propriétaire, création de la boutique (pays, monnaie, modes de paiement), enregistrement de l'appareil, réouverture hors ligne sans se reconnecter.
-- [ ] **7. Utilisateurs, PIN et droits** — profils des vendeurs, code PIN hors ligne, changement rapide d'utilisateur, verrouillage automatique, règles « qui a le droit de faire quoi », journal des actions.
+- [ ] **7. Utilisateurs, PIN et droits** — l'équipe de la boutique, chaque personne avec un rôle (propriétaire, caissier, vendeur, gestionnaire de stock, compteur d'inventaire), code PIN hors ligne, changement rapide d'utilisateur, verrouillage automatique, règles « qui a le droit de faire quoi », journal des actions.
 
 ### Phase 3 — Le stock
 
@@ -207,9 +209,9 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 
 ### Phase 6 — Publier
 
-- [ ] **18. La version web installable (PWA)** — installable sur téléphone et sur PC, testée hors ligne, mise en ligne.
-- [ ] **19. Les applications Android et iOS** — fichier de test Android (APK), Google Play, puis iPhone (TestFlight puis App Store).
-- [ ] **20. Windows, abonnement, mise en production** — logiciel Windows (.exe, choix entre Electron et Tauri expliqué), abonnement (règles d'Apple et de Google expliquées avant de coder), liste des vérifications avant le lancement, README complet.
+- [ ] **18. Le site et la version web installable (PWA)** — installable sur téléphone et sur PC, testée hors ligne, mise en ligne, avec la page de téléchargement de l'APK Android.
+- [ ] **19. L'application Android (APK)** — APK signé à télécharger depuis le site, mises à jour à distance (EAS Update), message « nouvelle version disponible ». Play Store et App Store : plus tard, si besoin.
+- [ ] **20. Windows, abonnement, mise en production** — logiciel Windows (.exe, choix entre Electron et Tauri expliqué), abonnement (hors Play Store, le paiement par Mobile Money devient possible directement dans l'appli ; les règles seront expliquées avant de coder), liste des vérifications avant le lancement, README complet.
 
 ## Hors périmètre pour l'instant (V2)
 
@@ -222,12 +224,14 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - les dépenses de la boutique ;
 - le rapport du soir par SMS ou WhatsApp ;
 - l'encaissement Mobile Money intégré ;
-- les pharmacies.
+- les pharmacies ;
+- le parrainage : un commerçant en invite un autre et gagne une récompense (lié à l'abonnement, idée d'Ernest du 25/10/2026) ;
+- la publication sur Google Play et l'App Store.
 
 ## À savoir
 
-- 💰 **Coûts** : développer ne coûte rien (offres gratuites de Supabase, PowerSync et Expo). Publier sur Google Play coûte 25 $ une seule fois ; sur l'App Store, 99 $ par an. Avec de vrais clients, il faudra sans doute des offres payantes pour les serveurs (par exemple, Supabase met en pause un projet gratuit qui ne sert pas pendant une semaine). On fera les comptes à l'étape 20.
-- ⏳ **Google Play** : pour un nouveau compte personnel, Google demande aujourd'hui un test avec au moins 12 personnes pendant 14 jours avant la publication. Le compte sera créé vers l'étape 12, pour que ces 14 jours passent pendant qu'on continue à coder.
+- 💰 **Coûts** : développer ne coûte rien (offres gratuites de Supabase, PowerSync et Expo). Distribuer l'APK depuis notre site ne coûte rien (Google Play : 25 $ une fois, App Store : 99 $ par an, seulement si un jour on y publie). Avec de vrais clients, il faudra sans doute des offres payantes pour les serveurs (par exemple, Supabase met en pause un projet gratuit qui ne sert pas pendant une semaine). On fera les comptes à l'étape 20.
+- ⚠️ **APK hors Play Store** : depuis le 30/09/2026, Google exige un développeur « vérifié » dans 4 pays (Brésil, Indonésie, Singapour, Thaïlande), pour les applis venant de certaines boutiques d'applications. L'installation directe d'un APK n'y est pas encore bloquée, et le Bénin n'est pas concerné. Google prévoit d'étendre cette vérification au monde entier en 2027 : il faudra alors sans doute faire vérifier son identité de développeur. À surveiller.
 - 🌐 **Le web hors ligne** : rouvrir la page sans internet demande la version installable (étape 18). Un petit essai sera fait dès l'étape 5, pour vérifier tôt que ça marche.
 
 ## Notes techniques
@@ -247,4 +251,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - **Textes** : tous dans `src/i18n/fr.ts`, affichés avec `t('clé')`. TypeScript signale une clé inconnue.
 - **Icônes** : `@react-native-vector-icons/material-design-icons` (et non `@expo/vector-icons`, qui va être abandonné). Paper le détecte tout seul. L'extension VS Code « Expo Tools » affiche un faux avertissement sur ce module dans `app.json` : Expo, lui, le lit sans problème.
 - **Navigation** : `src/app/(tabs)/_layout.tsx` utilise les onglets « sans habillage » d'Expo Router (`expo-router/ui`) : une liste d'onglets invisible + notre barre du bas (`BottomNav`) ou notre menu sur le côté (`SideNav`), selon la largeur (768 points).
+- **Supabase** : projet `boutik` (identifiant `twidouwbbikvqqghnhdp`), région Paris, PostgreSQL 17, sur le même compte qu'ÉcoPay. L'appli utilise la clé « publishable » (fichier `.env`, jamais dans Git) ; la clé « secret » et le mot de passe de la base ne vont jamais dans l'appli, dans Git ou dans une conversation.
+- **Migrations** : la base est décrite par les fichiers de `supabase/migrations/`, envoyés avec `npx supabase db push`. Ne jamais modifier une migration déjà envoyée : en créer une nouvelle (`npx supabase migration new <nom>`).
+- **Tests de sécurité** : `supabase/tests/` applique nos vraies migrations dans un PostgreSQL en mémoire (PGlite) qui imite Supabase, puis vérifie qu'une boutique ne voit ni ne modifie les données d'une autre. Ils tournent avec `npm test`, sans réseau. `npm run typecheck` vérifie l'appli ET ces tests (deux configurations TypeScript).
 - **Routes typées désactivées** (`typedRoutes: false` dans `app.json`) : avec Expo 58 et le dossier `src/app`, le générateur prenait tous les fichiers de `src/` pour des écrans et écrivait `/index` au lieu de `/`. À réessayer lors d'une future mise à jour d'Expo.

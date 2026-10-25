@@ -2,7 +2,8 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 // Configuration des tests automatiques (Vitest).
-// On y teste la logique métier « pure » : les calculs, sans aucun écran.
+// On y teste la logique métier « pure » (les calculs, sans aucun écran)
+// et la sécurité de la base de données (supabase/tests).
 export default defineConfig({
   resolve: {
     alias: {
@@ -11,6 +12,6 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'supabase/tests/**/*.test.ts'],
   },
 });
