@@ -1,0 +1,22 @@
+# Fins de ligne : on garde partout le format « LF » (celui de Linux et de Mac),
+# même sous Windows. Ça évite que Git croie que des fichiers ont changé
+# alors que non, et ça évite les erreurs de l'outil de mise en forme (Prettier).
+* text=auto eol=lf
+
+# Scripts Windows : eux ont besoin du format Windows (« CRLF »)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Fichiers binaires (images, polices, PDF…) : Git ne doit jamais les modifier
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
+*.wasm binary
