@@ -2,5 +2,6 @@
 docs/
 package-lock.json
 supabase/.temp/
+public/@powersync/
 # Fichier généré automatiquement par « npm run db:types »
 src/lib/database.types.ts

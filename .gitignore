@@ -33,6 +33,9 @@ yarn-error.*
 # local env files
 .env*.local
 
+# Fichiers web de PowerSync : recopiés automatiquement depuis node_modules après « npm install »
+public/@powersync/
+
 # Fichiers de secrets (clés Supabase, PowerSync…) : JAMAIS dans Git.
 # Seul le modèle « .env.example » (sans vraies clés) est partagé.
 .env

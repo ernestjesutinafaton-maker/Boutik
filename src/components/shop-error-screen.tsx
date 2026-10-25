@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from 'react-native-paper';
 
 import { useAuth } from '@/auth/auth-provider';
-import { clearShopCache, useShop } from '@/shop/shop-provider';
+import { useShop } from '@/shop/shop-provider';
 
 import { AuthLayout } from './auth-layout';
 import { BigButton } from './big-button';
@@ -24,7 +24,6 @@ export function ShopErrorScreen() {
   }
 
   async function handleSignOut() {
-    await clearShopCache();
     await signOut();
   }
 

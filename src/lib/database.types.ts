@@ -1435,6 +1435,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_changes: { Args: { p_changes: Json }; Returns: undefined }
       create_shop: {
         Args: {
           p_country_code: string

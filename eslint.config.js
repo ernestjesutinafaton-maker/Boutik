@@ -10,6 +10,6 @@ module.exports = defineConfig([
   // Signale aussi le code qui n'est pas mis en forme comme le veut Prettier
   eslintPluginPrettierRecommended,
   {
-    ignores: ['dist/*'],
+    ignores: ['dist/*', 'public/@powersync/*'],
   },
 ]);

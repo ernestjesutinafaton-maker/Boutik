@@ -4,11 +4,14 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
 import { Button, Card, Dialog, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
 
+import { usePowerSync } from '@powersync/react';
+
 import { useAuth } from '@/auth/auth-provider';
 import { BigButton } from '@/components/big-button';
 import type { IconName } from '@/components/icon-name';
 import { Screen } from '@/components/screen';
-import { clearShopCache, useShop } from '@/shop/shop-provider';
+import { deviceName } from '@/device/device';
+import { useShop } from '@/shop/shop-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 import { useThemePreference } from '@/theme/theme-preference';
 
@@ -25,15 +28,27 @@ const UPCOMING = [
 export default function MoreScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
+  const db = usePowerSync();
   const { session, signOut } = useAuth();
-  const { shop } = useShop();
+  const { shop, device } = useShop();
   const { preference, setPreference } = useThemePreference();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
+  // Nombre d'opérations pas encore envoyées qui empêchent la déconnexion (0 = rien de bloqué)
+  const [blockingCount, setBlockingCount] = useState(0);
   const version = Constants.expoConfig?.version ?? '';
+
+  /** Se déconnecter efface la base locale : on refuse s'il reste des opérations à envoyer. */
+  async function requestSignOut() {
+    const stats = await db.getUploadQueueStats();
+    if (stats.count > 0) {
+      setBlockingCount(stats.count);
+    } else {
+      setIsSignOutDialogOpen(true);
+    }
+  }
 
   async function handleSignOut() {
     setIsSignOutDialogOpen(false);
-    await clearShopCache();
     await signOut();
   }
 
@@ -48,7 +63,12 @@ export default function MoreScreen() {
               {t('account.shop', { name: shop.name })}
             </Text>
           ) : null}
-          <BigButton variant="outline" icon="logout" onPress={() => setIsSignOutDialogOpen(true)}>
+          <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
+            {device?.number
+              ? t('account.device', { name: deviceName, number: device.number })
+              : t('account.deviceNotRegistered', { name: deviceName })}
+          </Text>
+          <BigButton variant="outline" icon="logout" onPress={requestSignOut}>
             {t('account.signOut')}
           </BigButton>
         </Card.Content>
@@ -99,6 +119,18 @@ export default function MoreScreen() {
             <Button textColor={theme.app.colors.danger} onPress={handleSignOut}>
               {t('account.signOut')}
             </Button>
+          </Dialog.Actions>
+        </Dialog>
+
+        <Dialog visible={blockingCount > 0} onDismiss={() => setBlockingCount(0)}>
+          <Dialog.Title>{t('account.signOutBlockedTitle')}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyLarge">
+              {t('account.signOutBlockedText', { count: blockingCount })}
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setBlockingCount(0)}>{t('account.ok')}</Button>
           </Dialog.Actions>
         </Dialog>
       </Portal>

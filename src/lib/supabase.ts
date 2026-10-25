@@ -8,6 +8,9 @@ import { env } from '@/config/env';
 import { authStorage } from './auth-storage';
 import type { Database } from './database.types';
 
+/** Nom sous lequel la session de connexion est gardée dans l'appareil. */
+export const AUTH_STORAGE_KEY = 'boutik.auth';
+
 /**
  * Le client Supabase : c'est par lui que l'application parle au serveur
  * (connexion, création de la boutique…).
@@ -18,6 +21,7 @@ import type { Database } from './database.types';
 export const supabase = createClient<Database>(env.supabaseUrl, env.supabasePublishableKey, {
   auth: {
     storage: authStorage, // la session est gardée dans l'appareil (chiffrée sur téléphone)
+    storageKey: AUTH_STORAGE_KEY,
     persistSession: true, // on reste connecté quand on rouvre l'application
     autoRefreshToken: true, // la session est renouvelée automatiquement
     detectSessionInUrl: false, // pas de connexion par lien e-mail dans cette application

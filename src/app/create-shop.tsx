@@ -14,7 +14,7 @@ import { CURRENCIES } from '@/domain/money';
 import type { TranslationKey } from '@/i18n/keys';
 import { errorMessageKey } from '@/lib/error-messages';
 import { type FieldErrors, firstErrorPerField } from '@/lib/validation';
-import { clearShopCache, useShop } from '@/shop/shop-provider';
+import { useShop } from '@/shop/shop-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
 /** Écran affiché juste après l'inscription : on crée la boutique. */
@@ -53,7 +53,6 @@ export default function CreateShopScreen() {
   }
 
   async function handleSignOut() {
-    await clearShopCache();
     await signOut();
   }
 

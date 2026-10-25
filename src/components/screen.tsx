@@ -5,6 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '@/theme/paper-theme';
 
+import { SyncStatusBanner } from './sync-status-banner';
+
 type ScreenProps = {
   /** Titre affiché en haut de l'écran */
   title: string;
@@ -12,7 +14,7 @@ type ScreenProps = {
 };
 
 /**
- * Cadre commun à tous les écrans : fond, marges, titre et défilement.
+ * Cadre commun à tous les écrans : bandeau de synchronisation, fond, marges, titre et défilement.
  * Sur grand écran, le contenu est centré avec une largeur limitée pour rester lisible.
  */
 export function Screen({ title, children }: ScreenProps) {
@@ -28,6 +30,7 @@ export function Screen({ title, children }: ScreenProps) {
         { padding: spacing.md, paddingTop: insets.top + spacing.md },
       ]}>
       <View style={[styles.inner, { maxWidth: layout.contentMaxWidth, gap: spacing.md }]}>
+        <SyncStatusBanner />
         <Text variant="headlineMedium" style={styles.title}>
           {title}
         </Text>

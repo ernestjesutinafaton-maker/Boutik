@@ -99,10 +99,36 @@ export const fr = {
   account: {
     title: 'Mon compte',
     shop: 'Boutique : {{name}}',
+    device: 'Cet appareil : {{name}} (n° {{number}})',
+    deviceNotRegistered: 'Cet appareil : {{name}} (pas encore enregistré)',
     signOut: 'Se déconnecter',
     signOutConfirmTitle: 'Se déconnecter ?',
-    signOutConfirmText: 'Il faudra internet pour te reconnecter.',
+    signOutConfirmText:
+      'Les données de la boutique seront effacées de cet appareil. Il faudra internet pour te reconnecter.',
+    signOutBlockedTitle: 'Pas encore possible',
+    signOutBlockedText:
+      '{{count}} opération(s) n’ont pas encore été envoyées au serveur. Reconnecte-toi à internet, attends que tout soit envoyé, puis réessaie.',
     cancel: 'Annuler',
+    ok: 'J’ai compris',
+  },
+  sync: {
+    online: 'En ligne',
+    offline: 'Hors ligne',
+    syncing: 'Synchronisation…',
+    firstSync: 'Première synchronisation…',
+    allSynced: 'tout est à jour',
+    pending_one: '{{count}} opération en attente',
+    pending_other: '{{count}} opérations en attente',
+  },
+  syncTest: {
+    title: 'Essai de synchronisation',
+    help: 'Ajoute un client d’essai, coupe internet, ajoutes-en d’autres, puis rallume internet : ils partent tout seuls vers le serveur et apparaissent sur tes autres appareils.',
+    add: 'Ajouter un client d’essai',
+    customerName: 'Client d’essai n° {{number}} ({{device}})',
+    count_one: '{{count}} client dans la boutique',
+    count_other: '{{count}} clients dans la boutique',
+    temporary:
+      'Carte provisoire : elle sera remplacée par la vraie liste des clients à l’étape 14.',
   },
   errors: {
     emailRequired: 'Entre ton adresse e-mail.',

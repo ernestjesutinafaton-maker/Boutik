@@ -1,11 +1,13 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 import { useAuth } from '@/auth/auth-provider';
 import type { CreateShopInput } from '@/auth/schemas';
 import { getCountry } from '@/config/countries';
+import { registerDevice, type ShopDevice } from '@/device/device';
 import { CURRENCIES, type CurrencyCode } from '@/domain/money';
 import { supabase } from '@/lib/supabase';
+
+import { readShopCache, saveShopCache } from './shop-cache';
 
 /** La boutique dans laquelle on travaille, et la personne connectée dans cette boutique. */
 export type CurrentShop = {
@@ -28,12 +30,11 @@ type ShopResult = { status: Exclude<ShopStatus, 'loading'>; shop: CurrentShop | 
 type ShopContextValue = {
   status: ShopStatus;
   shop: CurrentShop | null;
+  /** Cet appareil dans la boutique (son numéro sert aux factures) ; null pendant l'enregistrement */
+  device: ShopDevice | null;
   createShop: (input: CreateShopInput) => Promise<void>;
   reload: () => void;
 };
-
-/** Dernière boutique connue, gardée dans l'appareil pour pouvoir démarrer sans internet. */
-const CACHE_KEY = 'boutik.current-shop';
 
 const ShopContext = createContext<ShopContextValue | null>(null);
 
@@ -52,7 +53,7 @@ async function fetchShop(userId: string): Promise<ShopResult> {
 
   if (error) {
     // Pas de réseau (ou serveur injoignable) : on reprend la dernière boutique connue
-    const cached = await readCachedShop(userId);
+    const cached = await readShopCache(userId);
     return cached ? { status: 'ready', shop: cached } : { status: 'error', shop: null };
   }
 
@@ -69,23 +70,8 @@ async function fetchShop(userId: string): Promise<ShopResult> {
     memberId: membership.id,
     memberName: membership.display_name,
   };
-  await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ userId, shop })).catch(() => {});
+  await saveShopCache(userId, shop);
   return { status: 'ready', shop };
-}
-
-async function readCachedShop(userId: string): Promise<CurrentShop | null> {
-  try {
-    const raw = await AsyncStorage.getItem(CACHE_KEY);
-    const cached = raw ? (JSON.parse(raw) as { userId: string; shop: CurrentShop }) : null;
-    return cached?.userId === userId ? cached.shop : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Oublie la dernière boutique connue (à la déconnexion). */
-export async function clearShopCache(): Promise<void> {
-  await AsyncStorage.removeItem(CACHE_KEY).catch(() => {});
 }
 
 /** Charge la boutique de la personne connectée et la partage avec tous les écrans. */
@@ -97,6 +83,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [loaded, setLoaded] = useState<(ShopResult & { userId: string }) | null>(null);
   // Augmenter ce compteur relance le chargement (après la création d'une boutique…)
   const [reloadCount, setReloadCount] = useState(0);
+  // L'appareil enregistré, et pour quelle boutique
+  const [registered, setRegistered] = useState<{ shopId: string; device: ShopDevice } | null>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -122,6 +110,27 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const isCurrent = userId !== null && loaded?.userId === userId;
   const status: ShopStatus = !userId ? 'none' : isCurrent ? loaded.status : 'loading';
   const shop = isCurrent ? loaded.shop : null;
+  const shopId = shop?.id ?? null;
+
+  // Dès que la boutique est connue : enregistrer cet appareil (numéro pour les factures)
+  useEffect(() => {
+    if (!shopId) {
+      return;
+    }
+    let cancelled = false;
+    registerDevice(shopId)
+      .then((device) => {
+        if (!cancelled) {
+          setRegistered({ shopId, device });
+        }
+      })
+      .catch((error: unknown) => console.warn('Enregistrement de l’appareil impossible :', error));
+    return () => {
+      cancelled = true;
+    };
+  }, [shopId]);
+
+  const device = registered?.shopId === shopId ? registered.device : null;
 
   async function createShop(input: CreateShopInput) {
     const country = getCountry(input.countryCode);
@@ -143,7 +152,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <ShopContext.Provider value={{ status, shop, createShop, reload }}>
+    <ShopContext.Provider value={{ status, shop, device, createShop, reload }}>
       {children}
     </ShopContext.Provider>
   );

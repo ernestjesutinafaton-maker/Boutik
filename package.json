@@ -5,6 +5,8 @@
   "dependencies": {
     "@expo/ui": "~58.0.23",
     "@op-engineering/op-sqlite": "^18.2.5",
+    "@powersync/common": "2.4.0",
+    "@powersync/react": "2.1.0",
     "@powersync/react-native": "^2.3.3",
     "@powersync/web": "^2.5.0",
     "@react-native-async-storage/async-storage": "2.2.0",
@@ -57,6 +59,7 @@
     "vitest": "^5.0.5"
   },
   "scripts": {
+    "postinstall": "powersync-web copy-assets -o public",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",

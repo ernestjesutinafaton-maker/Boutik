@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 
 import { AuthProvider, useAuth } from '@/auth/auth-provider';
 import { ShopErrorScreen } from '@/components/shop-error-screen';
+import { PowerSyncProvider } from '@/db/powersync-provider';
 import { ShopProvider, useShop } from '@/shop/shop-provider';
 import { ThemePreferenceProvider } from '@/theme/theme-preference';
 
@@ -16,15 +17,18 @@ SplashScreen.preventAutoHideAsync();
 
 /**
  * Mise en page racine : elle entoure TOUS les écrans de l'application.
- * Elle applique le thème, suit la connexion et la boutique, puis affiche le bon écran.
+ * Elle applique le thème, suit la connexion, ouvre la base locale (PowerSync),
+ * charge la boutique, puis affiche le bon écran.
  */
 export default function RootLayout() {
   return (
     <ThemePreferenceProvider>
       <AuthProvider>
-        <ShopProvider>
-          <RootNavigator />
-        </ShopProvider>
+        <PowerSyncProvider>
+          <ShopProvider>
+            <RootNavigator />
+          </ShopProvider>
+        </PowerSyncProvider>
       </AuthProvider>
     </ThemePreferenceProvider>
   );
