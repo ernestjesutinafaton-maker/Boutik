@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 /**
  * Une imitation minimale de Supabase, dans un PostgreSQL qui tourne en mémoire (PGlite) :
  * les rôles « anon » (visiteur) et « authenticated » (personne connectée), la table des
- * comptes et la fonction auth.uid() qui dit « qui est connecté ».
+ * comptes, la fonction auth.uid() qui dit « qui est connecté », et le stockage de fichiers.
  *
  * On y applique nos VRAIES migrations (supabase/migrations) : les tests vérifient donc
  * exactement les règles de sécurité qui seront envoyées sur Supabase, sans réseau.
@@ -25,6 +25,28 @@ const SUPABASE_IMITATION_SQL = `
   $$;
   grant usage on schema auth to anon, authenticated;
   grant usage on schema public to anon, authenticated;
+
+  -- Le stockage de fichiers (photos), réduit au strict nécessaire
+  create schema storage;
+  create table storage.buckets (
+    id text primary key,
+    name text not null,
+    public boolean default false,
+    file_size_limit bigint,
+    allowed_mime_types text[]
+  );
+  create table storage.objects (
+    id uuid primary key default gen_random_uuid(),
+    bucket_id text references storage.buckets (id),
+    name text not null,
+    created_at timestamptz default now()
+  );
+  alter table storage.objects enable row level security;
+  create function storage.foldername(name text) returns text[] language sql immutable as $$
+    select (string_to_array(name, '/'))[1:array_length(string_to_array(name, '/'), 1) - 1]
+  $$;
+  grant usage on schema storage to anon, authenticated;
+  grant select, insert, update, delete on storage.objects to authenticated;
 `;
 
 /** Crée une base neuve, avec toutes nos migrations appliquées dans l'ordre. */

@@ -1,3 +1,4 @@
+import { frProductErrors, frProducts } from './fr-products';
 import { frTeam } from './fr-team';
 
 /**
@@ -54,9 +55,6 @@ export const fr = {
     cashIn: 'Encaisser',
     newSale: 'Nouvelle vente',
     cancel: 'Annuler',
-  },
-  products: {
-    description: 'Fiches produits, unités (sac, kilo, carton…), codes-barres, prix et stock.',
   },
   customers: {
     description: 'Fiches clients, carnet de dettes, remboursements et relances WhatsApp.',
@@ -176,6 +174,8 @@ export const fr = {
     discountPercentInvalid: 'Entre un pourcentage entre 0 et 100, ou laisse vide.',
     pinFormat: 'Le code PIN doit contenir exactement 4 chiffres.',
     pinsDontMatch: 'Les deux codes PIN ne sont pas identiques.',
+    ...frProductErrors,
   },
   ...frTeam,
+  ...frProducts,
 } as const;

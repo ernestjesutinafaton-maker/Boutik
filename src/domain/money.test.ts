@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { type CurrencyCode, formatMoney, parseMoney } from './money';
+import { type CurrencyCode, formatMoney, formatMoneyInput, parseMoney } from './money';
 
 /**
  * formatMoney met des espaces insécables (qui ne se coupent pas en fin de ligne).
@@ -80,6 +80,13 @@ describe('parseMoney : comprendre un montant tapé au clavier', () => {
     expect(parseMoney('abc', 'XOF')).toBeNull();
     expect(parseMoney('-500', 'XOF')).toBeNull();
     expect(parseMoney('1,005', 'NGN')).toBeNull(); // 3 chiffres après la virgule
+  });
+
+  it('pré-remplit un champ sans symbole ni espaces', () => {
+    expect(formatMoneyInput(32000, 'XOF')).toBe('32000');
+    expect(formatMoneyInput(150050, 'NGN')).toBe('1500,50');
+    expect(formatMoneyInput(5, 'NGN')).toBe('0,05');
+    expect(parseMoney(formatMoneyInput(150050, 'NGN'), 'NGN')).toBe(150050);
   });
 
   it('retrouve le même montant après affichage puis saisie', () => {

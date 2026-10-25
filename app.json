@@ -36,7 +36,22 @@
         }
       ],
       "@react-native-vector-icons/material-design-icons",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Boutik utilise l'appareil photo pour scanner les codes-barres des produits.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Boutik utilise l'appareil photo pour photographier les produits.",
+          "photosPermission": "Boutik a besoin de tes photos pour choisir l'image d'un produit.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false,

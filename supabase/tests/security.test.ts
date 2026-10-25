@@ -221,6 +221,27 @@ describe("Sécurité : une boutique ne voit jamais les données d'une autre", ()
     );
     expect(loss.affectedRows).toBe(1);
   });
+
+  it('chaque boutique range ses photos de produits dans son propre dossier', async () => {
+    const upload = (userId: string, path: string) =>
+      asUser(db, userId, (tx) =>
+        tx.query("insert into storage.objects (bucket_id, name) values ('product-photos', $1)", [
+          path,
+        ])
+      );
+    const photo = `${shopA}/${riceId}/photo.jpg`;
+    expect((await upload(alice, photo)).affectedRows).toBe(1);
+    // Bruno ne peut ni ajouter une photo dans le dossier d'Alice, ni voir ses fichiers
+    await expect(upload(bruno, `${shopA}/${riceId}/pirate.jpg`)).rejects.toThrow(
+      /row-level security/
+    );
+    const seenByBruno = await asUser(db, bruno, (tx) =>
+      tx.query('select name from storage.objects where name = $1', [photo])
+    );
+    expect(seenByBruno.rows).toHaveLength(0);
+    // … mais il peut en mettre dans le sien
+    expect((await upload(bruno, `${shopB}/x/photo.jpg`)).affectedRows).toBe(1);
+  });
 });
 
 describe('Rôles : une personne peut en avoir plusieurs, et ses droits les additionnent', () => {

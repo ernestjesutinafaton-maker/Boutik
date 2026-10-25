@@ -111,3 +111,17 @@ export function parseMoney(input: string, currencyCode: CurrencyCode): number | 
   const amount = Number(integerPart + decimalPart.padEnd(decimals, '0'));
   return Number.isSafeInteger(amount) ? amount : null;
 }
+
+/**
+ * Écrit un montant tel qu'on le tape dans un champ (sans symbole ni espaces),
+ * pour pré-remplir un formulaire : 32000 (XOF) → "32000" ; 150050 (NGN) → "1500,50".
+ */
+export function formatMoneyInput(amount: number, currencyCode: CurrencyCode): string {
+  const { decimals } = getCurrency(currencyCode);
+  const sign = amount < 0 ? '-' : '';
+  const digits = String(Math.abs(amount)).padStart(decimals + 1, '0');
+  if (decimals === 0) {
+    return `${sign}${digits}`;
+  }
+  return `${sign}${digits.slice(0, -decimals)},${digits.slice(-decimals)}`;
+}

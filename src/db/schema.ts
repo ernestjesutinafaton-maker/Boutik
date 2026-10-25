@@ -339,6 +339,17 @@ const local_rejected_changes = new Table(
   { localOnly: true }
 );
 
+/** Photos de produits prises sur cet appareil, en attente d'envoi vers le stockage Supabase. */
+const local_photo_uploads = new Table(
+  {
+    shop_id: column.text,
+    product_id: column.text,
+    data: column.text, // l'image JPEG en base64
+    created_at: column.text,
+  },
+  { localOnly: true }
+);
+
 export const AppSchema = new Schema({
   shops,
   shop_members,
@@ -361,6 +372,7 @@ export const AppSchema = new Schema({
   customer_ledger,
   audit_log,
   local_rejected_changes,
+  local_photo_uploads,
 });
 
 /** Le type des lignes de chaque table, pour TypeScript (ex. LocalDatabase['customers']). */

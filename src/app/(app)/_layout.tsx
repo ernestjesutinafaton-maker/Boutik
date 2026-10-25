@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { PinLockScreen } from '@/components/pin-lock-screen';
+import { usePhotoUploader } from '@/products/photos';
 import { ActiveMemberProvider, useActiveMember } from '@/team/active-member-provider';
 
 /**
@@ -20,6 +21,8 @@ export default function AppLayout() {
 function AppStack() {
   const { t } = useTranslation();
   const { isReady, isLocked } = useActiveMember();
+  // Les photos de produits prises hors ligne partent dès qu'internet revient
+  usePhotoUploader();
 
   if (!isReady) {
     return null; // on ne sait pas encore qui est actif : rien ne doit s'afficher
