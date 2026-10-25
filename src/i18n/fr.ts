@@ -1,3 +1,4 @@
+import { frCash } from './fr-cash';
 import { frCustomers } from './fr-customers';
 import { frProductErrors, frProducts } from './fr-products';
 import { frSales, frSalesErrors } from './fr-sales';
@@ -62,7 +63,8 @@ export const fr = {
     usersHelp: 'Rôles et codes PIN des personnes de la boutique',
     salesHelp: 'Retrouver, renvoyer ou réimprimer une facture',
     printerHelp: 'Imprimante Bluetooth 58 ou 80 mm',
-    cashSession: 'Caisse du jour',
+    cashHelp: 'Fond de caisse, dépenses, clôture de la journée',
+    reportsHelp: 'Clôtures, « Faire un compte », archives par jour, semaine, mois',
     history: 'Historique des actions',
     shopSettings: 'Paramètres de la boutique',
     export: 'Export Excel / CSV',
@@ -161,4 +163,5 @@ export const fr = {
   ...frProducts,
   ...frSales,
   ...frCustomers,
+  ...frCash,
 } as const;

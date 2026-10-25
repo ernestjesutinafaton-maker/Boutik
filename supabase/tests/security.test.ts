@@ -222,6 +222,53 @@ describe("Sécurité : une boutique ne voit jamais les données d'une autre", ()
     expect(loss.affectedRows).toBe(1);
   });
 
+  it('dépenses : la vendeuse note une dépense, mais pas un retrait ; Bruno ne voit rien', async () => {
+    const methods = await asUser(db, alice, (tx) =>
+      tx.query<{ id: string }>(
+        "select id from public.payment_methods where shop_id = $1 and code = 'cash'",
+        [shopA]
+      )
+    );
+    const cash = methods.rows[0].id;
+    const insert = (userId: string, type: string, category: string | null) =>
+      asUser(db, userId, (tx) =>
+        tx.query(
+          'insert into public.cash_movements (shop_id, type, category, payment_method_id, amount) values ($1, $2, $3, $4, 2000)',
+          [shopA, type, category, cash]
+        )
+      );
+    expect((await insert(carla, 'expense', 'fuel')).affectedRows).toBe(1);
+    await expect(insert(carla, 'withdrawal', null)).rejects.toThrow(/row-level security/);
+    expect((await insert(alice, 'withdrawal', null)).affectedRows).toBe(1);
+    // Une dépense sans catégorie est refusée
+    await expect(insert(alice, 'expense', null)).rejects.toThrow(/check constraint/);
+    await expect(insert(bruno, 'expense', 'fuel')).rejects.toThrow(/row-level security/);
+    const seenByBruno = await asUser(db, bruno, (tx) =>
+      tx.query('select id from public.cash_movements')
+    );
+    expect(seenByBruno.rows).toHaveLength(0);
+    // Jamais de modification
+    await expect(
+      asUser(db, alice, (tx) =>
+        tx.query('update public.cash_movements set amount = 1 where shop_id = $1', [shopA])
+      )
+    ).rejects.toThrow(/permission denied/);
+  });
+
+  it('rapports : la vendeuse clôture la journée, seul le propriétaire (ou le gérant) fait un compte', async () => {
+    const insert = (userId: string, kind: string) =>
+      asUser(db, userId, (tx) =>
+        tx.query(
+          "insert into public.reports (shop_id, kind, period_start, period_end, data) values ($1, $2, now() - interval '1 day', now(), '{}')",
+          [shopA, kind]
+        )
+      );
+    expect((await insert(carla, 'day_close')).affectedRows).toBe(1);
+    await expect(insert(carla, 'account')).rejects.toThrow(/row-level security/);
+    expect((await insert(alice, 'account')).affectedRows).toBe(1);
+    await expect(insert(bruno, 'day_close')).rejects.toThrow(/row-level security/);
+  });
+
   it('chaque boutique range ses photos de produits dans son propre dossier', async () => {
     const upload = (userId: string, path: string) =>
       asUser(db, userId, (tx) =>

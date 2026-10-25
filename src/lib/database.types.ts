@@ -75,6 +75,87 @@ export type Database = {
           },
         ]
       }
+      cash_movements: {
+        Row: {
+          amount: number
+          cash_session_id: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          device_id: string | null
+          id: string
+          note: string | null
+          occurred_at: string
+          payment_method_id: string
+          shop_id: string
+          type: string
+        }
+        Insert: {
+          amount: number
+          cash_session_id?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          payment_method_id: string
+          shop_id: string
+          type: string
+        }
+        Update: {
+          amount?: number
+          cash_session_id?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          device_id?: string | null
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          payment_method_id?: string
+          shop_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cash_movements_cash_session_id_fkey"
+            columns: ["cash_session_id"]
+            isOneToOne: false
+            referencedRelation: "cash_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cash_sessions: {
         Row: {
           closed_at: string | null
@@ -796,6 +877,67 @@ export type Database = {
           },
           {
             foreignKeyName: "products_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          data: Json
+          device_id: string | null
+          id: string
+          kind: string
+          notes: string | null
+          period_end: string
+          period_start: string
+          shop_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          data: Json
+          device_id?: string | null
+          id?: string
+          kind: string
+          notes?: string | null
+          period_end: string
+          period_start: string
+          shop_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          data?: Json
+          device_id?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reports_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"

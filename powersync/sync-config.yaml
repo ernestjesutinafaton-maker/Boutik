@@ -43,5 +43,7 @@ streams:
       - SELECT * FROM sale_items WHERE shop_id IN my_shops
       - SELECT * FROM payments WHERE shop_id IN my_shops
       - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
+      - SELECT * FROM cash_movements WHERE shop_id IN my_shops
+      - SELECT * FROM reports WHERE shop_id IN my_shops
       # La traçabilité
       - SELECT * FROM audit_log WHERE shop_id IN my_shops

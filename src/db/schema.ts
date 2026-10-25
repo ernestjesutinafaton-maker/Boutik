@@ -309,6 +309,33 @@ const customer_ledger = new Table(
   { indexes: { customer: ['customer_id'] } }
 );
 
+/** Dépenses, achats payés par la caisse, retraits et ajouts d'argent (étape 15). */
+const cash_movements = new Table(
+  {
+    shop_id: column.text,
+    cash_session_id: column.text,
+    type: column.text,
+    category: column.text,
+    payment_method_id: column.text,
+    amount: column.integer,
+    note: column.text,
+    occurred_at: column.text,
+    ...tracking,
+  },
+  { indexes: { session: ['cash_session_id'] } }
+);
+
+/** Les rapports archivés : clôtures de journée et comptes (étape 15). */
+const reports = new Table({
+  shop_id: column.text,
+  kind: column.text,
+  period_start: column.text,
+  period_end: column.text,
+  data: column.text, // la fiche complète, en JSON
+  notes: column.text,
+  ...tracking,
+});
+
 // --- 5. La traçabilité ---
 
 const audit_log = new Table({
@@ -384,6 +411,8 @@ export const AppSchema = new Schema({
   sale_items,
   payments,
   customer_ledger,
+  cash_movements,
+  reports,
   audit_log,
   local_rejected_changes,
   local_photo_uploads,

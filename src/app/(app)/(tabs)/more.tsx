@@ -20,7 +20,6 @@ import { useThemePreference } from '@/theme/theme-preference';
 
 /** Les rubriques qui viendront s'ajouter ici, avec l'étape du plan où elles seront faites. */
 const UPCOMING = [
-  { labelKey: 'more.cashSession', icon: 'cash-multiple', step: 15 },
   { labelKey: 'more.history', icon: 'history', step: 17 },
   { labelKey: 'more.shopSettings', icon: 'store-cog', step: 17 },
   { labelKey: 'more.export', icon: 'file-excel', step: 17 },
@@ -77,6 +76,31 @@ export default function MoreScreen() {
           </BigButton>
         </Card.Content>
       </Card>
+
+      {can('cash.session') || can('cash.expense') || can('reports.account') ? (
+        <Card mode="outlined">
+          {can('cash.session') || can('cash.expense') ? (
+            <List.Item
+              title={t('cash.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('more.cashHelp')}
+              left={(props) => <List.Icon {...props} icon="cash-register" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/cash')}
+            />
+          ) : null}
+          {can('reports.account') || can('cash.session') ? (
+            <List.Item
+              title={t('report.archivesTitle')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('more.reportsHelp')}
+              left={(props) => <List.Icon {...props} icon="archive-clock" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/report')}
+            />
+          ) : null}
+        </Card>
+      ) : null}
 
       <Card mode="outlined">
         <List.Item
