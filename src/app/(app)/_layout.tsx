@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { PinLockScreen } from '@/components/pin-lock-screen';
 import { usePhotoUploader } from '@/products/photos';
+import { CartProvider } from '@/sales/cart-provider';
 import { ActiveMemberProvider, useActiveMember } from '@/team/active-member-provider';
 
 /**
@@ -13,7 +14,9 @@ import { ActiveMemberProvider, useActiveMember } from '@/team/active-member-prov
 export default function AppLayout() {
   return (
     <ActiveMemberProvider>
-      <AppStack />
+      <CartProvider>
+        <AppStack />
+      </CartProvider>
     </ActiveMemberProvider>
   );
 }

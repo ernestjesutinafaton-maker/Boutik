@@ -1,4 +1,6 @@
+import { frCustomers } from './fr-customers';
 import { frProductErrors, frProducts } from './fr-products';
+import { frSales, frSalesErrors } from './fr-sales';
 import { frTeam } from './fr-team';
 
 /**
@@ -44,20 +46,6 @@ export const fr = {
   comingSoon: {
     title: 'Bientôt disponible',
     plannedStep: "Prévu à l'étape {{step}} du plan",
-  },
-  sell: {
-    description:
-      'Vendre en quelques touches : chercher ou scanner un produit, remplir le panier, encaisser.',
-    demoTitle: 'Essai des composants',
-    demoHelp: 'Tape un montant, par exemple 32.000 : il s’affiche aussitôt au bon format.',
-    amountLabel: 'Montant reçu',
-    amountInvalid: 'Montant invalide : le FCFA n’a pas de centimes.',
-    cashIn: 'Encaisser',
-    newSale: 'Nouvelle vente',
-    cancel: 'Annuler',
-  },
-  customers: {
-    description: 'Fiches clients, carnet de dettes, remboursements et relances WhatsApp.',
   },
   dashboard: {
     description: 'Ventes, bénéfice réel, valeur du stock, dettes et alertes.',
@@ -175,7 +163,10 @@ export const fr = {
     pinFormat: 'Le code PIN doit contenir exactement 4 chiffres.',
     pinsDontMatch: 'Les deux codes PIN ne sont pas identiques.',
     ...frProductErrors,
+    ...frSalesErrors,
   },
   ...frTeam,
   ...frProducts,
+  ...frSales,
+  ...frCustomers,
 } as const;

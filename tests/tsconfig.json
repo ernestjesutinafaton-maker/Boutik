@@ -1,0 +1,10 @@
+{
+  // Réglages TypeScript des tests de la base locale.
+  // Ils tournent dans Node.js (et non dans l'application) : ils ont donc droit aux types de Node.
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts"],
+  "exclude": []
+}

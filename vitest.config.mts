@@ -3,7 +3,8 @@ import { defineConfig } from 'vitest/config';
 
 // Configuration des tests automatiques (Vitest).
 // On y teste la logique métier « pure » (les calculs, sans aucun écran)
-// et la sécurité de la base de données (supabase/tests).
+// la sécurité de la base de données (supabase/tests) et les opérations complètes
+// sur une vraie base locale SQLite (tests/).
 export default defineConfig({
   resolve: {
     alias: {
@@ -12,6 +13,6 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.test.ts', 'supabase/tests/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'supabase/tests/**/*.test.ts', 'tests/**/*.test.ts'],
   },
 });

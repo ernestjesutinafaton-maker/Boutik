@@ -31,13 +31,15 @@ describe('Droits des rôles', () => {
     expect(can(roles, 'stock.adjust')).toBe(false);
   });
 
-  it('le gérant remplace le propriétaire, sauf bénéfices, équipe et paramètres', () => {
+  it('le gérant remplace le propriétaire, sauf bénéfices, équipe, paramètres et dettes effacées', () => {
     expect(can(['manager'], 'sale.cancel')).toBe(true);
     expect(can(['manager'], 'prices.edit')).toBe(true);
     expect(can(['manager'], 'reports.account')).toBe(true);
     expect(can(['manager'], 'reports.profit')).toBe(false);
     expect(can(['manager'], 'team.manage')).toBe(false);
     expect(can(['manager'], 'settings.manage')).toBe(false);
+    expect(can(['manager'], 'credit.write_off')).toBe(false);
+    expect(can(['owner'], 'credit.write_off')).toBe(true);
   });
 
   it('le compteur ne fait que compter ; le gestionnaire de stock gère le stock sans changer les prix', () => {

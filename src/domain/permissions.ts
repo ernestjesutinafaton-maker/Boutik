@@ -21,6 +21,7 @@ export const PERMISSIONS = [
   'sale.cancel', // annuler une vente, faire un retour
   'sale.discount.unlimited', // accorder une remise au-delà de la limite des vendeurs
   'credit.repayment', // enregistrer un remboursement de crédit
+  'credit.write_off', // effacer une dette qui ne sera jamais payée
   'customers.edit', // créer et modifier les clients
   'cash.session', // ouvrir et fermer la caisse du jour
   'cash.expense', // enregistrer une dépense
@@ -42,9 +43,11 @@ export type Permission = (typeof PERMISSIONS)[number];
 
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   owner: PERMISSIONS,
-  // Le gérant remplace le propriétaire, sauf les bénéfices, l'équipe et les paramètres
+  // Le gérant remplace le propriétaire, sauf les bénéfices, l'équipe, les paramètres
+  // et l'effacement des dettes
   manager: PERMISSIONS.filter(
-    (permission) => !['reports.profit', 'team.manage', 'settings.manage'].includes(permission)
+    (permission) =>
+      !['reports.profit', 'team.manage', 'settings.manage', 'credit.write_off'].includes(permission)
   ),
   cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
   seller: ['sale.create', 'credit.repayment', 'customers.edit'],
