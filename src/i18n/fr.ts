@@ -129,16 +129,6 @@ export const fr = {
     pending_one: '{{count}} opération en attente',
     pending_other: '{{count}} opérations en attente',
   },
-  syncTest: {
-    title: 'Essai de synchronisation',
-    help: 'Ajoute un client d’essai, coupe internet, ajoutes-en d’autres, puis rallume internet : ils partent tout seuls vers le serveur et apparaissent sur tes autres appareils.',
-    add: 'Ajouter un client d’essai',
-    customerName: 'Client d’essai n° {{number}} ({{device}})',
-    count_one: '{{count}} client dans la boutique',
-    count_other: '{{count}} clients dans la boutique',
-    temporary:
-      'Carte provisoire : elle sera remplacée par la vraie liste des clients à l’étape 14.',
-  },
   errors: {
     emailRequired: 'Entre ton adresse e-mail.',
     emailInvalid: 'Cette adresse e-mail n’est pas valide.',

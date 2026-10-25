@@ -135,3 +135,58 @@ export function useLedgerByCustomer(): Map<string, LedgerEntry[]> {
   }
   return byCustomer;
 }
+
+export type RepaymentReceiptRow = {
+  id: string;
+  amount: number;
+  occurredAt: string;
+  methodLabel: string;
+  customerId: string;
+  customerName: string;
+  customerPhone: string | null;
+  receivedBy: string | null;
+  /** Ce que le client devait encore juste après ce remboursement */
+  balanceAfter: number;
+};
+
+type ReceiptRow = {
+  id: string;
+  amount: number;
+  occurred_at: string;
+  method_label: string | null;
+  customer_id: string;
+  customer_name: string;
+  customer_phone: string | null;
+  received_by: string | null;
+  balance_after: number;
+};
+
+/** Un remboursement, avec ce qu'il faut pour son reçu. */
+export function useRepaymentReceipt(paymentId: string): RepaymentReceiptRow | null {
+  const { data } = useQuery<ReceiptRow>(
+    `SELECT p.id, p.amount, p.occurred_at, pm.label AS method_label, c.id AS customer_id,
+            c.name AS customer_name, c.phone AS customer_phone, m.display_name AS received_by,
+            (SELECT COALESCE(SUM(l.amount), 0) FROM customer_ledger l
+              WHERE l.customer_id = p.customer_id AND l.occurred_at <= p.occurred_at) AS balance_after
+       FROM payments p
+       JOIN customers c ON c.id = p.customer_id
+       LEFT JOIN payment_methods pm ON pm.id = p.payment_method_id
+       LEFT JOIN shop_members m ON m.id = p.created_by
+      WHERE p.id = ? AND p.kind = 'repayment'`,
+    [paymentId]
+  );
+  const row = data[0];
+  return row
+    ? {
+        id: row.id,
+        amount: row.amount,
+        occurredAt: row.occurred_at,
+        methodLabel: row.method_label ?? '',
+        customerId: row.customer_id,
+        customerName: row.customer_name,
+        customerPhone: row.customer_phone,
+        receivedBy: row.received_by,
+        balanceAfter: row.balance_after,
+      }
+    : null;
+}

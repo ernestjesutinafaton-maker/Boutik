@@ -2,6 +2,7 @@ import { formatMoment } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
 import { formatQuantity } from '@/domain/quantity';
 import type { InvoiceData } from '@/invoices/invoice-html';
+import type { ReceiptData } from '@/invoices/receipt';
 
 import { encodeTicket, type PaperWidth, type TicketLine } from './escpos';
 
@@ -80,4 +81,33 @@ export function testTicketBytes(shopName: string, width: PaperWidth): Uint8Array
     ],
     width
   );
+}
+
+/** Le reçu d'un remboursement de crédit, ligne par ligne. */
+export function receiptTicketLines(data: ReceiptData): TicketLine[] {
+  const money = (amount: number) => formatMoney(amount, data.currency);
+  const lines: TicketLine[] = [
+    { kind: 'text', text: data.shop.name, align: 'center', bold: true, big: true },
+  ];
+  for (const contact of [data.shop.address, data.shop.phone]) {
+    if (contact) lines.push({ kind: 'text', text: contact, align: 'center' });
+  }
+  lines.push(
+    { kind: 'rule' },
+    { kind: 'text', text: `Reçu ${data.receiptNumber}`, bold: true },
+    { kind: 'text', text: formatMoment(data.occurredAt) },
+    { kind: 'text', text: `Client : ${data.customerName}` },
+    { kind: 'rule' },
+    { kind: 'columns', left: 'Montant reçu', right: money(data.amount), bold: true },
+    { kind: 'columns', left: 'Payé par', right: data.methodLabel },
+    data.balanceAfter > 0
+      ? { kind: 'columns', left: 'Reste à payer', right: money(data.balanceAfter), bold: true }
+      : { kind: 'text', text: 'Compte soldé. Merci !', align: 'center', bold: true }
+  );
+  if (data.receivedBy) lines.push({ kind: 'text', text: `Reçu par : ${data.receivedBy}` });
+  return lines;
+}
+
+export function receiptTicketBytes(data: ReceiptData, width: PaperWidth): Uint8Array {
+  return encodeTicket(receiptTicketLines(data), width);
 }

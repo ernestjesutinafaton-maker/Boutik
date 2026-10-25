@@ -20,6 +20,11 @@ export default function OutboxScreen() {
   function open(item: (typeof items)[number]) {
     if (item.saleId) {
       router.push(`/sale/${item.saleId}`);
+    } else if (item.paymentId && item.customerId) {
+      router.push({
+        pathname: '/customer/[customerId]/receipt',
+        params: { customerId: item.customerId, paymentId: item.paymentId },
+      });
     } else if (item.customerId) {
       router.push(`/customer/${item.customerId}`);
     }

@@ -6,21 +6,24 @@ import { whatsappLink } from '@/domain/phone';
 import type { SaleDetail } from '@/sales/sale-data';
 import type { ShopSettings } from '@/shop/shop-settings';
 
-import { type InvoiceData, type InvoiceFormat, invoiceHtml, invoiceText } from './invoice-html';
+import type { InvoiceData } from './invoice-html';
 
 /**
- * Partager et imprimer les factures.
+ * Partager et imprimer les documents (factures, reçus).
  *   - PDF : fabriqué dans l'appareil (même hors ligne), puis partagé (WhatsApp, e-mail…).
- *   - Impression A4 : par l'imprimante du téléphone ou de l'ordinateur.
- *   - Message WhatsApp : la facture en texte, envoyée au numéro du client.
+ *   - Impression : par l'imprimante du téléphone ou de l'ordinateur (A4 ou ticket).
+ *   - Message WhatsApp : le document en texte, envoyé au numéro du client.
  */
 
-/** Tailles des pages en points (1 point = 1/72 de pouce). */
-const PAGE_SIZES: Record<InvoiceFormat, { width: number; height?: number }> = {
-  a4: { width: 595, height: 842 },
-  ticket80: { width: 227 },
-  ticket58: { width: 164 },
-};
+/** Taille d'une page en points (1 point = 1/72 de pouce). Sans hauteur : longue bande (ticket). */
+export type PageSize = { width: number; height: number };
+
+export const A4: PageSize = { width: 595, height: 842 };
+
+/** Taille d'un ticket : largeur du papier, hauteur selon le nombre de lignes. */
+export function ticketPageSize(width: 58 | 80, lineCount: number): PageSize {
+  return { width: width === 58 ? 164 : 227, height: 260 + lineCount * 30 };
+}
 
 /** Les informations de la facture, à partir de la vente et des réglages de la boutique. */
 export function toInvoiceData(sale: SaleDetail, shop: ShopSettings): InvoiceData {
@@ -61,42 +64,26 @@ export function canSharePdf(): boolean {
   return Platform.OS !== 'web';
 }
 
-/** Hauteur d'un ticket : selon le nombre de lignes (un ticket est une longue bande de papier). */
-function ticketHeight(data: InvoiceData): number {
-  return 260 + data.items.length * 34 + data.payments.length * 16;
-}
-
-/** Fabrique le PDF de la facture et ouvre le partage (WhatsApp, e-mail, Bluetooth…). */
-export async function shareInvoicePdf(data: InvoiceData, format: InvoiceFormat = 'a4') {
-  const size = PAGE_SIZES[format];
-  const { uri } = await Print.printToFileAsync({
-    html: invoiceHtml(data, format),
-    width: size.width,
-    height: size.height ?? ticketHeight(data),
-  });
+/** Fabrique le PDF et ouvre le partage (WhatsApp, e-mail, Bluetooth…). */
+export async function shareHtmlAsPdf(html: string, title: string, size: PageSize = A4) {
+  const { uri } = await Print.printToFileAsync({ html, width: size.width, height: size.height });
   await Sharing.shareAsync(uri, {
     mimeType: 'application/pdf',
     UTI: 'com.adobe.pdf',
-    dialogTitle: `Facture ${data.invoiceNumber}`,
+    dialogTitle: title,
   });
 }
 
-/** Imprime la facture (A4, ou ticket sur une imprimante reconnue par le système). */
-export async function printInvoice(data: InvoiceData, format: InvoiceFormat = 'a4') {
-  const size = PAGE_SIZES[format];
-  await Print.printAsync({
-    html: invoiceHtml(data, format),
-    width: size.width,
-    height: size.height ?? ticketHeight(data),
-  });
+/** Imprime par l'imprimante du système (A4, ou ticket sur une imprimante installée). */
+export async function printHtml(html: string, size: PageSize = A4) {
+  await Print.printAsync({ html, width: size.width, height: size.height });
 }
 
 /**
- * Ouvre WhatsApp avec la facture en texte, sur la conversation du client
+ * Ouvre WhatsApp avec un message, sur la conversation du client
  * (ou, sans numéro, WhatsApp demande à qui l'envoyer).
  */
-export async function sendInvoiceByWhatsApp(data: InvoiceData, phone: string | null) {
-  const text = invoiceText(data);
+export async function openWhatsApp(phone: string | null, text: string) {
   const url = phone ? whatsappLink(phone, text) : `https://wa.me/?text=${encodeURIComponent(text)}`;
   await Linking.openURL(url);
 }
