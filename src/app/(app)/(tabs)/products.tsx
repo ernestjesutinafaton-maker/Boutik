@@ -60,6 +60,15 @@ export default function ProductsScreen() {
             {t('products.add')}
           </BigButton>
         ) : null}
+        {can('stock.receive') ? (
+          <BigButton
+            icon="truck-delivery"
+            variant="accent"
+            style={styles.action}
+            onPress={() => router.push('/stock/receive')}>
+            {t('products.receive')}
+          </BigButton>
+        ) : null}
       </View>
 
       <TextField

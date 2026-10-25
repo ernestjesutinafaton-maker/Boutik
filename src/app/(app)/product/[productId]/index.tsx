@@ -12,11 +12,20 @@ import { StatusChip } from '@/components/status-chip';
 import { useActionContext } from '@/data/use-action-context';
 import { displayUnits, isLowStock, sortUnits } from '@/domain/catalog';
 import { formatMoney } from '@/domain/money';
-import { formatMixedStock, formatQuantity, formatQuantityWithUnit } from '@/domain/quantity';
+import {
+  costForQuantity,
+  formatMixedStock,
+  formatQuantity,
+  formatQuantityWithUnit,
+} from '@/domain/quantity';
+import { formatDay, formatMoment, today } from '@/domain/dates';
+import { isExpired } from '@/domain/stock';
 import { archiveProduct } from '@/products/product-actions';
 import { useProduct } from '@/products/product-data';
 import { ProductPhoto } from '@/products/product-photo';
 import { useShop } from '@/shop/shop-provider';
+import type { LossReason } from '@/stock/movements';
+import { useProductLots, useProductMovements } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
@@ -30,8 +39,11 @@ export default function ProductScreen() {
   const { can } = useActiveMember();
   const { productId } = useLocalSearchParams<{ productId: string }>();
   const { product, archived, isLoading } = useProduct(productId);
+  const lots = useProductLots(productId);
+  const movements = useProductMovements(productId);
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
   const { spacing } = theme.app;
+  const showCosts = can('stock.view_costs');
 
   if (!product || !shop) {
     return (
@@ -50,6 +62,8 @@ export default function ProductScreen() {
   }
 
   const units = sortUnits(product.units);
+  const day = today();
+  const activeLots = lots.filter((lot) => lot.remaining > 0);
 
   return (
     <Screen title={product.name} stack>
@@ -132,6 +146,97 @@ export default function ProductScreen() {
             )}
           />
         ))}
+      </Card>
+
+      {can('stock.receive') && !archived ? (
+        <BigButton
+          icon="truck-delivery"
+          variant="accent"
+          onPress={() =>
+            router.push({ pathname: '/stock/receive', params: { productId: product.id } })
+          }>
+          {t('products.receive')}
+        </BigButton>
+      ) : null}
+
+      <Card mode="outlined">
+        <Card.Title title={t('lots.title')} titleVariant="titleLarge" />
+        {activeLots.length === 0 ? (
+          <Card.Content>
+            <Text variant="bodyLarge">{t('lots.empty')}</Text>
+          </Card.Content>
+        ) : null}
+        {activeLots.map((lot) => {
+          const details = [
+            t('lots.received', { date: formatDay(lot.receivedAt.slice(0, 10)) }),
+            lot.supplierName,
+            showCosts
+              ? t('lots.cost', {
+                  amount: formatMoney(
+                    costForQuantity(lot.costPrice, lot.costQuantity, 1000),
+                    shop.currencyCode
+                  ),
+                  unit: product.baseUnit,
+                })
+              : null,
+          ].filter(Boolean);
+          const expired = isExpired(lot, day);
+          return (
+            <List.Item
+              key={lot.id}
+              title={formatQuantityWithUnit(lot.remaining, product.baseUnit)}
+              titleStyle={styles.bold}
+              description={details.join(' · ')}
+              descriptionNumberOfLines={2}
+              right={() =>
+                lot.expiryDate ? (
+                  <View style={styles.price}>
+                    <StatusChip
+                      tone={expired ? 'danger' : 'neutral'}
+                      icon="calendar-alert"
+                      label={
+                        expired
+                          ? t('lots.expiredOn', { date: formatDay(lot.expiryDate) })
+                          : t('lots.expiresOn', { date: formatDay(lot.expiryDate) })
+                      }
+                    />
+                  </View>
+                ) : null
+              }
+            />
+          );
+        })}
+      </Card>
+
+      <Card mode="outlined">
+        <Card.Title title={t('movements.title')} titleVariant="titleLarge" />
+        {movements.length === 0 ? (
+          <Card.Content>
+            <Text variant="bodyLarge">{t('movements.empty')}</Text>
+          </Card.Content>
+        ) : null}
+        {movements.map((movement) => {
+          const reason = movement.lossReason as LossReason | null;
+          const reference =
+            movement.invoiceNumber ??
+            movement.supplierName ??
+            (reason ? t(`losses.reasons.${reason}`) : null);
+          const sign = movement.quantity > 0 ? '+' : '';
+          return (
+            <List.Item
+              key={movement.id}
+              title={`${t(`movements.types.${movement.type}`)} · ${sign}${formatQuantityWithUnit(movement.quantity, product.baseUnit)}`}
+              titleStyle={{
+                color: movement.quantity > 0 ? theme.colors.primary : theme.app.colors.danger,
+                fontWeight: '700',
+              }}
+              description={[formatMoment(movement.occurredAt), movement.memberName, reference]
+                .filter(Boolean)
+                .join(' · ')}
+              descriptionNumberOfLines={2}
+            />
+          );
+        })}
       </Card>
 
       {can('catalog.edit') && !archived ? (
