@@ -35,7 +35,7 @@ Dans le plan plus bas, une case cochée = une étape terminée et validée.
 5. **Connexion du propriétaire : e-mail + mot de passe.** Gratuit. Le code par SMS ou WhatsApp (payant à chaque envoi) viendra plus tard si besoin.
 6. **Stock affiché à 0 : la vente reste possible, avec un avertissement** (réglable par le propriétaire). Les produits **périmés** restent bloqués ; le propriétaire peut forcer, avec une trace.
 7. **Android : un fichier APK à télécharger depuis le site de Boutik, sans Play Store pour l'instant** (décidé par Ernest le 25/10/2026, pour éviter les 25 $). Les mises à jour du code arrivent à distance (EAS Update) ; quand un nouvel APK est nécessaire, l'appli prévient. Sur iPhone : la version web installable (PWA). Play Store et App Store restent possibles plus tard.
-8. **Plusieurs rôles dans l'équipe d'une boutique** (demandé par Ernest le 25/10/2026) : propriétaire, caissier, vendeur, gestionnaire de stock, compteur d'inventaire. Le détail des droits sera fixé à l'étape 7.
+8. **Plusieurs rôles dans l'équipe d'une boutique, et plusieurs rôles possibles pour une même personne** (demandé par Ernest le 25/10/2026) : propriétaire, gérant, caissier, vendeur, gestionnaire de stock, compteur d'inventaire. Exemple : une personne à la fois gérant, vendeur et caissier. Ses droits = la réunion des droits de ses rôles. En base : table de liaison `shop_member_roles` (un rôle retiré garde sa ligne, pour l'historique). Le détail des droits dans l'appli sera fixé à l'étape 7.
 
 Changements par rapport à l'ordre conseillé dans le cahier des charges :
 
@@ -96,7 +96,7 @@ le dernier arrivé gagne : 450 kg              ❌ 100 kg disparus
 
 ## Le schéma de la base de données
 
-Une table, c'est un tableau, comme une feuille Excel. Il y en a 19. Chaque ligne de chaque table contient :
+Une table, c'est un tableau, comme une feuille Excel. Il y en a 20. Chaque ligne de chaque table contient :
 
 - un `id` : identifiant unique (UUID, ex. `3f2b8c1e-…`) **créé par l'appareil lui-même** ;
 - un `shop_id` : la boutique à qui appartient la ligne (une boutique ne voit jamais les données d'une autre) ;
@@ -107,7 +107,8 @@ Une table, c'est un tableau, comme une feuille Excel. Il y en a 19. Chaque ligne
 | Table | À quoi elle sert |
 |---|---|
 | `shops` | La boutique : nom, logo, adresse, pays, monnaie, réglages |
-| `shop_members` | Les personnes : nom, rôle (propriétaire ou vendeur), code PIN protégé, limite de remise |
+| `shop_members` | Les personnes de l'équipe : nom, code PIN protégé, limite de remise |
+| `shop_member_roles` | Les rôles de chaque personne (une personne peut en avoir plusieurs) : propriétaire, gérant, caissier, vendeur, gestionnaire de stock, compteur |
 | `devices` | Les appareils de la boutique, chacun avec un numéro |
 | `customers` | Les clients : nom, téléphone, plafond de crédit |
 | `payment_methods` | Les modes de paiement : Espèces, MTN MoMo, Moov Money, Celtiis Cash… |
