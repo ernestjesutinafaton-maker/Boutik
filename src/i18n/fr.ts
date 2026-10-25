@@ -60,6 +60,7 @@ export const fr = {
     upcoming: 'À venir',
     users: 'Équipe et codes PIN',
     usersHelp: 'Rôles et codes PIN des personnes de la boutique',
+    salesHelp: 'Retrouver, renvoyer ou réimprimer une facture',
     cashSession: 'Caisse du jour',
     history: 'Historique des actions',
     shopSettings: 'Paramètres de la boutique',

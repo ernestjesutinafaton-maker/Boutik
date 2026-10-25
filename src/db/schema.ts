@@ -350,6 +350,20 @@ const local_photo_uploads = new Table(
   { localOnly: true }
 );
 
+/** La file « À envoyer » : factures et reçus à envoyer plus tard par WhatsApp. */
+const local_outbox = new Table(
+  {
+    shop_id: column.text,
+    kind: column.text, // invoice (facture), receipt (reçu), reminder (relance)
+    sale_id: column.text,
+    customer_id: column.text,
+    payment_id: column.text,
+    label: column.text,
+    created_at: column.text,
+  },
+  { localOnly: true }
+);
+
 export const AppSchema = new Schema({
   shops,
   shop_members,
@@ -373,6 +387,7 @@ export const AppSchema = new Schema({
   audit_log,
   local_rejected_changes,
   local_photo_uploads,
+  local_outbox,
 });
 
 /** Le type des lignes de chaque table, pour TypeScript (ex. LocalDatabase['customers']). */

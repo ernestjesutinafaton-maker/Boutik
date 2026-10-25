@@ -202,6 +202,9 @@ export default function SellScreen() {
         </Card.Content>
       </Card>
 
+      <Button icon="receipt-text" onPress={() => router.push('/sale')}>
+        {t('sell.history')}
+      </Button>
       <View style={[styles.row, { gap: spacing.sm }]}>
         <BigButton
           icon="delete-sweep"

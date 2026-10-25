@@ -12,6 +12,7 @@ import { BigButton } from '@/components/big-button';
 import type { IconName } from '@/components/icon-name';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
+import { useOutbox } from '@/invoices/outbox';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -34,6 +35,7 @@ export default function MoreScreen() {
   const { shop, device } = useShop();
   const { can } = useActiveMember();
   const { preference, setPreference } = useThemePreference();
+  const outbox = useOutbox();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   // Nombre d'opérations pas encore envoyées qui empêchent la déconnexion (0 = rien de bloqué)
   const [blockingCount, setBlockingCount] = useState(0);
@@ -74,6 +76,28 @@ export default function MoreScreen() {
             {t('account.signOut')}
           </BigButton>
         </Card.Content>
+      </Card>
+
+      <Card mode="outlined">
+        <List.Item
+          title={t('history.title')}
+          titleStyle={{ fontWeight: '700' }}
+          description={t('more.salesHelp')}
+          left={(props) => <List.Icon {...props} icon="receipt-text" />}
+          right={(props) => <List.Icon {...props} icon="chevron-right" />}
+          onPress={() => router.push('/sale')}
+        />
+        {outbox.length > 0 ? (
+          <List.Item
+            title={t('history.outbox', { count: outbox.length })}
+            titleStyle={{ fontWeight: '700', color: theme.app.colors.accent }}
+            left={(props) => (
+              <List.Icon {...props} icon="send-clock" color={theme.app.colors.accent} />
+            )}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push('/sale/outbox')}
+          />
+        ) : null}
       </Card>
 
       {can('team.manage') ? (
