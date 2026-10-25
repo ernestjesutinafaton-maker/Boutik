@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 5 — Hors ligne et synchronisation** (préparation des comptes Expo et PowerSync)
+👉 **Étape en cours : 5 — Comptes et boutique** (écrite, à tester)
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 
@@ -42,6 +42,7 @@ Changements par rapport à l'ordre conseillé dans le cahier des charges :
 - « Entrées de stock » et « mouvements + calcul du stock » sont réunis : une réception, ce sont justement des mouvements.
 - Le journal des actions et les droits sont posés dès l'étape 7 et utilisés ensuite partout ; l'écran d'historique et la vérification complète arrivent à l'étape 17.
 - Les données de démonstration arrivent juste avant le tableau de bord : il faut 30 jours de ventes pour vérifier ses calculs.
+- Les étapes 5 et 6 ont été échangées (25/10/2026) : la synchronisation n'envoie à un appareil que les données de SA boutique, il faut donc d'abord être connecté et membre d'une boutique.
 
 ## L'architecture hors ligne
 
@@ -185,8 +186,8 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 ### Phase 2 — Les données et le hors-ligne
 
 - [x] **4. La base Supabase** — le compte, toutes les tables, la sécurité par boutique (RLS), un test automatique qui prouve que la boutique B ne voit rien de la boutique A.
-- [ ] **5. Hors ligne et synchronisation** — premier development build Android, base locale, PowerSync, règles de synchronisation par boutique (avec leur test), bandeau « En ligne / X en attente », premier vrai test en coupant internet, petit essai de la version web hors ligne.
-- [ ] **6. Comptes et boutique** — inscription et connexion du propriétaire, création de la boutique (pays, monnaie, modes de paiement), enregistrement de l'appareil, réouverture hors ligne sans se reconnecter.
+- [ ] **5. Comptes et boutique** — inscription et connexion du propriétaire (session chiffrée dans l'appareil), création de la boutique (pays, monnaie, modes de paiement), déconnexion.
+- [ ] **6. Hors ligne et synchronisation** — premier development build Android, base locale, PowerSync, règles de synchronisation par boutique (avec leur test), enregistrement de l'appareil, bandeau « En ligne / X en attente », réouverture hors ligne sans se reconnecter, premier vrai test en coupant internet, petit essai de la version web hors ligne.
 - [ ] **7. Utilisateurs, PIN et droits** — l'équipe de la boutique, chaque personne avec un rôle (propriétaire, caissier, vendeur, gestionnaire de stock, compteur d'inventaire), code PIN hors ligne, changement rapide d'utilisateur, verrouillage automatique, règles « qui a le droit de faire quoi », journal des actions.
 
 ### Phase 3 — Le stock
@@ -212,7 +213,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 
 - [ ] **18. Le site et la version web installable (PWA)** — installable sur téléphone et sur PC, testée hors ligne, mise en ligne, avec la page de téléchargement de l'APK Android.
 - [ ] **19. L'application Android (APK)** — APK signé à télécharger depuis le site, mises à jour à distance (EAS Update), message « nouvelle version disponible ». Play Store et App Store : plus tard, si besoin.
-- [ ] **20. Windows, abonnement, mise en production** — logiciel Windows (.exe, choix entre Electron et Tauri expliqué), abonnement (hors Play Store, le paiement par Mobile Money devient possible directement dans l'appli ; les règles seront expliquées avant de coder), liste des vérifications avant le lancement, README complet.
+- [ ] **20. Windows, abonnement, mise en production** — logiciel Windows (.exe, choix entre Electron et Tauri expliqué), abonnement (hors Play Store, le paiement par Mobile Money devient possible directement dans l'appli ; les règles seront expliquées avant de coder), liste des vérifications avant le lancement (dont un vrai service d'envoi d'e-mails et la confirmation des adresses), README complet.
 
 ## Hors périmètre pour l'instant (V2)
 
@@ -255,4 +256,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - **Supabase** : projet `boutik` (identifiant `twidouwbbikvqqghnhdp`), région Paris, PostgreSQL 17, sur le même compte qu'ÉcoPay. L'appli utilise la clé « publishable » (fichier `.env`, jamais dans Git) ; la clé « secret » et le mot de passe de la base ne vont jamais dans l'appli, dans Git ou dans une conversation.
 - **Migrations** : la base est décrite par les fichiers de `supabase/migrations/`, envoyés avec `npx supabase db push`. Ne jamais modifier une migration déjà envoyée : en créer une nouvelle (`npx supabase migration new <nom>`).
 - **Tests de sécurité** : `supabase/tests/` applique nos vraies migrations dans un PostgreSQL en mémoire (PGlite) qui imite Supabase, puis vérifie qu'une boutique ne voit ni ne modifie les données d'une autre. Ils tournent avec `npm test`, sans réseau. `npm run typecheck` vérifie l'appli ET ces tests (deux configurations TypeScript).
+- **Connexion** : Supabase Auth, e-mail + mot de passe. Sur téléphone, la session est chiffrée (clé AES-256 dans le coffre-fort SecureStore, session chiffrée dans AsyncStorage) ; sur le web, elle est dans le localStorage du navigateur. Les écrans sont protégés dans `src/app/_layout.tsx` avec `Stack.Protected` : connexion → création de la boutique → application.
+- **Confirmation des e-mails désactivée pendant le développement** (Supabase → Authentication → Email : « Confirm email » éteint). Le service d'e-mails par défaut de Supabase n'écrit qu'aux membres de l'équipe du projet. Avant le lancement : brancher un vrai service d'envoi (SMTP) et réactiver la confirmation (étape 20).
+- **Types de la base** : après chaque migration envoyée, lancer `npm run db:types` pour mettre à jour `src/lib/database.types.ts` (TypeScript vérifie alors chaque requête).
 - **Routes typées désactivées** (`typedRoutes: false` dans `app.json`) : avec Expo 58 et le dossier `src/app`, le générateur prenait tous les fichiers de `src/` pour des écrans et écrivait `/index` au lieu de `/`. À réessayer lors d'une future mise à jour d'Expo.

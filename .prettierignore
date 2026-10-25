@@ -2,3 +2,5 @@
 docs/
 package-lock.json
 supabase/.temp/
+# Fichier généré automatiquement par « npm run db:types »
+src/lib/database.types.ts

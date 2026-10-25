@@ -3,7 +3,7 @@ import { HelperText, TextInput, type TextInputProps } from 'react-native-paper';
 
 import { useAppTheme } from '@/theme/paper-theme';
 
-type TextFieldProps = Omit<TextInputProps, 'mode' | 'error'> & {
+export type TextFieldProps = Omit<TextInputProps, 'mode' | 'error'> & {
   /** Message d'erreur affiché en rouge sous le champ (rien si null) */
   errorMessage?: string | null;
 };
