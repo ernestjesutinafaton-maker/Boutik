@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 1 — Outils et dépôt Git**
+👉 **Étape en cours : 2 — Création du projet**
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 
@@ -175,7 +175,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 
 ### Phase 1 — Les fondations
 
-- [ ] **1. Outils et dépôt Git** — suppression du dépôt Git vide du dossier personnel, réglages Git, extensions VS Code, Expo Go sur le téléphone.
+- [x] **1. Outils et dépôt Git** — suppression du dépôt Git vide du dossier personnel, réglages Git, extensions VS Code, Expo Go sur le téléphone.
 - [ ] **2. Création du projet** — projet Expo en TypeScript, avec Expo Router, pour Android, iOS et le web ; premier écran sur le téléphone et dans le navigateur ; explication de chaque dossier.
 - [ ] **3. Thème, navigation, langue** — fichier de thème « Vert Commerce » (clair et sombre), gros boutons, champs et cartes, onglets en bas sur téléphone et menu sur le côté sur grand écran, traductions, affichage « 32 000 FCFA », premiers tests automatiques.
 
@@ -235,4 +235,9 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - Outils présents sur le PC (25/10/2026) : Node.js 24, npm 11, Git 2.54, VS Code. Pas d'Android Studio (inutile grâce à EAS). Les outils Expo et Supabase se lancent avec `npx`, sans installation.
 - Git pour Windows règle `core.autocrlf=true` pour tout le PC. Le fichier `.gitattributes` du projet impose les fins de ligne « LF ».
 - Les messages de Git s'affichent en anglais sur ce PC.
-- Étape 2 : le dépôt Git existe déjà, donc `create-expo` posera la question « Skip initializing a new git repository? » → répondre **Oui** (touche Entrée). Il accepte un dossier qui contient déjà `docs/`, `.git` et `.gitattributes`, mais pas un dossier `.vscode/` : ne pas en créer avant l'étape 2.
+- Appareil de test : une tablette Xiaomi Redmi Pad 2. La mise en page « téléphone » se vérifie aussi dans le navigateur (outils de développement, mode appareil mobile).
+- Projet créé avec **Expo SDK 58** (React Native 0.88, React 19.3, TypeScript 6). Les écrans sont dans `src/app/` (Expo Router). Expo change beaucoup à chaque version : avant d'utiliser une fonction d'Expo, lire la documentation de la bonne version (voir `AGENTS.md`).
+- Toujours installer une bibliothèque avec `npx expo install <nom>` (et non `npm install <nom>`) : Expo choisit alors la version compatible.
+- Ne **jamais** lancer `npm audit fix --force` : les alertes de sécurité viennent des outils de développement d'Expo, et cette commande remplacerait Expo par la version 44.
+- Réseau : le Wi-Fi de la maison (Bbox) était réglé en profil « Public » dans Windows, ce qui bloque la tablette → le passer en « Privé ». Expo annonce l'adresse `192.168.1.143` (le PC a aussi des cartes réseau VMware et VirtualBox, à surveiller si le QR code ne marche plus).
+- Le fichier `LICENSE` du modèle Expo (licence libre MIT) a été retiré : le code de Boutik n'est pas en licence libre.
