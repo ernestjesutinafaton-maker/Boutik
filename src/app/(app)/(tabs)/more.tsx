@@ -87,6 +87,14 @@ export default function MoreScreen() {
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => router.push('/sale')}
         />
+        <List.Item
+          title={t('printer.title')}
+          titleStyle={{ fontWeight: '700' }}
+          description={t('more.printerHelp')}
+          left={(props) => <List.Icon {...props} icon="printer-pos" />}
+          right={(props) => <List.Icon {...props} icon="chevron-right" />}
+          onPress={() => router.push('/printer')}
+        />
         {outbox.length > 0 ? (
           <List.Item
             title={t('history.outbox', { count: outbox.length })}

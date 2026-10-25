@@ -147,6 +147,33 @@ export const frSales = {
       reminder: 'Relance de dette',
     },
   },
+  printer: {
+    title: 'Imprimante de tickets',
+    paper: 'Largeur du papier',
+    current: 'Imprimante choisie',
+    none: 'Aucune imprimante choisie.',
+    test: 'Imprimer un ticket d’essai',
+    testSent: 'Ticket d’essai envoyé. Vérifie que les accents (é, à, ç) sont bien imprimés.',
+    forget: 'Oublier cette imprimante',
+    pairHelp:
+      'Android : allume l’imprimante et appaire-la d’abord dans les réglages Bluetooth du téléphone (code souvent 0000 ou 1234). iPhone : seules les imprimantes « BLE » fonctionnent.',
+    search: 'Chercher les imprimantes',
+    noneFound:
+      'Aucune imprimante trouvée. Vérifie qu’elle est allumée et appairée dans les réglages Bluetooth.',
+    webHelp:
+      'Sur ordinateur, le ticket s’imprime par l’impression du système : installe ton imprimante de tickets dans Windows, puis choisis-la au moment d’imprimer.',
+    printTicket: 'Ticket',
+    chooseFirst: 'Ticket (choisir l’imprimante)',
+    errors: {
+      bluetooth_off: 'Le Bluetooth est éteint. Allume-le, puis réessaie.',
+      permission_denied:
+        'Boutik n’a pas le droit d’utiliser le Bluetooth. Autorise-le dans les réglages du téléphone.',
+      not_connected: 'Impossible de joindre l’imprimante. Est-elle allumée et à côté ?',
+      write_failed: 'L’impression s’est interrompue. Vérifie le papier et réessaie.',
+      unsupported: 'Cet appareil ne peut pas imprimer en Bluetooth.',
+      unknown: 'Impression impossible pour le moment. Réessaie.',
+    },
+  },
   customerPicker: {
     title: 'Choisir un client',
     search: 'Nom ou téléphone',

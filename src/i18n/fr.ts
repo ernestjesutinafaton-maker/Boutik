@@ -61,6 +61,7 @@ export const fr = {
     users: 'Équipe et codes PIN',
     usersHelp: 'Rôles et codes PIN des personnes de la boutique',
     salesHelp: 'Retrouver, renvoyer ou réimprimer une facture',
+    printerHelp: 'Imprimante Bluetooth 58 ou 80 mm',
     cashSession: 'Caisse du jour',
     history: 'Historique des actions',
     shopSettings: 'Paramètres de la boutique',

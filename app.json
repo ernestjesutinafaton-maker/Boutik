@@ -51,6 +51,12 @@
           "photosPermission": "Boutik a besoin de tes photos pour choisir l'image d'un produit.",
           "microphonePermission": false
         }
+      ],
+      [
+        "@ricka7x/expo-thermal-printer",
+        {
+          "bluetoothPermission": "Boutik utilise le Bluetooth pour imprimer les tickets de caisse."
+        }
       ]
     ],
     "experiments": {
