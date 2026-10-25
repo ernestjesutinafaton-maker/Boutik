@@ -119,3 +119,24 @@ export function formatMixedStock(
   const packsText = `${formatQuantity(packs * MILLI)}${NBSP}×${NBSP}${packaging.name}`;
   return rest > 0 ? `${packsText} + ${formatQuantityWithUnit(rest, baseUnitName)}` : packsText;
 }
+
+/**
+ * Lit une quantité tapée dans une unité (sac, carton…) et la convertit en unité de base.
+ * Pour un produit compté sans virgule (pièce, boîte), le résultat doit tomber juste :
+ * « 0,5 Carton 24 » = 12 boîtes est accepté, « 0,3 Carton 24 » = 7,2 boîtes est refusé.
+ */
+export function parseUnitQuantity(
+  input: string,
+  unitFactor: number,
+  allowDecimal: boolean
+): { quantityInUnit: number; baseQuantity: number } | null {
+  const quantityInUnit = parseQuantity(input, true);
+  if (!quantityInUnit) {
+    return null;
+  }
+  const baseQuantity = toBaseQuantity(quantityInUnit, unitFactor);
+  if (baseQuantity <= 0 || (!allowDecimal && baseQuantity % MILLI !== 0)) {
+    return null;
+  }
+  return { quantityInUnit, baseQuantity };
+}

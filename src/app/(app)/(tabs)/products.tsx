@@ -9,8 +9,13 @@ import { BigButton } from '@/components/big-button';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
 import { isLowStock, matchBarcode, searchProducts } from '@/domain/catalog';
+import { today } from '@/domain/dates';
+import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
+import { ExpiryChip } from '@/products/expiry-chip';
 import { useCatalog, useCategories } from '@/products/product-data';
 import { ProductListItem } from '@/products/product-list-item';
+import { useShopSettings } from '@/shop/shop-settings';
+import { expiryLevelsByProduct, useExpiringLots } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
@@ -23,6 +28,7 @@ export default function ProductsScreen() {
   const { can } = useActiveMember();
   const { products, isLoading } = useCatalog();
   const categories = useCategories();
+  const settings = useShopSettings();
   const [query, setQuery] = useState('');
   // Rayon choisi, ou filtre « stock bas » (null = tout)
   const [filter, setFilter] = useState<string | null>(null);
@@ -37,6 +43,15 @@ export default function ProductsScreen() {
         : product.categoryId === filter
   );
   const lowStockCount = products.filter(isLowStock).length;
+  const expiringLots = useExpiringLots(
+    settings?.id ?? '',
+    today(),
+    settings?.expiryAlertDays ?? DEFAULT_EXPIRY_ALERT_DAYS
+  );
+  const expiryLevels = expiryLevelsByProduct(expiringLots);
+  const alertCount =
+    expiringLots.filter((lot) => lot.level !== 'soon').length +
+    products.filter((product) => isLowStock(product) || product.stock <= 0).length;
 
   /** Code scanné, ou tapé par un lecteur USB suivi de « Entrée » : on ouvre le produit. */
   function openByBarcode(code: string) {
@@ -67,6 +82,34 @@ export default function ProductsScreen() {
             style={styles.action}
             onPress={() => router.push('/stock/receive')}>
             {t('products.receive')}
+          </BigButton>
+        ) : null}
+      </View>
+
+      <View style={[styles.actions, { gap: spacing.sm }]}>
+        <BigButton
+          icon="alert-decagram"
+          variant="outline"
+          style={styles.action}
+          onPress={() => router.push('/stock/alerts')}>
+          {alertCount > 0 ? t('products.alertsCount', { count: alertCount }) : t('products.alerts')}
+        </BigButton>
+        {can('stock.count') ? (
+          <BigButton
+            icon="clipboard-list"
+            variant="outline"
+            style={styles.action}
+            onPress={() => router.push('/inventory')}>
+            {t('products.inventory')}
+          </BigButton>
+        ) : null}
+        {can('stock.adjust') ? (
+          <BigButton
+            icon="delete-alert"
+            variant="outline"
+            style={styles.action}
+            onPress={() => router.push('/stock/loss')}>
+            {t('losses.declare')}
           </BigButton>
         ) : null}
       </View>
@@ -123,6 +166,7 @@ export default function ProductsScreen() {
             <ProductListItem
               product={product}
               onPress={() => router.push(`/product/${product.id}`)}
+              extra={<ExpiryChip level={expiryLevels.get(product.id) ?? 'ok'} />}
             />
           </View>
         ))}

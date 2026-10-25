@@ -1,6 +1,7 @@
 import type { Transaction } from '@powersync/common';
 import { useQuery } from '@powersync/react';
 
+import { type ExpiryAlertDays, type ExpiryLevel, expiryLevel, worstLevel } from '@/domain/expiry';
 import { fefoOrder, type LotBalance } from '@/domain/stock';
 
 /** Lecture des lots et des mouvements de stock (base LOCALE, marche hors ligne). */
@@ -106,4 +107,55 @@ export function useProductMovements(productId: string, limit = 50): MovementLine
     invoiceNumber: row.invoice_number,
     supplierName: row.supplier_name,
   }));
+}
+
+/** Un lot qui a une date de péremption et dont il reste quelque chose. */
+export type DatedLot = ProductLot & {
+  productId: string;
+  productName: string;
+  baseUnit: string;
+  level: ExpiryLevel;
+};
+
+type DatedLotRow = LotRow & { product_id: string; product_name: string; base_unit: string };
+
+/**
+ * Les lots encore en stock qui sont périmés ou vont bientôt l'être
+ * (selon les délais d'alerte de la boutique), du plus urgent au moins urgent.
+ */
+export function useExpiringLots(shopId: string, today: string, days: ExpiryAlertDays): DatedLot[] {
+  const { data } = useQuery<DatedLotRow>(
+    `SELECT * FROM (
+       SELECT l.id, l.expiry_date, l.received_at, l.cost_price, l.cost_quantity, l.supplier_name,
+              l.product_id, p.name AS product_name, p.base_unit,
+              COALESCE((SELECT SUM(m.quantity) FROM stock_movements m WHERE m.lot_id = l.id), 0)
+                AS remaining
+         FROM stock_lots l
+         JOIN products p ON p.id = l.product_id
+        WHERE l.shop_id = ? AND l.expiry_date IS NOT NULL AND p.archived_at IS NULL
+     ) WHERE remaining > 0
+     ORDER BY expiry_date`,
+    [shopId]
+  );
+  return data
+    .map((row) => {
+      const lot = toLot(row);
+      return {
+        ...lot,
+        productId: row.product_id,
+        productName: row.product_name,
+        baseUnit: row.base_unit,
+        level: expiryLevel(lot.expiryDate, today, days),
+      };
+    })
+    .filter((lot) => lot.level !== 'ok');
+}
+
+/** Pour chaque produit, son alerte de péremption la plus grave (pour les listes). */
+export function expiryLevelsByProduct(lots: readonly DatedLot[]): Map<string, ExpiryLevel> {
+  const levels = new Map<string, ExpiryLevel>();
+  for (const lot of lots) {
+    levels.set(lot.productId, worstLevel([levels.get(lot.productId) ?? 'ok', lot.level]));
+  }
+  return levels;
 }

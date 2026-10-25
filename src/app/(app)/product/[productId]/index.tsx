@@ -158,6 +158,16 @@ export default function ProductScreen() {
           {t('products.receive')}
         </BigButton>
       ) : null}
+      {can('stock.adjust') && !archived && product.stock > 0 ? (
+        <BigButton
+          icon="delete-alert"
+          variant="outline"
+          onPress={() =>
+            router.push({ pathname: '/stock/loss', params: { productId: product.id } })
+          }>
+          {t('losses.declare')}
+        </BigButton>
+      ) : null}
 
       <Card mode="outlined">
         <Card.Title title={t('lots.title')} titleVariant="titleLarge" />

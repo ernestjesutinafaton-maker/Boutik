@@ -8,6 +8,7 @@ import {
   lineAmount,
   mulDiv,
   parseQuantity,
+  parseUnitQuantity,
   toBaseQuantity,
 } from './quantity';
 
@@ -63,6 +64,27 @@ describe('Convertir entre unités', () => {
 
   it('1 carton de 24 boîtes = 24 boîtes', () => {
     expect(toBaseQuantity(1000, 24_000)).toBe(24_000);
+  });
+});
+
+describe('Quantité tapée dans une unité de vente', () => {
+  it('1,5 kilo de riz = 1,5 kg ; 2 sacs = 100 kg', () => {
+    expect(parseUnitQuantity('1,5', KILO.factor, true)).toEqual({
+      quantityInUnit: 1500,
+      baseQuantity: 1500,
+    });
+    expect(parseUnitQuantity('2', SAC_50.factor, true)?.baseQuantity).toBe(100_000);
+  });
+
+  it('un demi-carton de 24 boîtes = 12 boîtes, accepté même sans virgule', () => {
+    expect(parseUnitQuantity('0,5', 24_000, false)?.baseQuantity).toBe(12_000);
+  });
+
+  it('refuse ce qui ne tombe pas juste pour un produit à la pièce', () => {
+    expect(parseUnitQuantity('0,3', 24_000, false)).toBeNull(); // 7,2 boîtes
+    expect(parseUnitQuantity('1,5', 1000, false)).toBeNull();
+    expect(parseUnitQuantity('0', 1000, true)).toBeNull();
+    expect(parseUnitQuantity('', 1000, true)).toBeNull();
   });
 });
 
