@@ -1,8 +1,8 @@
 import { Stack } from 'expo-router';
 
-// L'écran de connexion est le premier écran de ce groupe
+// L'écran de connexion est le premier écran de ce groupe (« anchor » = point d'ancrage)
 export const unstable_settings = {
-  initialRouteName: 'sign-in',
+  anchor: 'sign-in',
 };
 
 /** Groupe des écrans accessibles sans être connecté : connexion et inscription. */

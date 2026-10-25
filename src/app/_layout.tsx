@@ -55,15 +55,20 @@ function RootNavigator() {
     return <ShopErrorScreen />;
   }
 
+  // L'écran où envoyer la personne selon sa situation. On le dit explicitement à chaque
+  // groupe protégé (« redirectTo ») : sinon Expo Router enverrait vers l'adresse du groupe
+  // « (auth) », qui n'a pas d'écran d'entrée (→ « Page could not be found »).
+  const home = !isSignedIn ? '/sign-in' : status === 'ready' ? '/' : '/create-shop';
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Protected guard={isSignedIn && status === 'ready'}>
+      <Stack.Protected guard={isSignedIn && status === 'ready'} redirectTo={home}>
         <Stack.Screen name="(tabs)" />
       </Stack.Protected>
-      <Stack.Protected guard={isSignedIn && status === 'none'}>
+      <Stack.Protected guard={isSignedIn && status === 'none'} redirectTo={home}>
         <Stack.Screen name="create-shop" />
       </Stack.Protected>
-      <Stack.Protected guard={!isSignedIn}>
+      <Stack.Protected guard={!isSignedIn} redirectTo={home}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
     </Stack>

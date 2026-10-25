@@ -103,11 +103,16 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       return;
     }
     let cancelled = false;
-    fetchShop(userId).then((result) => {
-      if (!cancelled) {
-        setLoaded({ ...result, userId });
-      }
-    });
+    fetchShop(userId)
+      .catch((error: unknown): ShopResult => {
+        console.warn('Chargement de la boutique impossible :', error);
+        return { status: 'error', shop: null };
+      })
+      .then((result) => {
+        if (!cancelled) {
+          setLoaded({ ...result, userId });
+        }
+      });
     return () => {
       cancelled = true;
     };

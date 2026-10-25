@@ -38,11 +38,19 @@ Dans le plan plus bas, une case cochée = une étape terminée et validée.
 8. **Plusieurs rôles dans l'équipe d'une boutique, et plusieurs rôles possibles pour une même personne** (demandé par Ernest le 25/10/2026) : propriétaire, gérant, caissier, vendeur, gestionnaire de stock, compteur d'inventaire. Exemple : une personne à la fois gérant, vendeur et caissier. Ses droits = la réunion des droits de ses rôles. En base : table de liaison `shop_member_roles` (un rôle retiré garde sa ligne, pour l'historique). Le détail des droits dans l'appli sera fixé à l'étape 7. Vente « en une fois » (choix A) : la personne qui vend encaisse aussi ; seul le caissier (ou gérant, propriétaire) ouvre et ferme la caisse du jour.
 9. **Clôture de la journée et « compte »** (demandé par Ernest le 25/10/2026, construit à l'étape 15) :
    - « Clôturer la journée » (caissier, gérant, propriétaire) : total des ventes du jour et fiche de rapport complète, figée et archivée. Le caissier ne voit ni prix d'achat ni bénéfice.
-   - « Faire un compte » (propriétaire et gérant seulement) : bilan de la période qui va du dernier compte (N-1) à maintenant (N) : ventes, paiements par mode, crédits accordés et remboursés, bénéfice, entrées, pertes et valeur du stock, écarts de caisse. Le compte suivant repart de cette date.
+   - « Faire un compte » (propriétaire et gérant seulement) : bilan de la période qui va du dernier compte (N-1) à maintenant (N) : ventes, paiements par mode, crédits accordés et remboursés, dépenses, bénéfice, entrées, pertes et valeur du stock, écarts de caisse, produits les plus vendus de la période, et liste des clients qui doivent de l'argent (avec le montant et l'ancienneté de la dette). Le compte suivant repart de cette date.
    - Archives consultables à toute date, regroupées par jour, par semaine ou par mois.
    - Rien n'est supprimé : « archiver » veut dire que la période est close. Une vente annulée ou retournée plus tard apparaît dans la période suivante (comme en comptabilité).
    - Hors ligne : si un autre appareil n'a pas encore synchronisé ses ventes au moment du compte, l'appli le signale. Les ventes arrivées après coup sont affichées à part, et le rapport peut être recalculé à tout moment, puisque rien n'est jamais effacé.
    - En base (à l'étape 15) : une table `reports` qui garde chaque rapport figé (type jour ou compte, début et fin de période, totaux, qui, quand, appareil), en lecture et ajout seulement.
+10. **Dépenses et sorties de caisse dès le MVP** (demandé par Ernest le 25/10/2026, construit à l'étape 15 ; c'était prévu en V2). Sans elles, la clôture afficherait de faux écarts. On distingue 4 cas, car ils ne comptent pas pareil :
+    - **Dépense** (essence du livreur, frais de livraison, transport, petites fournitures…) : l'argent sort de la caisse ET diminue le bénéfice.
+    - **Achat de marchandise payé avec la caisse** : l'argent sort de la caisse, mais ce n'est PAS une dépense. La marchandise entre dans le stock (réception), et son coût sera compté au moment de la vente. Sinon, on la compterait deux fois.
+    - **Retrait du propriétaire** (il emporte une partie de la recette) : l'argent sort de la caisse, sans être une dépense de la boutique.
+    - **Ajout d'argent dans la caisse** (monnaie apportée) : l'argent entre, sans être une vente.
+    - Chaque sortie garde : montant, catégorie, mode (espèces de la caisse, MoMo…), note, qui, quand et sur quel appareil. Elle apparaît dans la clôture de la journée et dans le compte. Bénéfice net = bénéfice − dépenses.
+    - Qui : le caissier, le gérant et le propriétaire enregistrent les dépenses ; le retrait du propriétaire est réservé au propriétaire et au gérant. Tout est tracé dans le journal.
+    - En base (à l'étape 15) : une table `cash_movements` (mouvements de caisse), en lecture et ajout seulement, comme les autres journaux.
 
 Changements par rapport à l'ordre conseillé dans le cahier des charges :
 
@@ -209,7 +217,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - [ ] **12. Les factures** — PDF fabriqué dans l'appareil (même hors ligne) avec un numéro unique, envoi par WhatsApp et file « À envoyer », historique pour renvoyer ou réimprimer.
 - [ ] **13. L'impression** — ticket sur imprimante Bluetooth 58 ou 80 mm (association une fois, puis un clic), impression A4.
 - [ ] **14. Clients et crédit** — fiche client, carnet de dettes, plafond, remboursements partiels avec reçu, liste des débiteurs (récent / plus de 30 jours / plus de 60 jours), relance WhatsApp, tests.
-- [ ] **15. Caisse du jour, clôtures et comptes** — ouverture de la caisse (fond de caisse) ; bouton **« Clôturer la journée »** : total des ventes du jour, argent attendu et compté par mode de paiement, écarts, fiche de rapport complète gardée dans les archives ; bouton **« Faire un compte »** (propriétaire et gérant) : bilan complet depuis le dernier compte (ventes, paiements, crédits, bénéfice, mouvements et valeur du stock, écarts de caisse) ; archives consultables à toute date, par jour, par semaine ou par mois ; tests.
+- [ ] **15. Caisse du jour, dépenses, clôtures et comptes** — ouverture de la caisse (fond de caisse) ; dépenses et sorties de caisse de la journée (essence, livraison, achat de marchandise payé par la caisse, retrait du propriétaire…) ; bouton **« Clôturer la journée »** : total des ventes du jour, argent attendu et compté par mode de paiement, écarts, fiche de rapport complète gardée dans les archives ; bouton **« Faire un compte »** (propriétaire et gérant) : bilan complet depuis le dernier compte (ventes, paiements, crédits, dépenses, bénéfice, mouvements et valeur du stock, écarts de caisse) ; archives consultables à toute date, par jour, par semaine ou par mois ; tests.
 
 ### Phase 5 — Piloter la boutique
 
@@ -230,7 +238,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - les vendeurs avec leur propre compte sur leur propre téléphone ;
 - la connexion par code SMS ou WhatsApp ;
 - la gestion des fournisseurs et de leurs dettes ;
-- les dépenses de la boutique ;
+- les dépenses avancées : budgets, dépenses prévues ou qui reviennent chaque mois. Les dépenses de la journée, elles, sont dans le MVP (étape 15) ;
 - le rapport du soir par SMS ou WhatsApp ;
 - l'encaissement Mobile Money intégré ;
 - les pharmacies ;

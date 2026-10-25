@@ -22,11 +22,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 1. Au démarrage : relire la session gardée dans l'appareil
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setIsLoading(false);
-    });
+    // 1. Au démarrage : relire la session gardée dans l'appareil.
+    //    Si la lecture échoue, on continue comme « pas connecté » : sinon l'écran de
+    //    démarrage resterait affiché pour toujours.
+    supabase.auth
+      .getSession()
+      .then(({ data }) => setSession(data.session))
+      .catch((error: unknown) => {
+        console.warn('Lecture de la session impossible :', error);
+        setSession(null);
+      })
+      .finally(() => setIsLoading(false));
 
     // 2. Ensuite : être prévenu de chaque connexion, déconnexion ou renouvellement
     const { data } = supabase.auth.onAuthStateChange((_event, newSession) => {
