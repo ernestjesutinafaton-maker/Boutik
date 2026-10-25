@@ -1,0 +1,47 @@
+# =============================================================================
+# Boutik — Règles de synchronisation (PowerSync « Sync Streams »)
+# =============================================================================
+# Ce fichier se copie-colle dans le tableau de bord de PowerSync (rubrique « Sync Streams »).
+#
+# Règle unique : chaque appareil reçoit UNIQUEMENT les données des boutiques dont
+# la personne connectée est membre actif. « my_shops » = la liste de ces boutiques.
+# Une boutique ne reçoit donc jamais les données d'une autre.
+#
+# ⚠️ Toute nouvelle table à synchroniser doit être ajoutée ICI, et aussi dans la
+# « publication » Supabase (voir supabase/migrations/…_powersync_publication.sql).
+# =============================================================================
+
+config:
+  edition: 3
+
+streams:
+  shop_data:
+    auto_subscribe: true
+    with:
+      my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true
+    queries:
+      # La boutique et les personnes
+      - SELECT * FROM shops WHERE id IN my_shops
+      - SELECT * FROM shop_members WHERE shop_id IN my_shops
+      - SELECT * FROM shop_member_roles WHERE shop_id IN my_shops
+      - SELECT * FROM devices WHERE shop_id IN my_shops
+      - SELECT * FROM customers WHERE shop_id IN my_shops
+      - SELECT * FROM payment_methods WHERE shop_id IN my_shops
+      # Les produits
+      - SELECT * FROM categories WHERE shop_id IN my_shops
+      - SELECT * FROM products WHERE shop_id IN my_shops
+      - SELECT * FROM product_units WHERE shop_id IN my_shops
+      # Le stock
+      - SELECT * FROM stock_receipts WHERE shop_id IN my_shops
+      - SELECT * FROM stock_lots WHERE shop_id IN my_shops
+      - SELECT * FROM stock_movements WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_counts WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_lines WHERE shop_id IN my_shops
+      # Les ventes et l'argent
+      - SELECT * FROM cash_sessions WHERE shop_id IN my_shops
+      - SELECT * FROM sales WHERE shop_id IN my_shops
+      - SELECT * FROM sale_items WHERE shop_id IN my_shops
+      - SELECT * FROM payments WHERE shop_id IN my_shops
+      - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
+      # La traçabilité
+      - SELECT * FROM audit_log WHERE shop_id IN my_shops

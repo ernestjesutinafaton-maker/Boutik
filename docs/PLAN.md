@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 5 — Comptes et boutique** (écrite, à tester)
+👉 **Étape en cours : 6 — Hors ligne et synchronisation** (6a : première version de test ; 6b : réglages PowerSync)
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 
@@ -201,7 +201,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 ### Phase 2 — Les données et le hors-ligne
 
 - [x] **4. La base Supabase** — le compte, toutes les tables, la sécurité par boutique (RLS), un test automatique qui prouve que la boutique B ne voit rien de la boutique A.
-- [ ] **5. Comptes et boutique** — inscription et connexion du propriétaire (session chiffrée dans l'appareil), création de la boutique (pays, monnaie, modes de paiement), déconnexion.
+- [x] **5. Comptes et boutique** — inscription et connexion du propriétaire (session chiffrée dans l'appareil), création de la boutique (pays, monnaie, modes de paiement), déconnexion.
 - [ ] **6. Hors ligne et synchronisation** — premier development build Android, base locale, PowerSync, règles de synchronisation par boutique (avec leur test), enregistrement de l'appareil, bandeau « En ligne / X en attente », réouverture hors ligne sans se reconnecter, premier vrai test en coupant internet, petit essai de la version web hors ligne.
 - [ ] **7. Utilisateurs, PIN et droits** — l'équipe de la boutique, chaque personne avec un rôle (propriétaire, caissier, vendeur, gestionnaire de stock, compteur d'inventaire), code PIN hors ligne, changement rapide d'utilisateur, verrouillage automatique, règles « qui a le droit de faire quoi », journal des actions.
 
@@ -274,4 +274,8 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - **Connexion** : Supabase Auth, e-mail + mot de passe. Sur téléphone, la session est chiffrée (clé AES-256 dans le coffre-fort SecureStore, session chiffrée dans AsyncStorage) ; sur le web, elle est dans le localStorage du navigateur. Les écrans sont protégés dans `src/app/_layout.tsx` avec `Stack.Protected` : connexion → création de la boutique → application.
 - **Confirmation des e-mails désactivée pendant le développement** (Supabase → Authentication → Email : « Confirm email » éteint). Le service d'e-mails par défaut de Supabase n'écrit qu'aux membres de l'équipe du projet. Avant le lancement : brancher un vrai service d'envoi (SMTP) et réactiver la confirmation (étape 20).
 - **Types de la base** : après chaque migration envoyée, lancer `npm run db:types` pour mettre à jour `src/lib/database.types.ts` (TypeScript vérifie alors chaque requête).
+- **PowerSync** : SDK `@powersync/react-native` + moteur SQLite `@op-engineering/op-sqlite` (téléphone), `@powersync/web` (navigateur, encore en « bêta » chez PowerSync). Les règles de synchronisation (Sync Streams, édition 3) sont dans `powersync/sync-config.yaml` (à recopier dans le tableau de bord PowerSync) ; la liste des tables suivies est dans la migration `…_powersync_publication.sql`. Une nouvelle table à synchroniser doit être ajoutée aux DEUX endroits. Le compte de lecture `powersync_role` a été créé à la main dans Supabase (mot de passe hors du projet).
+- **Envoi des modifications « tout ou rien »** (choix du 25/10/2026) : contrairement à la démo officielle de PowerSync (une requête par ligne), chaque opération locale (ex. une vente complète) partira en un seul envoi vers une fonction du serveur qui l'applique entièrement ou pas du tout. Pas de vente à moitié envoyée si le réseau coupe.
+- **Fabrication des applis (EAS)** : réglages dans `eas.json` (profils `development`, `preview`, `production`, tous en APK). Identifiant Android : `com.boutik.app` (à confirmer avant la première version publique : il ne pourra plus changer ensuite). Le fichier `.env` n'est pas envoyé à EAS : pour les versions autonomes (preview, production), les variables `EXPO_PUBLIC_…` seront déclarées dans EAS (étape 19).
+- **Expo Go ne suffit plus** à partir de l'étape 6 : on utilise notre propre version de test (« development build »), à refaire seulement quand on ajoute un module natif. Si la tablette ne joint pas le PC, utiliser `npx expo start --tunnel`.
 - **Routes typées désactivées** (`typedRoutes: false` dans `app.json`) : avec Expo 58 et le dossier `src/app`, le générateur prenait tous les fichiers de `src/` pour des écrans et écrivait `/index` au lieu de `/`. À réessayer lors d'une future mise à jour d'Expo.
