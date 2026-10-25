@@ -1,19 +1,19 @@
+// Charge les traductions avant tout le reste
+import '@/i18n';
+
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+
+import { ThemePreferenceProvider } from '@/theme/theme-preference';
 
 /**
  * Mise en page racine : elle entoure TOUS les écrans de l'application.
- *
- * Pour l'instant, c'est une simple « pile » d'écrans, sans barre de titre.
- * La vraie navigation (onglets en bas sur téléphone, menu sur le côté
- * sur grand écran) arrivera à l'étape 3.
+ * Elle applique le thème (clair ou sombre) puis affiche les écrans en « pile ».
+ * Plus tard s'ajouteront ici : la connexion, la base locale, la synchronisation…
  */
 export default function RootLayout() {
   return (
-    <>
-      {/* Icônes de la barre d'état (heure, batterie…) en foncé, car le fond est clair */}
-      <StatusBar style="dark" />
+    <ThemePreferenceProvider>
       <Stack screenOptions={{ headerShown: false }} />
-    </>
+    </ThemePreferenceProvider>
   );
 }

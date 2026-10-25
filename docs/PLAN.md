@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 2 — Création du projet**
+👉 **Étape en cours : 3 — Thème, navigation, langue** (écrite, en cours de test)
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 
@@ -176,7 +176,7 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 ### Phase 1 — Les fondations
 
 - [x] **1. Outils et dépôt Git** — suppression du dépôt Git vide du dossier personnel, réglages Git, extensions VS Code, Expo Go sur le téléphone.
-- [ ] **2. Création du projet** — projet Expo en TypeScript, avec Expo Router, pour Android, iOS et le web ; premier écran sur le téléphone et dans le navigateur ; explication de chaque dossier.
+- [x] **2. Création du projet** — projet Expo en TypeScript, avec Expo Router, pour Android, iOS et le web ; premier écran sur le téléphone et dans le navigateur ; explication de chaque dossier.
 - [ ] **3. Thème, navigation, langue** — fichier de thème « Vert Commerce » (clair et sombre), gros boutons, champs et cartes, onglets en bas sur téléphone et menu sur le côté sur grand écran, traductions, affichage « 32 000 FCFA », premiers tests automatiques.
 
 ### Phase 2 — Les données et le hors-ligne
@@ -243,3 +243,8 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - Ne **jamais** lancer `npm audit fix --force` : les alertes de sécurité viennent des outils de développement d'Expo, et cette commande remplacerait Expo par la version 44.
 - Réseau : le Wi-Fi de la maison (Bbox) était réglé en profil « Public » dans Windows, ce qui bloque la tablette → le passer en « Privé ». Expo annonce l'adresse `192.168.1.143` (le PC a aussi des cartes réseau VMware et VirtualBox, à surveiller si le QR code ne marche plus).
 - Le fichier `LICENSE` du modèle Expo (licence libre MIT) a été retiré : le code de Boutik n'est pas en licence libre.
+- **Thème** : toutes les couleurs, tailles et espacements sont dans `src/theme/tokens.ts` ; leur traduction pour React Native Paper est dans `src/theme/paper-theme.ts` (les écrans lisent le thème avec `useAppTheme()`). Le choix clair / sombre / auto est enregistré dans l'appareil (AsyncStorage).
+- **Textes** : tous dans `src/i18n/fr.ts`, affichés avec `t('clé')`. TypeScript signale une clé inconnue.
+- **Icônes** : `@react-native-vector-icons/material-design-icons` (et non `@expo/vector-icons`, qui va être abandonné). Paper le détecte tout seul. L'extension VS Code « Expo Tools » affiche un faux avertissement sur ce module dans `app.json` : Expo, lui, le lit sans problème.
+- **Navigation** : `src/app/(tabs)/_layout.tsx` utilise les onglets « sans habillage » d'Expo Router (`expo-router/ui`) : une liste d'onglets invisible + notre barre du bas (`BottomNav`) ou notre menu sur le côté (`SideNav`), selon la largeur (768 points).
+- **Routes typées désactivées** (`typedRoutes: false` dans `app.json`) : avec Expo 58 et le dossier `src/app`, le générateur prenait tous les fichiers de `src/` pour des écrans et écrivait `/index` au lieu de `/`. À réessayer lors d'une future mise à jour d'Expo.
