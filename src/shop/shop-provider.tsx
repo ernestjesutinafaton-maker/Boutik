@@ -5,6 +5,7 @@ import type { CreateShopInput } from '@/auth/schemas';
 import { getCountry } from '@/config/countries';
 import { registerDevice, type ShopDevice } from '@/device/device';
 import { CURRENCIES, type CurrencyCode } from '@/domain/money';
+import { isRole, type Role } from '@/domain/permissions';
 import { supabase } from '@/lib/supabase';
 
 import { readShopCache, saveShopCache } from './shop-cache';
@@ -17,6 +18,8 @@ export type CurrentShop = {
   currencyCode: CurrencyCode;
   memberId: string;
   memberName: string;
+  /** Les rôles du compte connecté (gardés aussi pour démarrer hors ligne) */
+  memberRoles: Role[];
 };
 
 /**
@@ -46,7 +49,10 @@ function toCurrencyCode(code: string): CurrencyCode {
 async function fetchShop(userId: string): Promise<ShopResult> {
   const { data, error } = await supabase
     .from('shop_members')
-    .select('id, display_name, shops (id, name, country_code, currency_code)')
+    .select(
+      `id, display_name, shops (id, name, country_code, currency_code),
+       shop_member_roles!shop_member_roles_member_id_fkey (role, revoked_at)`
+    )
     .eq('user_id', userId)
     .eq('active', true)
     .limit(1);
@@ -69,6 +75,10 @@ async function fetchShop(userId: string): Promise<ShopResult> {
     currencyCode: toCurrencyCode(membership.shops.currency_code),
     memberId: membership.id,
     memberName: membership.display_name,
+    memberRoles: membership.shop_member_roles
+      .filter((grant) => grant.revoked_at === null)
+      .map((grant) => grant.role)
+      .filter(isRole),
   };
   await saveShopCache(userId, shop);
   return { status: 'ready', shop };

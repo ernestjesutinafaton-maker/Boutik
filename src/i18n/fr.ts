@@ -1,5 +1,9 @@
+import { frTeam } from './fr-team';
+
 /**
  * Tous les textes de l'application, en français.
+ * Les textes de chaque grande partie sont rangés dans leur propre fichier (fr-team.ts…)
+ * et rassemblés ici.
  *
  * Les écrans n'écrivent jamais de texte en dur : ils demandent une « clé »
  * (par exemple t('nav.sell') → « Caisse »).
@@ -8,6 +12,22 @@
  * {{step}}, {{version}}… sont des « trous » remplis au moment de l'affichage.
  */
 export const fr = {
+  common: {
+    back: 'Retour',
+    save: 'Enregistrer',
+    cancel: 'Annuler',
+    add: 'Ajouter',
+    edit: 'Modifier',
+    confirm: 'Confirmer',
+    close: 'Fermer',
+    search: 'Rechercher',
+    none: 'Aucun',
+    yes: 'Oui',
+    no: 'Non',
+    forbidden: 'Tu n’as pas le droit d’utiliser cette fonction.',
+    notFound: 'Élément introuvable.',
+    saved: 'Enregistré.',
+  },
   app: {
     name: 'Boutik',
     tagline: 'Stock · Caisse · Crédit',
@@ -52,7 +72,8 @@ export const fr = {
     themeHelp:
       'Le mode clair est conseillé en plein soleil. « Auto » suit le réglage du téléphone.',
     upcoming: 'À venir',
-    users: 'Utilisateurs et codes PIN',
+    users: 'Équipe et codes PIN',
+    usersHelp: 'Rôles et codes PIN des personnes de la boutique',
     cashSession: 'Caisse du jour',
     history: 'Historique des actions',
     shopSettings: 'Paramètres de la boutique',
@@ -149,5 +170,12 @@ export const fr = {
     signupDisabled: 'Les inscriptions sont fermées pour le moment.',
     network: 'Pas de connexion internet. Vérifie ton réseau, puis réessaie.',
     unknown: 'Une erreur inattendue est survenue. Réessaie dans un instant.',
+    memberNameTooShort: 'Le nom doit faire au moins 2 caractères.',
+    memberNameTooLong: 'Le nom doit faire au plus 60 caractères.',
+    rolesRequired: 'Choisis au moins un rôle.',
+    discountPercentInvalid: 'Entre un pourcentage entre 0 et 100, ou laisse vide.',
+    pinFormat: 'Le code PIN doit contenir exactement 4 chiffres.',
+    pinsDontMatch: 'Les deux codes PIN ne sont pas identiques.',
   },
+  ...frTeam,
 } as const;

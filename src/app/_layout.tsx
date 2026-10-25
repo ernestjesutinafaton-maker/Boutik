@@ -67,7 +67,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={isSignedIn && status === 'ready'} redirectTo={home}>
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(app)" />
       </Stack.Protected>
       <Stack.Protected guard={isSignedIn && status === 'none'} redirectTo={home}>
         <Stack.Screen name="create-shop" />

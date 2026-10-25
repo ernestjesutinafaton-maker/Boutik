@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native';
 import { Button, Card, Dialog, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
 
 import { usePowerSync } from '@powersync/react';
+import { router } from 'expo-router';
 
 import { useAuth } from '@/auth/auth-provider';
 import { BigButton } from '@/components/big-button';
@@ -12,12 +13,12 @@ import type { IconName } from '@/components/icon-name';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
 import { useShop } from '@/shop/shop-provider';
+import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 import { useThemePreference } from '@/theme/theme-preference';
 
 /** Les rubriques qui viendront s'ajouter ici, avec l'étape du plan où elles seront faites. */
 const UPCOMING = [
-  { labelKey: 'more.users', icon: 'account-key', step: 7 },
   { labelKey: 'more.cashSession', icon: 'cash-multiple', step: 15 },
   { labelKey: 'more.history', icon: 'history', step: 17 },
   { labelKey: 'more.shopSettings', icon: 'store-cog', step: 17 },
@@ -31,6 +32,7 @@ export default function MoreScreen() {
   const db = usePowerSync();
   const { session, signOut } = useAuth();
   const { shop, device } = useShop();
+  const { can } = useActiveMember();
   const { preference, setPreference } = useThemePreference();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   // Nombre d'opérations pas encore envoyées qui empêchent la déconnexion (0 = rien de bloqué)
@@ -73,6 +75,19 @@ export default function MoreScreen() {
           </BigButton>
         </Card.Content>
       </Card>
+
+      {can('team.manage') ? (
+        <Card mode="outlined">
+          <List.Item
+            title={t('more.users')}
+            titleStyle={{ fontWeight: '700' }}
+            description={t('more.usersHelp')}
+            left={(props) => <List.Icon {...props} icon="account-key" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push('/team')}
+          />
+        </Card>
+      ) : null}
 
       <Card mode="outlined">
         <Card.Title title={t('more.appearance')} titleVariant="titleLarge" />

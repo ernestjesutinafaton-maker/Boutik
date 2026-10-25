@@ -9,7 +9,7 @@ Lancement au Bénin (FCFA), prévue dès le départ pour toute l'Afrique.
 
 ## Où en est-on ?
 
-👉 **Étape en cours : 6 — Hors ligne et synchronisation** (6a : première version de test ; 6b : réglages PowerSync)
+👉 **Étapes 7 à 15 en cours de construction** sur la branche Git `etapes-7-a-15` (demande d'Ernest du 25/10/2026 : « fais les étapes jusqu'à la 15 »). Reste à faire pour l'étape 6 : le test « rouvrir sans internet » avec l'APK d'essai (`preview`).
 
 Dans le plan plus bas, une case cochée = une étape terminée et validée.
 

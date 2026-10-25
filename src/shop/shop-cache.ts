@@ -16,7 +16,11 @@ export async function readShopCache(userId: string): Promise<CurrentShop | null>
   try {
     const raw = await AsyncStorage.getItem(CACHE_KEY);
     const cached = raw ? (JSON.parse(raw) as { userId: string; shop: CurrentShop }) : null;
-    return cached?.userId === userId ? cached.shop : null;
+    if (cached?.userId !== userId) {
+      return null;
+    }
+    // Les mémoires gardées avant l'étape 7 n'avaient pas encore les rôles
+    return { ...cached.shop, memberRoles: cached.shop.memberRoles ?? [] };
   } catch {
     return null;
   }

@@ -9,6 +9,7 @@ describe('errorMessageKey : traduire les erreurs du serveur en français clair',
     ).toBe('errors.invalidCredentials');
     expect(errorMessageKey({ code: 'user_already_exists' })).toBe('errors.emailAlreadyUsed');
     expect(errorMessageKey({ code: 'weak_password' })).toBe('errors.weakPassword');
+    expect(errorMessageKey({ code: 'email_address_invalid' })).toBe('errors.emailInvalid');
     expect(errorMessageKey({ code: 'over_request_rate_limit' })).toBe('errors.tooManyAttempts');
   });
 
