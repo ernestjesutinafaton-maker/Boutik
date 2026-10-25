@@ -1,0 +1,3 @@
+# Fichiers que Prettier ne doit pas remettre en forme
+docs/
+package-lock.json

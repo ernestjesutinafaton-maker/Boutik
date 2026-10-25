@@ -39,7 +39,8 @@ export default function HomeScreen() {
         <Text style={styles.success}>✅ Le projet fonctionne !</Text>
         <Text style={styles.info}>Plateforme : {getPlatformLabel()}</Text>
         <Text style={styles.info}>
-          Écran : {Math.round(width)} points de large ({isLargeScreen ? 'grand écran' : 'petit écran'})
+          Écran : {Math.round(width)} points de large (
+          {isLargeScreen ? 'grand écran' : 'petit écran'})
         </Text>
       </View>
     </SafeAreaView>

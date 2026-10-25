@@ -238,6 +238,8 @@ Les grosses étapes sont découpées en petites parties, avec un « OK » entre 
 - Appareil de test : une tablette Xiaomi Redmi Pad 2. La mise en page « téléphone » se vérifie aussi dans le navigateur (outils de développement, mode appareil mobile).
 - Projet créé avec **Expo SDK 58** (React Native 0.88, React 19.3, TypeScript 6). Les écrans sont dans `src/app/` (Expo Router). Expo change beaucoup à chaque version : avant d'utiliser une fonction d'Expo, lire la documentation de la bonne version (voir `AGENTS.md`).
 - Toujours installer une bibliothèque avec `npx expo install <nom>` (et non `npm install <nom>`) : Expo choisit alors la version compatible.
+- Vérifications à lancer avant chaque commit : `npm test` (tests automatiques, Vitest), `npm run lint` (ESLint + Prettier), `npm run typecheck` (TypeScript). Les tests sont à côté du code qu'ils vérifient (`money.ts` → `money.test.ts`).
+- Sous Windows, `npx expo install … -- --dev` a rangé les outils dans `dependencies` au lieu de `devDependencies` : vérifier `package.json` après chaque installation d'outil de développement.
 - Ne **jamais** lancer `npm audit fix --force` : les alertes de sécurité viennent des outils de développement d'Expo, et cette commande remplacerait Expo par la version 44.
 - Réseau : le Wi-Fi de la maison (Bbox) était réglé en profil « Public » dans Windows, ce qui bloque la tablette → le passer en « Privé ». Expo annonce l'adresse `192.168.1.143` (le PC a aussi des cartes réseau VMware et VirtualBox, à surveiller si le QR code ne marche plus).
 - Le fichier `LICENSE` du modèle Expo (licence libre MIT) a été retiré : le code de Boutik n'est pas en licence libre.
