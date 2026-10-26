@@ -32,6 +32,9 @@ export function MoneyText({
 
   return (
     <Text
+      // Le montant reste sur une ligne : il rapetisse plutôt que de couper « FCFA »
+      numberOfLines={1}
+      adjustsFontSizeToFit
       style={[
         {
           color,

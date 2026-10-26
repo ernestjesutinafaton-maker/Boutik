@@ -188,19 +188,14 @@ export default function SaleScreen() {
       </BigButton>
 
       {can('sale.cancel') && !isCancelled ? (
-        <View style={[styles.row, { gap: spacing.sm }]}>
+        <View style={{ gap: spacing.sm }}>
           <BigButton
             icon="keyboard-return"
             variant="outline"
-            style={styles.fill}
             onPress={() => router.push(`/sale/${sale.id}/return`)}>
             {t('sale.return')}
           </BigButton>
-          <BigButton
-            icon="cancel"
-            variant="danger"
-            style={styles.fill}
-            onPress={() => setIsCancelOpen(true)}>
+          <BigButton icon="cancel" variant="danger" onPress={() => setIsCancelOpen(true)}>
             {t('sale.cancel')}
           </BigButton>
         </View>
