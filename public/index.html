@@ -11,10 +11,9 @@
       name="description"
       content="Boutik : stock, caisse et crédit pour les boutiques, même sans internet." />
     <!-- Version installable (PWA) : nom, icônes, couleurs -->
-    <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#059669" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" href="/app/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/app/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Boutik" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -43,13 +42,26 @@
       pendant le développement.
     -->
     <script>
-      if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('/sw.js').catch(function (error) {
-            console.warn('Service worker non enregistré :', error);
+      (function () {
+        // Sur le site, l'appli vit sous /app ; dans la version ordinateur, à la racine
+        var base = location.pathname.indexOf('/app') === 0 ? '/app/' : '/';
+        var manifest = document.createElement('link');
+        manifest.rel = 'manifest';
+        manifest.href = base + 'manifest.json';
+        document.head.appendChild(manifest);
+        var local =
+          /^(localhost|tauri\.localhost)$/.test(location.hostname) ||
+          location.protocol === 'tauri:';
+        if ('serviceWorker' in navigator && !local && base === '/app/') {
+          window.addEventListener('load', function () {
+            navigator.serviceWorker
+              .register(base + 'sw.js', { scope: base })
+              .catch(function (error) {
+                console.warn('Service worker non enregistré :', error);
+              });
           });
-        });
-      }
+        }
+      })();
     </script>
   </head>
 

@@ -2,16 +2,17 @@
 // Il garde dans le navigateur tous les fichiers de l'appli : elle s'ouvre ensuite sans internet.
 // Utilisé par « npm run build:web » (après « expo export »).
 module.exports = {
-  globDirectory: 'dist/',
+  globDirectory: 'dist/app/',
   // Tous les fichiers de l'appli, dont le moteur SQLite de PowerSync (.wasm)
   globPatterns: ['**/*.{js,mjs,html,css,ttf,otf,woff,woff2,ico,json,png,jpg,svg,wasm}'],
   globIgnores: ['vercel.json', '**/*.map'],
-  swDest: 'dist/sw.js',
+  swDest: 'dist/app/sw.js',
   // Appli « une seule page » : toute adresse ouvre index.html (même hors ligne)
-  navigateFallback: '/index.html',
-  navigateFallbackDenylist: [/^\/sw\.js$/, /\.apk$/],
+  navigateFallback: '/app/index.html',
+  navigateFallbackDenylist: [/^\/app\/sw\.js$/],
   // Le moteur SQLite pèse plusieurs Mo
   maximumFileSizeToCacheInBytes: 30 * 1024 * 1024,
+  modifyURLPrefix: { '': '/app/' },
   ignoreURLParametersMatching: [/^utm_/, /^fbclid$/],
   // Une nouvelle version attend l'accord de la personne (bandeau « Nouvelle version »)
   skipWaiting: false,

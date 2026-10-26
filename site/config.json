@@ -1,0 +1,16 @@
+{
+  "siteUrl": "https://boutik-services.vercel.app",
+  "contactEmail": "",
+  "whatsapp": "",
+  "editeur": {
+    "nom": "Ernest AFATON",
+    "adresse": "",
+    "pays": "Bénin"
+  },
+  "version": "1.0.0",
+  "downloads": {
+    "android": "/telecharger/boutik.apk",
+    "windows": "/telecharger/Boutik-setup.exe",
+    "linux": "/telecharger/Boutik.AppImage"
+  }
+}

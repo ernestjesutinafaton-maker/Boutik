@@ -10,7 +10,16 @@ const VARIANTS = {
   preview: { suffix: '.preview', name: 'Boutik (essai)' },
 };
 
-module.exports = ({ config }) => {
+// Adresse de l'appli web : sur le site, elle vit sous /app (la racine est le site vitrine).
+// Dans la version ordinateur (Tauri, BOUTIK_DESKTOP=1), elle est à la racine.
+const WEB_BASE = process.env.BOUTIK_DESKTOP ? '' : '/app';
+
+module.exports = ({ config: base }) => {
+  const config = {
+    ...base,
+    experiments: { ...base.experiments, baseUrl: WEB_BASE },
+    extra: { ...base.extra, webBase: WEB_BASE },
+  };
   const variant = VARIANTS[process.env.APP_VARIANT];
   if (!variant) {
     return config;

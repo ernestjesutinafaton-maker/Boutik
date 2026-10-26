@@ -1,7 +1,13 @@
 import type { CommonPowerSyncDatabase } from '@powersync/common';
 import { PowerSyncDatabase } from '@powersync/web';
 
+import Constants from 'expo-constants';
+
 import { AppSchema } from './schema';
+
+// L'appli web vit sous /app sur le site (voir app.config.js), à la racine dans la version ordinateur
+const WEB_BASE = (Constants.expoConfig?.extra?.webBase as string | undefined) ?? '';
+const WORKER = `${WEB_BASE}/@powersync/worker.js`;
 
 /**
  * La base locale — version NAVIGATEUR : SQLite fonctionne dans le navigateur grâce à
@@ -12,9 +18,9 @@ export const powersync: CommonPowerSyncDatabase = new PowerSyncDatabase({
   schema: AppSchema,
   database: {
     dbFilename: 'boutik.db',
-    worker: '/@powersync/worker.js',
+    worker: WORKER,
   },
   sync: {
-    worker: '/@powersync/worker.js',
+    worker: WORKER,
   },
 });

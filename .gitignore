@@ -50,3 +50,7 @@ example
 # generated native folders
 /ios
 /android
+downloads/
+dist-desktop/
+src-tauri/target/
+src-tauri/gen/

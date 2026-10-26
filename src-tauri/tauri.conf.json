@@ -1,0 +1,51 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Boutik",
+  "version": "1.0.0",
+  "identifier": "com.boutik.desktop",
+  "build": {
+    "frontendDist": "../dist-desktop",
+    "devUrl": "http://localhost:8082",
+    "beforeDevCommand": "npx cross-env BOUTIK_DESKTOP=1 expo start --web --port 8082",
+    "beforeBuildCommand": "npm run build:desktop-web"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Boutik",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 380,
+        "minHeight": 600,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "appimage", "deb"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "Boutik",
+    "shortDescription": "Stock, caisse et crédit pour les boutiques",
+    "category": "Business",
+    "windows": {
+      "nsis": {
+        "languages": ["French"],
+        "installMode": "currentUser"
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  }
+}

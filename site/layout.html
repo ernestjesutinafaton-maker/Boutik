@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{{title}}</title>
+    <meta name="description" content="{{description}}" />
+    <link rel="canonical" href="{{siteUrl}}{{path}}" />
+    <meta name="theme-color" content="#059669" />
+    <link rel="icon" href="/app/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/app/apple-touch-icon.png" />
+    <meta property="og:title" content="{{title}}" />
+    <meta property="og:description" content="{{description}}" />
+    <meta property="og:image" content="{{siteUrl}}/app/icon-512.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="fr_FR" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="/site/style.css?v={{version}}" />
+    <script src="/site/site.js?v={{version}}" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#contenu">Aller au contenu</a>
+    <header class="topbar">
+      <div class="wrap topbar-in">
+        <a class="brand" href="/" aria-label="Boutik, accueil">
+          <img src="/app/icon-192.png" alt="" width="36" height="36" />
+          <span>Boutik</span>
+        </a>
+        <button
+          class="menu-btn"
+          aria-label="Ouvrir le menu"
+          aria-expanded="false"
+          aria-controls="menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav id="menu" class="menu" aria-label="Menu principal">
+          <a href="/#fonctions">Fonctions</a>
+          <a href="/#hors-ligne">Hors ligne</a>
+          <a href="/telecharger">Télécharger</a>
+          <a href="/faq">FAQ</a>
+          <a href="/#contact">Contact</a>
+          <a class="btn btn-ghost" href="/app/">Se connecter</a>
+          <a class="btn btn-primary" href="/telecharger">Essayer gratuitement</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenu">{{content}}</main>
+
+    <footer class="footer">
+      <div class="wrap footer-in">
+        <div class="footer-brand">
+          <a class="brand" href="/"
+            ><img src="/app/icon-192.png" alt="" width="32" height="32" /><span>Boutik</span></a
+          >
+          <p>Stock, caisse et crédit pour les boutiques d’Afrique — même sans internet.</p>
+        </div>
+        <nav aria-label="Produit">
+          <h3>Produit</h3>
+          <a href="/#fonctions">Fonctions</a>
+          <a href="/telecharger">Télécharger</a>
+          <a href="/app/">Version web</a>
+          <a href="/#tarifs">Tarifs</a>
+        </nav>
+        <nav aria-label="Aide">
+          <h3>Aide</h3>
+          <a href="/faq">Questions fréquentes</a>
+          <a href="/#contact">Contact</a>
+        </nav>
+        <nav aria-label="Informations légales">
+          <h3>Légal</h3>
+          <a href="/confidentialite">Confidentialité</a>
+          <a href="/conditions">Conditions d’utilisation</a>
+          <a href="/mentions-legales">Mentions légales</a>
+        </nav>
+      </div>
+      <p class="wrap copyright">
+        © {{year}} Boutik · Fait pour les commerçants du Bénin et d’Afrique de l’Ouest
+      </p>
+    </footer>
+  </body>
+</html>
