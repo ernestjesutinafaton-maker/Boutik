@@ -12,16 +12,16 @@ Un seul code pour Android (prioritaire), iPhone (version web installable) et ord
 
 ## Ce que fait Boutik
 
-| Rubrique | Contenu |
-|---|---|
-| **Caisse** | panier rapide (recherche, code-barres, lecteur USB), unités (sac, kilo, carton…), remise limitée par personne, paiement mixte ou partiel (le reste passe en crédit), monnaie à rendre, annulation et retour d'articles |
-| **Factures** | PDF fabriqué dans l'appareil, numéro unique même hors ligne (`F2-000123`), WhatsApp, file « À envoyer », ticket Bluetooth 58/80 mm, impression A4 |
-| **Produits et stock** | fiches avec photo, rayons, plusieurs unités et prix, réceptions de marchandise, lots et dates de péremption (le plus proche sort en premier), alertes J-30 / J-7, pertes, stock bas, inventaire « à l'aveugle » |
-| **Clients et crédit** | carnet de dettes, plafond de crédit, remboursements avec reçu, débiteurs classés par ancienneté, relance WhatsApp, dettes anciennes |
-| **Caisse du jour** | fond de caisse, dépenses et sorties, « Clôturer la journée » (argent attendu / compté, écarts), « Faire un compte », archives par jour / semaine / mois |
-| **Tableau de bord** | chiffre d'affaires, bénéfice réel, argent encaissé, dettes, valeur du stock, meilleures ventes, produits qui dorment, alertes |
-| **Équipe** | plusieurs rôles par personne (propriétaire, gérant, caissier, vendeur, gestionnaire de stock, compteur), code PIN hors ligne, journal de toutes les actions sensibles |
-| **Réglages** | paramètres de la boutique, modes de paiement, imprimante, export Excel/CSV, boutique de démonstration |
+| Rubrique              | Contenu                                                                                                                                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Caisse**            | panier rapide (recherche, code-barres, lecteur USB), unités (sac, kilo, carton…), remise limitée par personne, paiement mixte ou partiel (le reste passe en crédit), monnaie à rendre, annulation et retour d'articles |
+| **Factures**          | PDF fabriqué dans l'appareil, numéro unique même hors ligne (`F2-000123`), WhatsApp, file « À envoyer », ticket Bluetooth 58/80 mm, impression A4                                                                      |
+| **Produits et stock** | fiches avec photo, rayons, plusieurs unités et prix, réceptions de marchandise, lots et dates de péremption (le plus proche sort en premier), alertes J-30 / J-7, pertes, stock bas, inventaire « à l'aveugle »        |
+| **Clients et crédit** | carnet de dettes, plafond de crédit, remboursements avec reçu, débiteurs classés par ancienneté, relance WhatsApp, dettes anciennes                                                                                    |
+| **Caisse du jour**    | fond de caisse, dépenses et sorties, « Clôturer la journée » (argent attendu / compté, écarts), « Faire un compte », archives par jour / semaine / mois                                                                |
+| **Tableau de bord**   | chiffre d'affaires, bénéfice réel, argent encaissé, dettes, valeur du stock, meilleures ventes, produits qui dorment, alertes                                                                                          |
+| **Équipe**            | plusieurs rôles par personne (propriétaire, gérant, caissier, vendeur, gestionnaire de stock, compteur), code PIN hors ligne, journal de toutes les actions sensibles                                                  |
+| **Réglages**          | paramètres de la boutique, modes de paiement, imprimante, export Excel/CSV, boutique de démonstration                                                                                                                  |
 
 ## Les outils
 
@@ -65,14 +65,14 @@ Les tests sont de trois sortes :
 
 ## Fabriquer et publier
 
-| Quoi | Commande |
-|---|---|
-| Version de test (dev) Android | `npx eas-cli@latest build --profile development --platform android` |
-| APK d'essai autonome | `npx eas-cli@latest build --profile preview --platform android` |
-| APK final | `npx eas-cli@latest build --profile production --platform android` |
+| Quoi                                      | Commande                                                                                |
+| ----------------------------------------- | --------------------------------------------------------------------------------------- |
+| Version de test (dev) Android             | `npx eas-cli@latest build --profile development --platform android`                     |
+| APK d'essai autonome                      | `npx eas-cli@latest build --profile preview --platform android`                         |
+| APK final                                 | `npx eas-cli@latest build --profile production --platform android`                      |
 | Mise à jour à distance (sans réinstaller) | `npx eas-cli@latest update --channel production --message "…" --environment production` |
-| Version web installable (dossier `dist/`) | `npm run build:web` |
-| Base de données | `npx supabase db push --linked` puis `npm run db:types` |
+| Version web installable (dossier `dist/`) | `npm run build:web`                                                                     |
+| Base de données                           | `npx supabase db push --linked` puis `npm run db:types`                                 |
 
 ⚠️ Après une migration qui ajoute une table : l'ajouter aussi dans `powersync/sync-config.yaml`
 et recopier ce fichier dans le tableau de bord PowerSync.
