@@ -21,32 +21,37 @@ export type ActionContext = {
 export type WhenOptions = { occurredAt?: string };
 
 /** Les actions sensibles notées dans le journal (qui, quoi, quand, sur quel appareil). */
-export type AuditAction =
-  | 'member.create'
-  | 'member.update'
-  | 'member.pin_change'
-  | 'product.create'
-  | 'product.update'
-  | 'product.price_change'
-  | 'product.archive'
-  | 'stock.receive'
-  | 'stock.loss'
-  | 'stock.adjust'
-  | 'inventory.validate'
-  | 'sale.create'
-  | 'sale.cancel'
-  | 'sale.return'
-  | 'sale.discount'
-  | 'sale.expired_forced'
-  | 'customer.create'
-  | 'customer.update'
-  | 'credit.repayment'
-  | 'credit.manual_debt'
-  | 'credit.write_off'
-  | 'cash.open'
-  | 'cash.close'
-  | 'cash.movement'
-  | 'report.account';
+export const AUDIT_ACTIONS = [
+  'member.create',
+  'member.update',
+  'member.pin_change',
+  'product.create',
+  'product.update',
+  'product.price_change',
+  'product.archive',
+  'stock.receive',
+  'stock.loss',
+  'stock.adjust',
+  'inventory.validate',
+  'sale.create',
+  'sale.cancel',
+  'sale.return',
+  'sale.discount',
+  'sale.expired_forced',
+  'customer.create',
+  'customer.update',
+  'credit.repayment',
+  'credit.manual_debt',
+  'credit.write_off',
+  'cash.open',
+  'cash.close',
+  'cash.movement',
+  'report.account',
+  'settings.update',
+  'payment_method.update',
+] as const;
+
+export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 /**
  * Note une action dans le journal, DANS la même transaction que l'action elle-même :

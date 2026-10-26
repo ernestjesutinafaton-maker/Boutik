@@ -9,7 +9,6 @@ import { router } from 'expo-router';
 
 import { useAuth } from '@/auth/auth-provider';
 import { BigButton } from '@/components/big-button';
-import type { IconName } from '@/components/icon-name';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
 import { useOutbox } from '@/invoices/outbox';
@@ -17,13 +16,6 @@ import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 import { useThemePreference } from '@/theme/theme-preference';
-
-/** Les rubriques qui viendront s'ajouter ici, avec l'étape du plan où elles seront faites. */
-const UPCOMING = [
-  { labelKey: 'more.history', icon: 'history', step: 17 },
-  { labelKey: 'more.shopSettings', icon: 'store-cog', step: 17 },
-  { labelKey: 'more.export', icon: 'file-excel', step: 17 },
-] as const satisfies readonly { labelKey: `more.${string}`; icon: IconName; step: number }[];
 
 /** Rubrique « Plus » : mon compte, réglages et accès aux autres fonctions. */
 export default function MoreScreen() {
@@ -132,6 +124,41 @@ export default function MoreScreen() {
         ) : null}
       </Card>
 
+      {can('settings.manage') || can('reports.account') ? (
+        <Card mode="outlined">
+          {can('settings.manage') ? (
+            <List.Item
+              title={t('settings.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('settings.menuHelp')}
+              left={(props) => <List.Icon {...props} icon="store-cog" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/settings')}
+            />
+          ) : null}
+          {can('reports.account') ? (
+            <List.Item
+              title={t('audit.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('audit.menuHelp')}
+              left={(props) => <List.Icon {...props} icon="history" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/history')}
+            />
+          ) : null}
+          {can('reports.account') ? (
+            <List.Item
+              title={t('export.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('export.menuHelp')}
+              left={(props) => <List.Icon {...props} icon="file-excel" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/export')}
+            />
+          ) : null}
+        </Card>
+      ) : null}
+
       {can('settings.manage') ? (
         <Card mode="outlined">
           <List.Item
@@ -174,18 +201,6 @@ export default function MoreScreen() {
             {t('more.themeHelp')}
           </Text>
         </Card.Content>
-      </Card>
-
-      <Card mode="outlined">
-        <Card.Title title={t('more.upcoming')} titleVariant="titleLarge" />
-        {UPCOMING.map((item) => (
-          <List.Item
-            key={item.labelKey}
-            title={t(item.labelKey)}
-            description={t('comingSoon.plannedStep', { step: item.step })}
-            left={(props) => <List.Icon {...props} icon={item.icon} />}
-          />
-        ))}
       </Card>
 
       <Text variant="bodyMedium" style={[styles.version, { color: theme.colors.onSurfaceVariant }]}>

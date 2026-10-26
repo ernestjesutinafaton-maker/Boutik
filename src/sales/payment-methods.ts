@@ -24,3 +24,24 @@ export function usePaymentMethods(): PaymentMethod[] {
   );
   return data.map((row) => ({ ...row, isCash: row.kind === 'cash' }));
 }
+
+export type ManagedPaymentMethod = PaymentMethod & { active: boolean };
+
+/** Tous les modes de paiement, même désactivés (pour l'écran des paramètres). */
+export function useAllPaymentMethods(): ManagedPaymentMethod[] {
+  const { shop } = useShop();
+  const { data } = useQuery<MethodRow & { active: number }>(
+    `SELECT id, code, label, kind, active FROM payment_methods
+      WHERE shop_id = ?
+      ORDER BY sort_order, label`,
+    [shop?.id ?? '']
+  );
+  return data.map((row) => ({
+    id: row.id,
+    code: row.code,
+    label: row.label,
+    kind: row.kind,
+    isCash: row.kind === 'cash',
+    active: row.active === 1,
+  }));
+}

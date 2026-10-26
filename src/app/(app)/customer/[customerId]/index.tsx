@@ -15,6 +15,7 @@ import { archiveCustomer, writeOffDebt } from '@/customers/customer-actions';
 import { useCustomer, useCustomerLedger } from '@/customers/customer-data';
 import { useActionContext } from '@/data/use-action-context';
 import { debtAging } from '@/domain/credit';
+import { canSeeCustomers } from '@/domain/permissions';
 import { formatDay, formatMoment, today } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
 import { openWhatsApp } from '@/invoices/invoice-actions';
@@ -32,7 +33,7 @@ export default function CustomerScreen() {
   const db = usePowerSync();
   const context = useActionContext();
   const settings = useShopSettings();
-  const { can } = useActiveMember();
+  const { can, member } = useActiveMember();
   const { customerId } = useLocalSearchParams<{ customerId: string }>();
   const { customer, isLoading } = useCustomer(customerId);
   const ledger = useCustomerLedger(customerId);
@@ -43,6 +44,13 @@ export default function CustomerScreen() {
   const currency = settings?.currencyCode ?? 'XOF';
   const { spacing } = theme.app;
 
+  if (!canSeeCustomers(member?.roles ?? [])) {
+    return (
+      <Screen title={t('customers.detailTitle')} stack>
+        <Notice message={t('common.forbidden')} />
+      </Screen>
+    );
+  }
   if (!customer || !settings) {
     return (
       <Screen title={t('customers.detailTitle')} stack>

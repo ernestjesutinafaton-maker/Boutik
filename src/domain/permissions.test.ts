@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { can, isRole, maxDiscountPercent, PERMISSIONS, permissionsFor } from './permissions';
+import {
+  can,
+  canSeeCustomers,
+  isRole,
+  maxDiscountPercent,
+  PERMISSIONS,
+  permissionsFor,
+} from './permissions';
 
 describe('Droits des rôles', () => {
   it('le propriétaire a tous les droits', () => {
@@ -70,5 +77,56 @@ describe('Limite de remise', () => {
   it('le propriétaire et le gérant n’ont pas de limite', () => {
     expect(maxDiscountPercent(['owner'], 0, 0)).toBe(100);
     expect(maxDiscountPercent(['manager', 'seller'], 0, 0)).toBe(100);
+  });
+});
+
+describe('Vérification complète : le tableau des droits', () => {
+  // Une ligne par rôle : exactement ce que chaque rôle a le droit de faire.
+  // Changer un droit oblige à changer ce tableau : rien ne change par accident.
+  const EXPECTED: Record<string, string[]> = {
+    manager: PERMISSIONS.filter(
+      (p) => !['reports.profit', 'team.manage', 'settings.manage', 'credit.write_off'].includes(p)
+    ),
+    cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
+    seller: ['sale.create', 'credit.repayment', 'customers.edit'],
+    stock_manager: [
+      'stock.receive',
+      'stock.count',
+      'stock.adjust',
+      'stock.view_costs',
+      'catalog.edit',
+    ],
+    stock_counter: ['stock.count'],
+  };
+
+  it('chaque rôle a exactement ses droits, ni plus ni moins', () => {
+    for (const [role, permissions] of Object.entries(EXPECTED)) {
+      expect(
+        [...permissionsFor([role as Parameters<typeof permissionsFor>[0][number]])].sort()
+      ).toEqual([...permissions].sort());
+    }
+  });
+
+  it('seul le propriétaire voit les bénéfices, gère l’équipe et les paramètres', () => {
+    for (const permission of [
+      'reports.profit',
+      'team.manage',
+      'settings.manage',
+      'credit.write_off',
+    ] as const) {
+      expect(can(['owner'], permission)).toBe(true);
+      expect(
+        can(['manager', 'cashier', 'seller', 'stock_manager', 'stock_counter'], permission)
+      ).toBe(false);
+    }
+  });
+
+  it('les clients et leurs dettes ne sont pas visibles des rôles du stock', () => {
+    expect(canSeeCustomers(['seller'])).toBe(true);
+    expect(canSeeCustomers(['cashier'])).toBe(true);
+    expect(canSeeCustomers(['manager'])).toBe(true);
+    expect(canSeeCustomers(['stock_manager'])).toBe(false);
+    expect(canSeeCustomers(['stock_counter'])).toBe(false);
+    expect(canSeeCustomers(['stock_counter', 'seller'])).toBe(true);
   });
 });

@@ -12,6 +12,8 @@ import { AgingChip } from '@/customers/aging-chip';
 import { useCustomers, useLedgerByCustomer } from '@/customers/customer-data';
 import { searchCustomers } from '@/customers/customer-picker';
 import { type AgingBucket, debtAging } from '@/domain/credit';
+import { Notice } from '@/components/notice';
+import { canSeeCustomers } from '@/domain/permissions';
 import { today } from '@/domain/dates';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
@@ -30,7 +32,7 @@ const FILTER_MATCH: Record<Filter, (bucket: AgingBucket, balance: number) => boo
 export default function CustomersScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
-  const { can } = useActiveMember();
+  const { can, member } = useActiveMember();
   const settings = useShopSettings();
   const { customers, isLoading } = useCustomers();
   const ledger = useLedgerByCustomer();
@@ -60,6 +62,14 @@ export default function CustomersScreen() {
         ? a.customer.name.localeCompare(b.customer.name)
         : b.aging.ageDays - a.aging.ageDays || b.customer.balance - a.customer.balance
     );
+
+  if (!canSeeCustomers(member?.roles ?? [])) {
+    return (
+      <Screen title={t('nav.customers')}>
+        <Notice message={t('common.forbidden')} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen title={t('nav.customers')}>

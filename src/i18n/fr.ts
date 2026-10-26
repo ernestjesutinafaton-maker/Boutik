@@ -3,6 +3,7 @@ import { frCustomers } from './fr-customers';
 import { frDashboard } from './fr-dashboard';
 import { frProductErrors, frProducts } from './fr-products';
 import { frSales, frSalesErrors } from './fr-sales';
+import { frSettings, frSettingsErrors } from './fr-settings';
 import { frTeam } from './fr-team';
 
 /**
@@ -56,16 +57,12 @@ export const fr = {
     themeSystem: 'Auto',
     themeHelp:
       'Le mode clair est conseillé en plein soleil. « Auto » suit le réglage du téléphone.',
-    upcoming: 'À venir',
     users: 'Équipe et codes PIN',
     usersHelp: 'Rôles et codes PIN des personnes de la boutique',
     salesHelp: 'Retrouver, renvoyer ou réimprimer une facture',
     printerHelp: 'Imprimante Bluetooth 58 ou 80 mm',
     cashHelp: 'Fond de caisse, dépenses, clôture de la journée',
     reportsHelp: 'Clôtures, « Faire un compte », archives par jour, semaine, mois',
-    history: 'Historique des actions',
-    shopSettings: 'Paramètres de la boutique',
-    export: 'Export Excel / CSV',
     version: 'Version {{version}}',
   },
   auth: {
@@ -156,6 +153,7 @@ export const fr = {
     pinsDontMatch: 'Les deux codes PIN ne sont pas identiques.',
     ...frProductErrors,
     ...frSalesErrors,
+    ...frSettingsErrors,
   },
   ...frTeam,
   ...frProducts,
@@ -163,4 +161,5 @@ export const fr = {
   ...frCustomers,
   ...frCash,
   ...frDashboard,
+  ...frSettings,
 } as const;

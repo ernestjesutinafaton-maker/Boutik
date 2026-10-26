@@ -56,7 +56,8 @@ const { saveCount, startInventory, useInventoryCount, useInventoryCounts, useInv
   await import('@/stock/inventory');
 const { createSale } = await import('@/sales/sale-actions');
 const { useSale, useSales, useCustomerSales } = await import('@/sales/sale-data');
-const { usePaymentMethods } = await import('@/sales/payment-methods');
+const { useAllPaymentMethods, usePaymentMethods } = await import('@/sales/payment-methods');
+const { useAuditLog } = await import('@/history/audit-data');
 const { useOpenCashSession } = await import('@/sales/cash-session-data');
 const { createCustomer, recordRepayment } = await import('@/customers/customer-actions');
 const { useCustomer, useCustomerLedger, useCustomers, useLedgerByCustomer, useRepaymentReceipt } =
@@ -315,5 +316,15 @@ describe('Lectures des écrans sur une vraie base', () => {
     });
     expect(useTeamMembers().members[0]).toMatchObject({ name: 'Koffi', roles: ['owner'] });
     expect(usePaymentMethods().map((method) => method.label)).toEqual(['Espèces', 'MTN MoMo']);
+    expect(useAllPaymentMethods().every((method) => method.active)).toBe(true);
+    const log = useAuditLog(dayRange(today()));
+    expect(log.map((entry) => entry.action)).toEqual(
+      expect.arrayContaining(['product.create', 'stock.receive', 'sale.create', 'credit.repayment'])
+    );
+    expect(log.find((entry) => entry.action === 'sale.create')).toMatchObject({
+      memberName: 'Koffi',
+      deviceNumber: 1,
+      entityType: 'sale',
+    });
   });
 });

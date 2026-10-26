@@ -77,6 +77,20 @@ export function can(roles: readonly Role[], permission: Permission): boolean {
   return permissionsFor(roles).has(permission);
 }
 
+/**
+ * Voir les clients et leurs dettes : utile pour vendre, encaisser un remboursement
+ * ou gérer la boutique — pas pour les rôles du stock seulement (compteur, magasinier).
+ */
+export function canSeeCustomers(roles: readonly Role[]): boolean {
+  const granted = permissionsFor(roles);
+  return (
+    granted.has('sale.create') ||
+    granted.has('customers.edit') ||
+    granted.has('credit.repayment') ||
+    granted.has('reports.account')
+  );
+}
+
 /** Vérifie qu'un texte venu de la base est bien un rôle connu. */
 export function isRole(value: unknown): value is Role {
   return typeof value === 'string' && (ROLES as readonly string[]).includes(value);
