@@ -30,7 +30,7 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
 - [ ] Tester sur 2 ou 3 téléphones bon marché (Android 10 et plus), dont un sans Google Play.
 
 ### Site et version web
-- [ ] Choisir l'adresse du site (nom de domaine) et l'hébergement (EAS Hosting d'Expo, Netlify, Cloudflare…).
+- [x] Adresse choisie par Ernest (26/10/2026) : **https://boutik-services.vercel.app** (hébergement Vercel, réglages dans `public/vercel.json`, publication avec `npm run deploy:web`).
 - [ ] Publier `dist/` (après `npm run build:web`) ; vérifier l'installation sur Android, iPhone et ordinateur.
 
 ### Essais en boutique
