@@ -73,6 +73,14 @@
         "projectId": "95d5a20f-3546-4e2e-a82c-516a120c689d"
       }
     },
-    "owner": "ernest_afaton"
+    "owner": "ernest_afaton",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/95d5a20f-3546-4e2e-a82c-516a120c689d",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }
