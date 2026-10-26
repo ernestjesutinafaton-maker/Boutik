@@ -8,6 +8,7 @@ import { useAppTheme } from '@/theme/paper-theme';
 
 import { ActiveMemberBar } from './active-member-bar';
 import { SyncStatusBanner } from './sync-status-banner';
+import { UpdateBanner } from './update-banner';
 
 type ScreenProps = {
   /** Titre de l'écran */
@@ -34,6 +35,7 @@ export function Screen({ title, stack = false, scroll = true, children }: Screen
 
   const content = (
     <View style={[styles.inner, { maxWidth: layout.contentMaxWidth, gap: spacing.md }]}>
+      <UpdateBanner />
       <SyncStatusBanner />
       <ActiveMemberBar />
       {stack ? null : (

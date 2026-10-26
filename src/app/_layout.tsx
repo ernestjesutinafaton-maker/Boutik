@@ -75,6 +75,8 @@ function RootNavigator() {
       <Stack.Protected guard={!isSignedIn} redirectTo={home}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
+      {/* Page publique, accessible connecté ou non */}
+      <Stack.Screen name="telecharger" />
     </Stack>
   );
 }

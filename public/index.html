@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>%WEB_TITLE%</title>
+    <meta name="description" content="Boutik : stock, caisse et crédit pour les boutiques, même sans internet." />
+    <!-- Version installable (PWA) : nom, icônes, couleurs -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#059669" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Boutik" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <!-- Le style recommandé par react-native-web : https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      /* La page occupe toute la hauteur */
+      html,
+      body {
+        height: 100%;
+        background-color: #f6f8f7;
+      }
+      /* Pas de défilement de la page entière (les écrans ont leur propre défilement) */
+      body {
+        overflow: hidden;
+      }
+      /* L'élément racine occupe toute la hauteur */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+    <!--
+      Le « service worker » garde l'appli dans le navigateur : elle s'ouvre ensuite même
+      sans internet. Il n'existe que dans la version publiée (npm run build:web), pas
+      pendant le développement.
+    -->
+    <script>
+      if ('serviceWorker' in navigator && location.hostname !== 'localhost') {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/sw.js').catch(function (error) {
+            console.warn('Service worker non enregistré :', error);
+          });
+        });
+      }
+    </script>
+  </head>
+
+  <body>
+    <noscript>Boutik a besoin de JavaScript pour fonctionner.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
