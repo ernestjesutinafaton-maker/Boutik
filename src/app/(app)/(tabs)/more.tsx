@@ -132,6 +132,19 @@ export default function MoreScreen() {
         ) : null}
       </Card>
 
+      {can('settings.manage') ? (
+        <Card mode="outlined">
+          <List.Item
+            title={t('demo.menu')}
+            titleStyle={{ fontWeight: '700' }}
+            description={t('demo.menuHelp')}
+            left={(props) => <List.Icon {...props} icon="store-plus" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push('/demo')}
+          />
+        </Card>
+      ) : null}
+
       {can('team.manage') ? (
         <Card mode="outlined">
           <List.Item

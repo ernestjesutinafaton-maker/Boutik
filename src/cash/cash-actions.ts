@@ -1,6 +1,6 @@
 import type { CommonPowerSyncDatabase } from '@powersync/common';
 
-import { type ActionContext, logAction } from '@/data/audit';
+import { type ActionContext, logAction, type WhenOptions } from '@/data/audit';
 import { newId, nowIso } from '@/data/ids';
 import { type CashMovementType, closingDifferences, expectedByMethod } from '@/domain/cash';
 import { today } from '@/domain/dates';
@@ -59,12 +59,16 @@ export async function recordCashMovement(
     methodId: string;
     amount: number;
     note: string | null;
-  }
+  },
+  options: WhenOptions = {}
 ): Promise<string> {
   const id = newId();
-  const now = nowIso();
+  const now = options.occurredAt ?? nowIso();
   await db.writeTransaction(async (tx) => {
-    const session = context.deviceId ? await findOpenCashSession(tx, context.deviceId) : null;
+    const session =
+      context.deviceId && !options.occurredAt
+        ? await findOpenCashSession(tx, context.deviceId)
+        : null;
     await tx.execute(
       `INSERT INTO cash_movements
          (id, shop_id, cash_session_id, type, category, payment_method_id, amount, note,
@@ -85,7 +89,7 @@ export async function recordCashMovement(
         now,
       ]
     );
-    await logAction(tx, context, 'cash.movement', { type: 'cash_movement', id }, { ...input });
+    await logAction(tx, context, 'cash.movement', { type: 'cash_movement', id }, { ...input }, now);
   });
   return id;
 }

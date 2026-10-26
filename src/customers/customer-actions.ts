@@ -1,6 +1,6 @@
 import type { CommonPowerSyncDatabase } from '@powersync/common';
 
-import { type ActionContext, logAction } from '@/data/audit';
+import { type ActionContext, logAction, type WhenOptions } from '@/data/audit';
 import { newId, nowIso } from '@/data/ids';
 import { findOpenCashSession } from '@/sales/cash-session-data';
 
@@ -105,12 +105,16 @@ export async function recordRepayment(
     methodId: string;
     cashReceived: number | null;
     changeGiven: number | null;
-  }
+  },
+  options: WhenOptions = {}
 ): Promise<string> {
   const paymentId = newId();
-  const now = nowIso();
+  const now = options.occurredAt ?? nowIso();
   await db.writeTransaction(async (tx) => {
-    const session = context.deviceId ? await findOpenCashSession(tx, context.deviceId) : null;
+    const session =
+      context.deviceId && !options.occurredAt
+        ? await findOpenCashSession(tx, context.deviceId)
+        : null;
     await tx.execute(
       `INSERT INTO payments
          (id, shop_id, kind, customer_id, payment_method_id, amount, cash_received, change_given,
@@ -158,7 +162,8 @@ export async function recordRepayment(
         amount: input.amount,
         balanceBefore: input.customer.balance,
         balanceAfter: input.customer.balance - input.amount,
-      }
+      },
+      now
     );
   });
   return paymentId;

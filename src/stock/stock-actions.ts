@@ -1,6 +1,6 @@
 import type { CommonPowerSyncDatabase } from '@powersync/common';
 
-import { type ActionContext, logAction } from '@/data/audit';
+import { type ActionContext, logAction, type WhenOptions } from '@/data/audit';
 import { newId, nowIso } from '@/data/ids';
 import { today } from '@/domain/dates';
 import { allocate, latestCost, receiptLine } from '@/domain/stock';
@@ -29,10 +29,11 @@ export type ReceiptLineInput = {
 export async function receiveStock(
   db: CommonPowerSyncDatabase,
   context: ActionContext,
-  input: { supplierName: string | null; reference: string | null; lines: ReceiptLineInput[] }
+  input: { supplierName: string | null; reference: string | null; lines: ReceiptLineInput[] },
+  options: WhenOptions = {}
 ): Promise<string> {
   const receiptId = newId();
-  const now = nowIso();
+  const now = options.occurredAt ?? nowIso();
   let totalCost = 0;
 
   await db.writeTransaction(async (tx) => {
@@ -91,7 +92,8 @@ export async function receiveStock(
           expiry: line.expiryDate,
         })),
         totalCost,
-      }
+      },
+      now
     );
   });
   return receiptId;

@@ -1,5 +1,6 @@
 import { frCash } from './fr-cash';
 import { frCustomers } from './fr-customers';
+import { frDashboard } from './fr-dashboard';
 import { frProductErrors, frProducts } from './fr-products';
 import { frSales, frSalesErrors } from './fr-sales';
 import { frTeam } from './fr-team';
@@ -47,9 +48,6 @@ export const fr = {
   comingSoon: {
     title: 'Bientôt disponible',
     plannedStep: "Prévu à l'étape {{step}} du plan",
-  },
-  dashboard: {
-    description: 'Ventes, bénéfice réel, valeur du stock, dettes et alertes.',
   },
   more: {
     appearance: 'Apparence',
@@ -164,4 +162,5 @@ export const fr = {
   ...frSales,
   ...frCustomers,
   ...frCash,
+  ...frDashboard,
 } as const;

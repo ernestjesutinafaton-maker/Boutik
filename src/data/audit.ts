@@ -14,6 +14,12 @@ export type ActionContext = {
   deviceId: string | null;
 };
 
+/**
+ * Options d'une écriture : « occurredAt » permet de dater une opération dans le passé
+ * (données de démonstration). Par défaut : maintenant.
+ */
+export type WhenOptions = { occurredAt?: string };
+
 /** Les actions sensibles notées dans le journal (qui, quoi, quand, sur quel appareil). */
 export type AuditAction =
   | 'member.create'
@@ -51,7 +57,8 @@ export async function logAction(
   context: ActionContext,
   action: AuditAction,
   entity: { type: string; id: string } | null,
-  details: Record<string, unknown> = {}
+  details: Record<string, unknown> = {},
+  occurredAt?: string
 ): Promise<void> {
   const now = nowIso();
   await tx.execute(
@@ -67,7 +74,7 @@ export async function logAction(
       JSON.stringify(details),
       context.memberId,
       context.deviceId,
-      now,
+      occurredAt ?? now,
       now,
     ]
   );

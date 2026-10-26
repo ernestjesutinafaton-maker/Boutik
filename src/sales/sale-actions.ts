@@ -1,6 +1,6 @@
 import type { CommonPowerSyncDatabase, Transaction } from '@powersync/common';
 
-import { type ActionContext, logAction } from '@/data/audit';
+import { type ActionContext, logAction, type WhenOptions } from '@/data/audit';
 import { newId, nowIso } from '@/data/ids';
 import { today } from '@/domain/dates';
 import { toBaseQuantity } from '@/domain/quantity';
@@ -106,14 +106,15 @@ export type NewSale = {
 export async function createSale(
   db: CommonPowerSyncDatabase,
   context: ActionContext,
-  sale: NewSale
+  sale: NewSale,
+  options: WhenOptions = {}
 ): Promise<{ saleId: string; invoiceNumber: string }> {
   const deviceId = context.deviceId;
   if (!deviceId) {
     throw new DeviceNotRegisteredError();
   }
   const saleId = newId();
-  const now = nowIso();
+  const now = options.occurredAt ?? nowIso();
   const day = today();
   const subtotal = cartSubtotal(sale.lines);
   const total = subtotal - sale.discount;
@@ -142,7 +143,8 @@ export async function createSale(
     );
     const sequence = last.seq + 1;
     invoiceNumber = formatInvoiceNumber(sale.deviceNumber, sequence);
-    const session = await findOpenCashSession(tx, deviceId);
+    // Une vente datée dans le passé (démonstration) n'appartient à aucune caisse ouverte
+    const session = options.occurredAt ? null : await findOpenCashSession(tx, deviceId);
 
     await tx.execute(
       `INSERT INTO sales
@@ -266,26 +268,47 @@ export async function createSale(
     }
 
     const entity = { type: 'sale', id: saleId };
-    await logAction(tx, context, 'sale.create', entity, {
-      invoiceNumber,
-      total,
-      paid,
-      due,
-      customer: sale.customer?.name ?? null,
-      items: sale.lines.length,
-    });
-    if (sale.discount > 0) {
-      await logAction(tx, context, 'sale.discount', entity, {
+    await logAction(
+      tx,
+      context,
+      'sale.create',
+      entity,
+      {
         invoiceNumber,
-        subtotal,
-        discount: sale.discount,
-      });
+        total,
+        paid,
+        due,
+        customer: sale.customer?.name ?? null,
+        items: sale.lines.length,
+      },
+      now
+    );
+    if (sale.discount > 0) {
+      await logAction(
+        tx,
+        context,
+        'sale.discount',
+        entity,
+        {
+          invoiceNumber,
+          subtotal,
+          discount: sale.discount,
+        },
+        now
+      );
     }
     if (expiredUsed.length > 0) {
-      await logAction(tx, context, 'sale.expired_forced', entity, {
-        invoiceNumber,
-        products: expiredUsed,
-      });
+      await logAction(
+        tx,
+        context,
+        'sale.expired_forced',
+        entity,
+        {
+          invoiceNumber,
+          products: expiredUsed,
+        },
+        now
+      );
     }
   });
 
