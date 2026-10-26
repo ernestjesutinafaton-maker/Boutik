@@ -1,0 +1,60 @@
+/** Textes de l'abonnement. */
+export const frSubscription = {
+  subscription: {
+    title: 'Mon abonnement',
+    menuHelp: 'Prix, paiement par Mobile Money, historique',
+    ownerOnly: 'Seul le propriétaire de la boutique gère l’abonnement.',
+    offline: 'Connecte-toi à internet pour voir le prix et payer.',
+    currentPrice: 'Ton prix ce mois-ci',
+    welcome: 'Prix de bienvenue : 10 000 F par mois pendant les 3 premiers mois.',
+    tierReason: 'Selon tes ventes du trimestre précédent : {{amount}} par mois en moyenne.',
+    rulesTitle: 'Comment le prix est calculé',
+    rules:
+      'Les 3 premiers mois : 10 000 F par mois. Ensuite, chaque trimestre, le prix dépend de la moyenne mensuelle de tes ventes du trimestre précédent :',
+    neverBlocked:
+      'Même si l’abonnement n’est pas payé, tu peux toujours vendre et voir le carnet de crédit. Seuls le tableau de bord, les comptes et l’export sont limités, 7 jours après la fin.',
+    howToPay: 'Payer',
+    sendTo: 'Envoie {{amount}} par Mobile Money (MTN, Moov ou Celtiis) à ce numéro :',
+    duration: 'Durée',
+    months_one: '{{count}} mois',
+    months_other: '{{count}} mois',
+    paidWith: 'Envoyé avec',
+    senderPhone: 'Numéro qui a envoyé l’argent',
+    reference: 'Numéro de la transaction (dans le SMS reçu)',
+    declare: 'J’ai payé : envoyer pour vérification',
+    missing: 'Indique le numéro qui a envoyé l’argent et le numéro de la transaction.',
+    declareError: 'Envoi impossible. Vérifie ta connexion internet et réessaie.',
+    declared: 'Merci ! Ton paiement sera vérifié rapidement, puis ton abonnement sera prolongé.',
+    history: 'Mes paiements',
+    paymentStatus: {
+      pending: 'En vérification',
+      validated: 'Validé',
+      rejected: 'Refusé',
+    },
+    states: {
+      trial_one: 'Essai gratuit : encore {{count}} jour (jusqu’au {{date}})',
+      trial_other: 'Essai gratuit : encore {{count}} jours (jusqu’au {{date}})',
+      active: 'Abonnée jusqu’au {{date}}',
+      grace_one: 'Abonnement terminé : encore {{count}} jour avant limitation',
+      grace_other: 'Abonnement terminé : encore {{count}} jours avant limitation',
+      expired: 'Abonnement expiré : fonctions avancées limitées',
+    },
+    banner: {
+      trial_one: 'Essai gratuit : encore {{count}} jour.',
+      trial_other: 'Essai gratuit : encore {{count}} jours.',
+      grace:
+        'Ton abonnement est terminé. Renouvelle-le pour garder le tableau de bord et les comptes.',
+      expired:
+        'Abonnement expiré : tu peux vendre, mais le tableau de bord, les comptes et l’export sont limités.',
+      action: 'Payer',
+    },
+    limited: 'Cette fonction est limitée : l’abonnement de la boutique est expiré.',
+    adminTitle: 'Paiements d’abonnement',
+    adminMenu: 'Administration Boutik',
+    adminHelp:
+      'Vérifie que l’argent est bien arrivé sur le numéro de Boutik (montant et numéro de transaction), puis valide.',
+    adminEmpty: 'Aucun paiement déclaré.',
+    validate: 'Valider',
+    reject: 'Refuser',
+  },
+} as const;

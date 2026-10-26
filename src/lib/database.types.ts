@@ -741,6 +741,21 @@ export type Database = {
           },
         ]
       }
+      platform_admins: {
+        Row: {
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       product_units: {
         Row: {
           archived_at: string | null
@@ -1265,6 +1280,7 @@ export type Database = {
           invoice_footer: string | null
           logo_path: string | null
           name: string
+          paid_until: string | null
           phone: string | null
           seller_max_discount_percent: number
           updated_at: string
@@ -1281,6 +1297,7 @@ export type Database = {
           invoice_footer?: string | null
           logo_path?: string | null
           name: string
+          paid_until?: string | null
           phone?: string | null
           seller_max_discount_percent?: number
           updated_at?: string
@@ -1297,6 +1314,7 @@ export type Database = {
           invoice_footer?: string | null
           logo_path?: string | null
           name?: string
+          paid_until?: string | null
           phone?: string | null
           seller_max_discount_percent?: number
           updated_at?: string
@@ -1572,11 +1590,87 @@ export type Database = {
           },
         ]
       }
+      subscription_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          declared_by: string | null
+          id: string
+          monthly_price: number
+          months: number
+          operator: string
+          reference: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sender_phone: string
+          shop_id: string
+          status: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          declared_by?: string | null
+          id?: string
+          monthly_price: number
+          months: number
+          operator: string
+          reference: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_phone: string
+          shop_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          declared_by?: string | null
+          id?: string
+          monthly_price?: number
+          months?: number
+          operator?: string
+          reference?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sender_phone?: string
+          shop_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_payments_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_subscription_payments: {
+        Args: never
+        Returns: {
+          amount: number
+          created_at: string
+          id: string
+          months: number
+          operator: string
+          paid_until: string
+          reference: string
+          sender_phone: string
+          shop_id: string
+          shop_name: string
+          status: string
+        }[]
+      }
+      am_i_platform_admin: { Args: never; Returns: boolean }
       apply_changes: { Args: { p_changes: Json }; Returns: undefined }
       create_shop: {
         Args: {
@@ -1588,6 +1682,16 @@ export type Database = {
         }
         Returns: string
       }
+      declare_subscription_payment: {
+        Args: {
+          p_months: number
+          p_operator: string
+          p_reference: string
+          p_sender_phone: string
+          p_shop_id: string
+        }
+        Returns: string
+      }
       register_device: {
         Args: {
           p_device_id: string
@@ -1596,6 +1700,18 @@ export type Database = {
           p_shop_id: string
         }
         Returns: number
+      }
+      review_subscription_payment: {
+        Args: { p_accept: boolean; p_note: string; p_payment_id: string }
+        Returns: undefined
+      }
+      subscription_quote: {
+        Args: { p_shop_id: string }
+        Returns: {
+          average_revenue: number
+          monthly_price: number
+          reason: string
+        }[]
       }
     }
     Enums: {

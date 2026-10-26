@@ -3,6 +3,7 @@ import { frCustomers } from './fr-customers';
 import { frDashboard } from './fr-dashboard';
 import { frProductErrors, frProducts } from './fr-products';
 import { frPublish } from './fr-publish';
+import { frSubscription } from './fr-subscription';
 import { frSales, frSalesErrors } from './fr-sales';
 import { frSettings, frSettingsErrors } from './fr-settings';
 import { frTeam } from './fr-team';
@@ -164,4 +165,5 @@ export const fr = {
   ...frDashboard,
   ...frSettings,
   ...frPublish,
+  ...frSubscription,
 } as const;

@@ -1086,3 +1086,50 @@ h2 {
     transform: none;
   }
 }
+
+/* Tarifs */
+.prices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+@media (max-width: 800px) {
+  .prices {
+    grid-template-columns: 1fr;
+  }
+}
+.price {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  padding: 28px;
+  background: #fff;
+  text-align: center;
+}
+.price.featured {
+  border-color: var(--green);
+  box-shadow: var(--shadow);
+  transform: translateY(-6px);
+}
+.price h3 {
+  margin: 0 0 8px;
+}
+.price .amount {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--green-deep);
+  margin: 0 0 8px;
+}
+.price .amount small {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 4px;
+}
+.price p {
+  color: var(--muted);
+  margin: 0;
+}
+.price-notes {
+  max-width: 640px;
+  margin: 30px auto;
+}

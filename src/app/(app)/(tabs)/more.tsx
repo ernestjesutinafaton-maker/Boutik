@@ -12,6 +12,7 @@ import { BigButton } from '@/components/big-button';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
 import { useOutbox } from '@/invoices/outbox';
+import { useIsPlatformAdmin } from '@/subscription/subscription-data';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -27,6 +28,7 @@ export default function MoreScreen() {
   const { can } = useActiveMember();
   const { preference, setPreference } = useThemePreference();
   const outbox = useOutbox();
+  const isPlatformAdmin = useIsPlatformAdmin();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   // Nombre d'opérations pas encore envoyées qui empêchent la déconnexion (0 = rien de bloqué)
   const [blockingCount, setBlockingCount] = useState(0);
@@ -126,6 +128,26 @@ export default function MoreScreen() {
 
       {can('settings.manage') || can('reports.account') ? (
         <Card mode="outlined">
+          {can('settings.manage') ? (
+            <List.Item
+              title={t('subscription.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('subscription.menuHelp')}
+              left={(props) => <List.Icon {...props} icon="crown" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/subscription')}
+            />
+          ) : null}
+          {isPlatformAdmin ? (
+            <List.Item
+              title={t('subscription.adminMenu')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('subscription.adminTitle')}
+              left={(props) => <List.Icon {...props} icon="shield-crown" />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/admin-payments')}
+            />
+          ) : null}
           {can('settings.manage') ? (
             <List.Item
               title={t('settings.title')}

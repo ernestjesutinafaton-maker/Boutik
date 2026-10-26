@@ -33,6 +33,7 @@ const shops = new Table({
   expiry_alert_days_second: column.integer,
   seller_max_discount_percent: column.integer,
   allow_sale_without_stock: column.integer,
+  paid_until: column.text, // fin de l'abonnement payé (modifiée seulement par le serveur)
   created_at: column.text,
   updated_at: column.text,
 });

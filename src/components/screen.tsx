@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SubscriptionBanner } from '@/subscription/subscription-banner';
 import { useAppTheme } from '@/theme/paper-theme';
 
 import { ActiveMemberBar } from './active-member-bar';
@@ -37,6 +38,7 @@ export function Screen({ title, stack = false, scroll = true, children }: Screen
     <View style={[styles.inner, { maxWidth: layout.contentMaxWidth, gap: spacing.md }]}>
       <UpdateBanner />
       <SyncStatusBanner />
+      <SubscriptionBanner />
       <ActiveMemberBar />
       {stack ? null : (
         <Text variant="headlineMedium" style={styles.title}>

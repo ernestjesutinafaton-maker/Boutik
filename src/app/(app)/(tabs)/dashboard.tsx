@@ -19,6 +19,7 @@ import { useCatalog } from '@/products/product-data';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useExpiringLots } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';
+import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
 import { useAppTheme } from '@/theme/paper-theme';
 
 /**
@@ -39,6 +40,7 @@ export default function DashboardScreen() {
     settings?.expiryAlertDays ?? DEFAULT_EXPIRY_ALERT_DAYS
   );
   const [period, setPeriod] = useState<DashboardPeriod>('today');
+  const limited = useIsLimited();
   const currency: CurrencyCode = settings?.currencyCode ?? 'XOF';
   const { spacing } = theme.app;
 
@@ -57,6 +59,14 @@ export default function DashboardScreen() {
             />
           </Card>
         ) : null}
+      </Screen>
+    );
+  }
+
+  if (limited) {
+    return (
+      <Screen title={t('nav.dashboard')}>
+        <LimitedNotice />
       </Screen>
     );
   }

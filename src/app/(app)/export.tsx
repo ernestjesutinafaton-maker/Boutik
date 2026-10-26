@@ -13,6 +13,7 @@ import { buildExport, type ExportKind } from '@/export/datasets';
 import { shareTextFile } from '@/export/share-file';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
+import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
 import { useAppTheme } from '@/theme/paper-theme';
 
 const KINDS: ExportKind[] = ['sales', 'saleLines', 'products', 'customers', 'expenses'];
@@ -54,6 +55,7 @@ export default function ExportScreen() {
   const [message, setMessage] = useState<{ text: string; tone: 'info' | 'error' } | null>(null);
   const [isWorking, setIsWorking] = useState(false);
   const { spacing } = theme.app;
+  const limited = useIsLimited();
   // Les produits et les clients sont exportés tels qu'ils sont aujourd'hui (pas de période)
   const usesPeriod = kind === 'sales' || kind === 'saleLines' || kind === 'expenses';
 
@@ -61,6 +63,14 @@ export default function ExportScreen() {
     return (
       <Screen title={t('export.title')} stack>
         <Notice message={t('common.forbidden')} />
+      </Screen>
+    );
+  }
+
+  if (limited) {
+    return (
+      <Screen title={t('export.title')} stack>
+        <LimitedNotice />
       </Screen>
     );
   }
