@@ -50,7 +50,19 @@ const contact = [
   .filter(Boolean)
   .join('\n');
 
+// Logos officiels (site/icons/*.svg) insérés dans la page : {{icon.android}}, {{icon.windows}}…
+const icons = Object.fromEntries(
+  readdirSync(join(site, 'icons')).map((file) => [
+    `icon.${file.replace('.svg', '')}`,
+    readFileSync(join(site, 'icons', file), 'utf8')
+      .trim()
+      .replace('<svg ', '<svg aria-hidden="true" focusable="false" width="40" height="40" ')
+      .replace(/<title>.*?<\/title>/, ''),
+  ])
+);
+
 const values = {
+  ...icons,
   siteUrl: config.siteUrl,
   version: config.version,
   year: String(new Date().getFullYear()),

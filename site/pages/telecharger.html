@@ -15,7 +15,7 @@ description: Installe Boutik sur ton téléphone Android, ton ordinateur Windows
   <div class="wrap install">
     <article class="install-card reveal" id="android" data-platform="android">
       <div class="install-head">
-        <span class="dl-ico">🤖</span>
+        <span class="dl-ico ico-android">{{icon.android}}</span>
         <h2>Android</h2>
       </div>
       <a class="btn btn-primary btn-lg" href="{{downloads.android}}" download>Télécharger l’APK</a>
@@ -35,7 +35,7 @@ description: Installe Boutik sur ton téléphone Android, ton ordinateur Windows
 
     <article class="install-card reveal" style="--d: 80ms" id="windows" data-platform="windows">
       <div class="install-head">
-        <span class="dl-ico">🪟</span>
+        <span class="dl-ico ico-windows">{{icon.windows}}</span>
         <h2>Windows</h2>
       </div>
       <a class="btn btn-primary btn-lg" href="{{downloads.windows}}" download
@@ -57,7 +57,7 @@ description: Installe Boutik sur ton téléphone Android, ton ordinateur Windows
 
     <article class="install-card reveal" style="--d: 160ms" id="linux" data-platform="linux">
       <div class="install-head">
-        <span class="dl-ico">🐧</span>
+        <span class="dl-ico ico-linux">{{icon.linux}}</span>
         <h2>Linux</h2>
       </div>
       <a class="btn btn-primary btn-lg" href="{{downloads.linux}}" download
@@ -74,7 +74,7 @@ description: Installe Boutik sur ton téléphone Android, ton ordinateur Windows
 
     <article class="install-card reveal" style="--d: 240ms" id="web" data-platform="web">
       <div class="install-head">
-        <span class="dl-ico">🌐</span>
+        <span class="dl-ico ico-web">{{icon.web}}</span>
         <h2>Version web</h2>
       </div>
       <a class="btn btn-primary btn-lg" href="/app/">Ouvrir Boutik</a>
@@ -88,5 +88,7 @@ description: Installe Boutik sur ton téléphone Android, ton ordinateur Windows
       </ol>
     </article>
   </div>
-  <p class="note wrap reveal">🍎 Applications iPhone et Mac : bientôt disponibles.</p>
+  <p class="note wrap reveal">
+    <span class="inline-ico">{{icon.apple}}</span> Applications iPhone et Mac : bientôt disponibles.
+  </p>
 </section>
