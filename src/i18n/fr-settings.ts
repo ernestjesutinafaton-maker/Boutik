@@ -1,5 +1,19 @@
 /** Textes du journal des actions, des paramètres et de l'export (étape 17). */
 export const frSettings = {
+  reset: {
+    title: 'Effacer les données de test',
+    help: 'Pendant l’essai gratuit, tu peux repartir de zéro : produits, clients, ventes, stock, caisse et comptes sont effacés pour de bon. Ta boutique, ton équipe et tes moyens de paiement restent.',
+    button: 'Tout effacer',
+    confirmTitle: 'Tout effacer pour de bon ?',
+    confirmText:
+      'Cette action ne peut pas être annulée. Tous les téléphones de la boutique seront vidés à leur prochaine connexion. Tape « {{word}} » pour confirmer.',
+    typeWord: 'Tape {{word}}',
+    done: 'C’est fait : la boutique est vide. Les autres téléphones seront vidés à leur prochaine connexion.',
+    pending:
+      'Des opérations de ce téléphone ne sont pas encore envoyées. Connecte-toi à internet, attends l’envoi, puis recommence.',
+    forbidden: 'Effacement refusé : il n’est possible que pendant les 15 jours d’essai.',
+    offline: 'Effacement impossible : vérifie ta connexion internet et recommence.',
+  },
   audit: {
     title: 'Historique des actions',
     menuHelp: 'Qui a fait quoi, quand, sur quel appareil',

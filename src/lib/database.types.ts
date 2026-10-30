@@ -1701,6 +1701,10 @@ export type Database = {
         }
         Returns: number
       }
+      reset_shop_data: {
+        Args: { p_confirmation: string; p_shop_id: string }
+        Returns: undefined
+      }
       review_subscription_payment: {
         Args: { p_accept: boolean; p_note: string; p_payment_id: string }
         Returns: undefined

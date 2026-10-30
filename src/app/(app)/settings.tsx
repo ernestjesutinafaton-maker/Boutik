@@ -35,6 +35,7 @@ import {
   type SettingsInput,
   settingsToInput,
 } from '@/shop/settings-values';
+import { ResetDataCard } from '@/shop/reset-data-card';
 import { type ShopSettings, useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -190,6 +191,8 @@ function SettingsForm({ settings }: { settings: ShopSettings }) {
       </BigButton>
 
       <PaymentMethodsCard />
+
+      <ResetDataCard />
     </Screen>
   );
 }
