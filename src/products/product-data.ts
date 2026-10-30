@@ -30,6 +30,7 @@ type UnitJson = {
   name: string;
   factor: number;
   sale_price: number | null;
+  purchase_price: number | null;
   barcode: string | null;
   is_default: number;
   sort_order: number;
@@ -44,7 +45,7 @@ const PRODUCT_SELECT = `
          p.allow_decimal, p.low_stock_threshold, p.track_expiry, p.photo_path, p.archived_at,
          COALESCE((SELECT SUM(m.quantity) FROM stock_movements m WHERE m.product_id = p.id), 0) AS stock,
          (SELECT json_group_array(json_object(
-                   'id', u.id, 'name', u.name, 'factor', u.factor, 'sale_price', u.sale_price,
+                   'id', u.id, 'name', u.name, 'factor', u.factor, 'sale_price', u.sale_price, 'purchase_price', u.purchase_price,
                    'barcode', u.barcode, 'is_default', u.is_default, 'sort_order', u.sort_order))
             FROM product_units u
            WHERE u.product_id = p.id AND u.archived_at IS NULL) AS units
@@ -57,6 +58,7 @@ function toUnit(json: UnitJson): CatalogUnit {
     name: json.name,
     factor: json.factor,
     salePrice: json.sale_price,
+    purchasePrice: json.purchase_price ?? null,
     barcode: json.barcode,
     isDefault: json.is_default === 1,
     sortOrder: json.sort_order ?? 0,

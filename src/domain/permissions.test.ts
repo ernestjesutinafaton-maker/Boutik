@@ -38,9 +38,12 @@ describe('Droits des rôles', () => {
     expect(can(roles, 'stock.adjust')).toBe(false);
   });
 
-  it('le gérant remplace le propriétaire, sauf bénéfices, équipe, paramètres et dettes effacées', () => {
+  it('le gérant remplace le propriétaire, sauf bénéfices, équipe, paramètres, dettes effacées et catalogue', () => {
     expect(can(['manager'], 'sale.cancel')).toBe(true);
-    expect(can(['manager'], 'prices.edit')).toBe(true);
+    // Seul le propriétaire ajoute les produits et fixe les prix
+    expect(can(['manager'], 'prices.edit')).toBe(false);
+    expect(can(['manager'], 'catalog.edit')).toBe(false);
+    expect(can(['owner'], 'catalog.edit')).toBe(true);
     expect(can(['manager'], 'reports.account')).toBe(true);
     expect(can(['manager'], 'reports.profit')).toBe(false);
     expect(can(['manager'], 'team.manage')).toBe(false);
@@ -54,6 +57,7 @@ describe('Droits des rôles', () => {
     expect(can(['stock_manager'], 'stock.adjust')).toBe(true);
     expect(can(['stock_manager'], 'stock.view_costs')).toBe(true);
     expect(can(['stock_manager'], 'prices.edit')).toBe(false);
+    expect(can(['stock_manager'], 'catalog.edit')).toBe(false);
     expect(can(['stock_manager'], 'sale.create')).toBe(false);
   });
 
@@ -92,17 +96,13 @@ describe('Vérification complète : le tableau des droits', () => {
           'settings.manage',
           'credit.write_off',
           'data.delete',
+          'catalog.edit',
+          'prices.edit',
         ].includes(p)
     ),
     cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
     seller: ['sale.create', 'credit.repayment', 'customers.edit'],
-    stock_manager: [
-      'stock.receive',
-      'stock.count',
-      'stock.adjust',
-      'stock.view_costs',
-      'catalog.edit',
-    ],
+    stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
     stock_counter: ['stock.count'],
   };
 
@@ -121,6 +121,8 @@ describe('Vérification complète : le tableau des droits', () => {
       'settings.manage',
       'credit.write_off',
       'data.delete',
+      'catalog.edit',
+      'prices.edit',
     ] as const) {
       expect(can(['owner'], permission)).toBe(true);
       expect(

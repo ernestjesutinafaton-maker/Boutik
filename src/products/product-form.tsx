@@ -21,6 +21,8 @@ import { Notice } from '@/components/notice';
 import { TextField } from '@/components/text-field';
 import { useActionContext } from '@/data/use-action-context';
 import { newId } from '@/data/ids';
+import { formatMoney } from '@/domain/money';
+import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
@@ -30,6 +32,7 @@ import {
   BASE_KEY,
   type PackagingInput,
   type ProductErrors,
+  previewMargins,
   type ProductInput,
 } from './product-form-values';
 import { ProductPhoto } from './product-photo';
@@ -71,6 +74,8 @@ export function ProductForm(props: ProductFormProps) {
   const categories = useCategories();
   const canEditPrices = can('prices.edit');
   const { spacing } = theme.app;
+  const currency = useShopSettings()?.currencyCode ?? 'XOF';
+  const margins = previewMargins(values, currency);
 
   // Où ira le code scanné : le produit lui-même, ou un conditionnement
   const [scanTarget, setScanTarget] = useState<string | null>(null);
@@ -96,6 +101,7 @@ export function ProductForm(props: ProductFormProps) {
       name: '',
       contains: '',
       price: '',
+      cost: '',
       barcode: '',
     };
     onChange({ ...values, packagings: [...values.packagings, packaging] });
@@ -258,6 +264,14 @@ export function ProductForm(props: ProductFormProps) {
                 disabled={!canEditPrices}
                 errorMessage={errors.fields.basePrice ? t(errors.fields.basePrice) : null}
               />
+              <TextField
+                label={t('productForm.baseCost', { unit: unitName })}
+                value={values.baseCost}
+                onChangeText={(baseCost) => onChange({ ...values, baseCost })}
+                keyboardType="numeric"
+                disabled={!canEditPrices}
+                errorMessage={errors.fields.baseCost ? t(errors.fields.baseCost) : null}
+              />
             </View>
           </View>
 
@@ -318,6 +332,14 @@ export function ProductForm(props: ProductFormProps) {
                   errorMessage={packagingErrors.price ? t(packagingErrors.price) : null}
                 />
                 <TextField
+                  label={t('productForm.packagingCost')}
+                  value={packaging.cost}
+                  onChangeText={(cost) => updatePackaging(packaging.key, { cost })}
+                  keyboardType="numeric"
+                  disabled={!canEditPrices}
+                  errorMessage={packagingErrors.cost ? t(packagingErrors.cost) : null}
+                />
+                <TextField
                   label={t('productForm.packagingBarcode')}
                   value={packaging.barcode}
                   onChangeText={(barcode) => updatePackaging(packaging.key, { barcode })}
@@ -336,6 +358,45 @@ export function ProductForm(props: ProductFormProps) {
           </Text>
         </Card.Content>
       </Card>
+
+      {canEditPrices && margins.some((unit) => unit.margin !== null) ? (
+        <Card mode="outlined">
+          <Card.Title title={t('productForm.marginsTitle')} titleVariant="titleLarge" />
+          <Card.Content style={{ gap: spacing.xs }}>
+            {margins.map((unit) => (
+              <View key={unit.unitId} style={[styles.row, { gap: spacing.sm }]}>
+                <Text variant="bodyLarge" style={styles.fill}>
+                  {unit.unitName}
+                  {unit.cost !== null
+                    ? ` · ${t(unit.derived ? 'productForm.costDerived' : 'productForm.cost', {
+                        amount: formatMoney(unit.cost, currency),
+                      })}`
+                    : ''}
+                </Text>
+                <Text
+                  variant="bodyLarge"
+                  style={{
+                    fontWeight: '700',
+                    color:
+                      unit.margin !== null && unit.margin < 0
+                        ? theme.app.colors.danger
+                        : theme.colors.primary,
+                  }}>
+                  {unit.margin === null
+                    ? '—'
+                    : `${unit.margin > 0 ? '+' : ''}${formatMoney(unit.margin, currency)}`}
+                </Text>
+              </View>
+            ))}
+            {margins.some((unit) => unit.margin !== null && unit.margin < 0) ? (
+              <Notice tone="error" message={t('productForm.marginLoss')} />
+            ) : null}
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+              {t('productForm.marginsHelp')}
+            </Text>
+          </Card.Content>
+        </Card>
+      ) : null}
 
       <Card mode="outlined">
         <Card.Title title={t('productForm.stockTitle')} titleVariant="titleLarge" />

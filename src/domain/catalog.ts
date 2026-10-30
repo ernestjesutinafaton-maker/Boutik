@@ -12,6 +12,8 @@ export type CatalogUnit = {
   factor: number;
   /** Prix de vente de CETTE unité (null = pas vendue dans cette unité) */
   salePrice: number | null;
+  /** Prix d'achat de CETTE unité chez le fournisseur (null = inconnu) */
+  purchasePrice: number | null;
   barcode: string | null;
   isDefault: boolean;
   sortOrder: number;

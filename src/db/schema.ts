@@ -133,6 +133,7 @@ const product_units = new Table(
     name: column.text,
     factor: column.integer,
     sale_price: column.integer,
+    purchase_price: column.integer,
     barcode: column.text,
     is_default: column.integer,
     sort_order: column.integer,

@@ -25,6 +25,7 @@ export const frProducts = {
     baseUnit: 'Unité de base (le stock est compté dans cette unité)',
     contains: 'Contient {{quantity}} {{unit}}',
     notSold: 'Pas vendu',
+    marginLine: 'bénéfice {{amount}}',
     archive: 'Supprimer',
     archiveConfirmTitle: 'Supprimer ce produit ?',
     archiveConfirmText:
@@ -56,6 +57,15 @@ export const frProducts = {
     baseUnitFallback: 'unité',
     allowDecimal: 'Vendre avec une virgule (ex. 2,5 {{unit}})',
     basePrice: 'Prix de vente pour 1 {{unit}}',
+    baseCost: 'Prix d’achat pour 1 {{unit}} (chez le fournisseur, facultatif)',
+    packagingCost: 'Prix d’achat chez le fournisseur (facultatif)',
+    marginsTitle: 'Bénéfice par unité vendue',
+    cost: 'acheté {{amount}}',
+    costDerived: 'revient à {{amount}}',
+    marginLoss:
+      'Attention : une unité est vendue moins cher qu’elle ne coûte. Vérifie son prix de vente.',
+    marginsHelp:
+      'Tape le prix d’achat d’une seule unité (par exemple le sac) : les autres sont calculées. Le bénéfice réel de tes comptes utilise le prix payé à chaque réception, moins les dépenses.',
     packagingsTitle: 'Autres unités de vente ou d’achat',
     packagingsHelp:
       'Sac, carton, tine… Indique combien de {{unit}} chacune contient. Laisse le prix vide si tu ne la vends pas (seulement pour acheter).',

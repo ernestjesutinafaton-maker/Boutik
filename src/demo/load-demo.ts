@@ -78,6 +78,8 @@ export async function loadDemoData(
           name: unit.name,
           factor: unit.factor * 1000,
           salePrice: unit.price,
+          // Le prix d'achat de l'unité achetée au fournisseur (les autres en sont déduites)
+          purchasePrice: index === product.purchase.unitIndex ? product.purchase.cost : null,
           barcode: null,
           isDefault: index === 0,
           sortOrder: index,

@@ -1,4 +1,5 @@
 import { type CatalogProduct, sortUnits } from '@/domain/catalog';
+import { type UnitMargin, unitMargins } from '@/domain/margin';
 import { type CurrencyCode, formatMoneyInput, parseMoney } from '@/domain/money';
 import { formatQuantity, MILLI, parseQuantity } from '@/domain/quantity';
 import type { TranslationKey } from '@/i18n/keys';
@@ -18,6 +19,8 @@ export type PackagingInput = {
   /** Combien d'unités de base il contient, tapé en texte (« 50 », « 2,5 ») */
   contains: string;
   price: string;
+  /** Prix d'achat chez le fournisseur (texte, vide = inconnu) */
+  cost: string;
   barcode: string;
 };
 
@@ -30,6 +33,8 @@ export type ProductInput = {
   baseUnit: string;
   baseUnitId: string | null;
   basePrice: string;
+  /** Prix d'achat de l'unité de base (texte, vide = inconnu) */
+  baseCost: string;
   allowDecimal: boolean;
   trackExpiry: boolean;
   /** Seuil d'alerte de stock bas, en unités de base (texte, vide = pas d'alerte) */
@@ -47,6 +52,7 @@ export type UnitValues = {
   name: string;
   factor: number;
   salePrice: number | null;
+  purchasePrice: number | null;
   barcode: string | null;
   isDefault: boolean;
   sortOrder: number;
@@ -63,8 +69,8 @@ export type ProductValues = {
   units: UnitValues[];
 };
 
-type ProductField = 'name' | 'baseUnit' | 'basePrice' | 'lowStock' | 'barcode';
-type PackagingField = 'name' | 'contains' | 'price' | 'barcode';
+type ProductField = 'name' | 'baseUnit' | 'basePrice' | 'baseCost' | 'lowStock' | 'barcode';
+type PackagingField = 'name' | 'contains' | 'price' | 'cost' | 'barcode';
 
 export type ProductErrors = {
   fields: Partial<Record<ProductField, TranslationKey>>;
@@ -83,6 +89,7 @@ export function emptyProductInput(): ProductInput {
     baseUnit: '',
     baseUnitId: null,
     basePrice: '',
+    baseCost: '',
     allowDecimal: false,
     trackExpiry: false,
     lowStock: '',
@@ -107,6 +114,7 @@ export function productToInput(product: CatalogProduct, currency: CurrencyCode):
     baseUnit: product.baseUnit,
     baseUnitId: base?.id ?? null,
     basePrice: money(base?.salePrice ?? null),
+    baseCost: money(base?.purchasePrice ?? null),
     allowDecimal: product.allowDecimal,
     trackExpiry: product.trackExpiry,
     lowStock: product.lowStockThreshold === null ? '' : formatQuantity(product.lowStockThreshold),
@@ -116,6 +124,7 @@ export function productToInput(product: CatalogProduct, currency: CurrencyCode):
       name: unit.name,
       contains: formatQuantity(unit.factor),
       price: money(unit.salePrice),
+      cost: money(unit.purchasePrice),
       barcode: unit.barcode ?? '',
     })),
     defaultKey: defaultUnit && defaultUnit !== base ? defaultUnit.id : BASE_KEY,
@@ -157,6 +166,10 @@ export function parseProductInput(
   if (basePrice === 'invalid') {
     errors.fields.basePrice = 'errors.priceInvalid';
   }
+  const baseCost = readPrice(input.baseCost);
+  if (baseCost === 'invalid') {
+    errors.fields.baseCost = 'errors.priceInvalid';
+  }
 
   let lowStockThreshold: number | null = null;
   if (input.lowStock.trim() !== '') {
@@ -193,6 +206,10 @@ export function parseProductInput(
     if (price === 'invalid') {
       packagingErrors.price = 'errors.priceInvalid';
     }
+    const cost = readPrice(packaging.cost);
+    if (cost === 'invalid') {
+      packagingErrors.cost = 'errors.priceInvalid';
+    }
 
     if (packagingBarcode) {
       if (barcodes.includes(packagingBarcode)) {
@@ -209,6 +226,7 @@ export function parseProductInput(
         name: packagingName,
         factor: factor ?? MILLI,
         salePrice: price === 'invalid' ? null : price,
+        purchasePrice: cost === 'invalid' ? null : cost,
         barcode: packagingBarcode || null,
         isDefault: false,
         sortOrder: index + 1,
@@ -221,6 +239,7 @@ export function parseProductInput(
     name: baseUnit,
     factor: MILLI,
     salePrice: basePrice === 'invalid' ? null : basePrice,
+    purchasePrice: baseCost === 'invalid' ? null : baseCost,
     barcode: null,
     isDefault: false,
     sortOrder: 0,
@@ -261,4 +280,36 @@ export function parseProductInput(
       units,
     },
   };
+}
+
+/**
+ * Les marges pendant la saisie (avant d'enregistrer) : ce qui est tapé de travers
+ * est simplement ignoré ici (le formulaire le signale à l'enregistrement).
+ */
+export function previewMargins(input: ProductInput, currency: CurrencyCode): UnitMargin[] {
+  const money = (text: string) => (text.trim() === '' ? null : parseMoney(text, currency));
+  const units = [
+    {
+      id: BASE_KEY,
+      name: input.baseUnit.trim() || '—',
+      factor: MILLI,
+      salePrice: money(input.basePrice),
+      purchasePrice: money(input.baseCost),
+    },
+    ...input.packagings.flatMap((packaging) => {
+      const factor = parseQuantity(packaging.contains);
+      return factor === null || factor === 0
+        ? []
+        : [
+            {
+              id: packaging.key,
+              name: packaging.name.trim() || '—',
+              factor,
+              salePrice: money(packaging.price),
+              purchasePrice: money(packaging.cost),
+            },
+          ];
+    }),
+  ];
+  return unitMargins(units).filter((unit) => unit.salePrice !== null || unit.cost !== null);
 }

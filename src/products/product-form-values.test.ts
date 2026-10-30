@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { CatalogProduct } from '@/domain/catalog';
 
 import {
+  previewMargins,
   BASE_KEY,
   emptyProductInput,
   type ProductInput,
@@ -20,8 +21,16 @@ function rizInput(): ProductInput {
     allowDecimal: true,
     lowStock: '100',
     packagings: [
-      { key: 'a', id: null, name: 'Sac 50 kg', contains: '50', price: '32 000', barcode: '' },
-      { key: 'b', id: null, name: 'Tine', contains: '2,5', price: '1750', barcode: '' },
+      {
+        key: 'a',
+        id: null,
+        name: 'Sac 50 kg',
+        contains: '50',
+        price: '32 000',
+        cost: '',
+        barcode: '',
+      },
+      { key: 'b', id: null, name: 'Tine', contains: '2,5', price: '1750', cost: '', barcode: '' },
     ],
     defaultKey: 'a',
   };
@@ -40,6 +49,7 @@ describe('Formulaire produit', () => {
         name: 'Sac 50 kg',
         factor: 50_000,
         salePrice: 32_000,
+        purchasePrice: null,
         isDefault: true,
       }),
       expect.objectContaining({ name: 'Tine', factor: 2500, salePrice: 1750, sortOrder: 2 }),
@@ -82,8 +92,8 @@ describe('Formulaire produit', () => {
   it('signale les erreurs de chaque conditionnement', () => {
     const input = rizInput();
     input.packagings.push(
-      { key: 'c', id: null, name: 'sac 50 KG', contains: '0', price: 'abc', barcode: '' },
-      { key: 'd', id: null, name: 'KG', contains: '1', price: '', barcode: '' }
+      { key: 'c', id: null, name: 'sac 50 KG', contains: '0', price: 'abc', cost: '', barcode: '' },
+      { key: 'd', id: null, name: 'KG', contains: '1', price: '', cost: '', barcode: '' }
     );
     const result = parseProductInput(input, 'XOF');
     expect(result.success).toBe(false);
@@ -132,6 +142,7 @@ describe('Formulaire produit', () => {
           name: 'Sac 50 kg',
           factor: 50_000,
           salePrice: 32_000,
+          purchasePrice: null,
           barcode: null,
           isDefault: true,
           sortOrder: 1,
@@ -141,6 +152,7 @@ describe('Formulaire produit', () => {
           name: 'kg',
           factor: 1000,
           salePrice: 700,
+          purchasePrice: null,
           barcode: null,
           isDefault: false,
           sortOrder: 0,
@@ -152,7 +164,15 @@ describe('Formulaire produit', () => {
     expect(input.basePrice).toBe('700');
     expect(input.defaultKey).toBe('u2');
     expect(input.packagings).toEqual([
-      { key: 'u2', id: 'u2', name: 'Sac 50 kg', contains: '50', price: '32000', barcode: '' },
+      {
+        key: 'u2',
+        id: 'u2',
+        name: 'Sac 50 kg',
+        contains: '50',
+        price: '32000',
+        cost: '',
+        barcode: '',
+      },
     ]);
     const result = parseProductInput(input, 'XOF');
     expect(result.success).toBe(true);
@@ -163,5 +183,33 @@ describe('Formulaire produit', () => {
       ['u1', 1000, 700, false],
       ['u2', 50_000, 32_000, true],
     ]);
+  });
+});
+
+describe('Bénéfice pendant la saisie', () => {
+  it('le sac acheté 30 000 F : le kg revient à 600 F, vendu 700 F il rapporte 100 F', () => {
+    const input = rizInput();
+    input.packagings[0].cost = '30 000';
+    const margins = previewMargins(input, 'XOF');
+    expect(margins.find((unit) => unit.unitName === 'kg')).toMatchObject({
+      cost: 600,
+      derived: true,
+      margin: 100,
+    });
+    expect(margins.find((unit) => unit.unitName === 'Sac 50 kg')).toMatchObject({
+      cost: 30_000,
+      margin: 2000,
+    });
+  });
+
+  it('le prix d’achat tapé est enregistré avec l’unité', () => {
+    const input = rizInput();
+    input.packagings[0].cost = '30 000';
+    const result = parseProductInput(input, 'XOF');
+    expect(result.success).toBe(true);
+    if (!result.success) return;
+    const sac = result.data.units.find((unit) => unit.name === 'Sac 50 kg');
+    expect(sac?.purchasePrice).toBe(30_000);
+    expect(result.data.units[0].purchasePrice).toBeNull();
   });
 });

@@ -20,9 +20,9 @@ async function insertUnit(
 ) {
   await tx.execute(
     `INSERT INTO product_units
-       (id, shop_id, product_id, name, factor, sale_price, barcode, is_default, sort_order,
-        created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+       (id, shop_id, product_id, name, factor, sale_price, purchase_price, barcode, is_default,
+        sort_order, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       newId(),
       context.shopId,
@@ -30,6 +30,7 @@ async function insertUnit(
       unit.name,
       unit.factor,
       unit.salePrice,
+      unit.purchasePrice,
       unit.barcode,
       unit.isDefault ? 1 : 0,
       unit.sortOrder,
@@ -153,19 +154,21 @@ export async function updateProduct(
         previous.name !== unit.name ||
         previous.factor !== unit.factor ||
         previous.salePrice !== unit.salePrice ||
+        previous.purchasePrice !== unit.purchasePrice ||
         previous.barcode !== unit.barcode ||
         previous.isDefault !== unit.isDefault ||
         previous.sortOrder !== unit.sortOrder;
       if (changed) {
         await tx.execute(
           `UPDATE product_units
-              SET name = ?, factor = ?, sale_price = ?, barcode = ?, is_default = ?,
-                  sort_order = ?, updated_at = ?
+              SET name = ?, factor = ?, sale_price = ?, purchase_price = ?, barcode = ?,
+                  is_default = ?, sort_order = ?, updated_at = ?
             WHERE id = ?`,
           [
             unit.name,
             unit.factor,
             unit.salePrice,
+            unit.purchasePrice,
             unit.barcode,
             unit.isDefault ? 1 : 0,
             unit.sortOrder,

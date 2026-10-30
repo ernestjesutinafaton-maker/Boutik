@@ -30,8 +30,8 @@ export const PERMISSIONS = [
   'stock.count', // compter le stock (inventaire « à l'aveugle »)
   'stock.adjust', // voir le stock calculé, valider l'inventaire, ajuster le stock
   'stock.view_costs', // voir les prix d'achat
-  'catalog.edit', // créer et modifier les produits, unités, catégories
-  'prices.edit', // modifier les prix de vente
+  'catalog.edit', // créer, modifier et supprimer les produits, unités, rayons (propriétaire seul)
+  'prices.edit', // fixer les prix de vente et d'achat (propriétaire seul)
   'expired.force', // forcer la vente d'un produit périmé
   'reports.account', // faire un « compte », voir les archives
   'reports.profit', // voir les bénéfices et le tableau de bord complet
@@ -45,7 +45,7 @@ export type Permission = (typeof PERMISSIONS)[number];
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   owner: PERMISSIONS,
   // Le gérant remplace le propriétaire, sauf les bénéfices, l'équipe, les paramètres
-  // l'effacement des dettes et les suppressions
+  // l'effacement des dettes, les suppressions, et le catalogue avec ses prix
   manager: PERMISSIONS.filter(
     (permission) =>
       ![
@@ -54,17 +54,13 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
         'settings.manage',
         'credit.write_off',
         'data.delete',
+        'catalog.edit',
+        'prices.edit',
       ].includes(permission)
   ),
   cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
   seller: ['sale.create', 'credit.repayment', 'customers.edit'],
-  stock_manager: [
-    'stock.receive',
-    'stock.count',
-    'stock.adjust',
-    'stock.view_costs',
-    'catalog.edit',
-  ],
+  stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
   stock_counter: ['stock.count'],
 };
 

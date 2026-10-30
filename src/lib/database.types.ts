@@ -766,6 +766,7 @@ export type Database = {
           is_default: boolean
           name: string
           product_id: string
+          purchase_price: number | null
           sale_price: number | null
           shop_id: string
           sort_order: number
@@ -780,6 +781,7 @@ export type Database = {
           is_default?: boolean
           name: string
           product_id: string
+          purchase_price?: number | null
           sale_price?: number | null
           shop_id: string
           sort_order?: number
@@ -794,6 +796,7 @@ export type Database = {
           is_default?: boolean
           name?: string
           product_id?: string
+          purchase_price?: number | null
           sale_price?: number | null
           shop_id?: string
           sort_order?: number

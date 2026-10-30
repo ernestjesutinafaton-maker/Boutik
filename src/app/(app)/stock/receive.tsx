@@ -15,6 +15,7 @@ import { useActionContext } from '@/data/use-action-context';
 import { type CatalogProduct, type CatalogUnit, sortUnits } from '@/domain/catalog';
 import { parseDayInput } from '@/domain/dates';
 import { type CurrencyCode, formatMoneyInput, parseMoney } from '@/domain/money';
+import { unitCost } from '@/domain/margin';
 import { costForQuantity, lineAmount, parseQuantity } from '@/domain/quantity';
 import type { TranslationKey } from '@/i18n/keys';
 import { useProduct } from '@/products/product-data';
@@ -51,7 +52,29 @@ type LastCost = { costPrice: number; costQuantity: number } | null;
 const LAST_COST_SQL =
   'SELECT cost_price, cost_quantity FROM stock_lots WHERE product_id = ? ORDER BY received_at DESC LIMIT 1';
 
-/** Prépare une ligne, avec le dernier prix d'achat ramené à l'unité choisie. */
+/**
+ * Le prix d'achat proposé pour une unité : d'abord celui du catalogue (fixé par le
+ * propriétaire, déduit des autres unités si besoin), sinon celui de la dernière réception.
+ */
+function suggestedCost(
+  product: CatalogProduct,
+  unit: CatalogUnit,
+  lastCost: LastCost,
+  currency: CurrencyCode
+): string | null {
+  const fromCatalog = unitCost(unit, product.units).cost;
+  if (fromCatalog !== null) {
+    return formatMoneyInput(fromCatalog, currency);
+  }
+  return lastCost
+    ? formatMoneyInput(
+        costForQuantity(lastCost.costPrice, lastCost.costQuantity, unit.factor),
+        currency
+      )
+    : null;
+}
+
+/** Prépare une ligne, avec le prix d'achat proposé pour l'unité choisie. */
 function makeLine(
   product: CatalogProduct,
   unit: CatalogUnit,
@@ -63,12 +86,7 @@ function makeLine(
     product,
     unitId: unit.id,
     quantity: '',
-    unitCost: lastCost
-      ? formatMoneyInput(
-          costForQuantity(lastCost.costPrice, lastCost.costQuantity, unit.factor),
-          currency
-        )
-      : '',
+    unitCost: suggestedCost(product, unit, lastCost, currency) ?? '',
     expiry: '',
     lastCost,
   };
@@ -149,12 +167,7 @@ function ReceiveForm({
   function changeUnit(line: LineDraft, unit: CatalogUnit) {
     updateLine(line.key, {
       unitId: unit.id,
-      unitCost: line.lastCost
-        ? formatMoneyInput(
-            costForQuantity(line.lastCost.costPrice, line.lastCost.costQuantity, unit.factor),
-            currency
-          )
-        : line.unitCost,
+      unitCost: suggestedCost(line.product, unit, line.lastCost, currency) ?? line.unitCost,
     });
   }
 

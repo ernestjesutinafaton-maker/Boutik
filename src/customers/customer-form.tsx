@@ -51,8 +51,8 @@ export function CustomerForm({
         value={values.creditLimit}
         onChangeText={(creditLimit) => onChange({ ...values, creditLimit })}
         keyboardType="numeric"
-        // Le plafond de crédit est une décision du propriétaire ou du gérant
-        disabled={!can('prices.edit')}
+        // Le plafond de crédit est une décision du propriétaire ou du gérant (ceux qui font les comptes)
+        disabled={!can('reports.account')}
         errorMessage={errors.creditLimit ? t(errors.creditLimit) : null}
       />
       <HelperText type="info" visible>

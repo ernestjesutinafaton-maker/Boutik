@@ -20,6 +20,7 @@ import {
 } from '@/domain/quantity';
 import { formatDay, formatMoment, today } from '@/domain/dates';
 import { isExpired } from '@/domain/stock';
+import { unitMargins } from '@/domain/margin';
 import { archiveProduct } from '@/products/product-actions';
 import { useProduct } from '@/products/product-data';
 import { ProductPhoto } from '@/products/product-photo';
@@ -62,6 +63,19 @@ export default function ProductScreen() {
   }
 
   const units = sortUnits(product.units);
+  const margins = can('stock.view_costs') ? unitMargins(units) : [];
+  const marginLine = (unitId: string): string | null => {
+    const margin = margins.find((entry) => entry.unitId === unitId);
+    if (!margin || margin.cost === null) return null;
+    const cost = t(margin.derived ? 'productForm.costDerived' : 'productForm.cost', {
+      amount: formatMoney(margin.cost, shop.currencyCode),
+    });
+    return margin.margin === null
+      ? cost
+      : `${cost} · ${t('products.marginLine', {
+          amount: `${margin.margin > 0 ? '+' : ''}${formatMoney(margin.margin, shop.currencyCode)}`,
+        })}`;
+  };
   const day = today();
   const activeLots = lots.filter((lot) => lot.remaining > 0);
 
@@ -132,14 +146,19 @@ export default function ProductScreen() {
             key={unit.id}
             title={unit.isDefault ? `${unit.name} ★` : unit.name}
             titleStyle={styles.bold}
-            description={
+            description={[
               unit.factor === 1000 && unit.sortOrder === 0
                 ? t('products.baseUnit')
                 : t('products.contains', {
                     quantity: formatQuantity(unit.factor),
                     unit: product.baseUnit,
-                  })
-            }
+                  }),
+              // Prix d'achat et bénéfice : seulement pour qui voit les coûts
+              marginLine(unit.id),
+            ]
+              .filter(Boolean)
+              .join('\n')}
+            descriptionNumberOfLines={2}
             right={() => (
               <Text
                 variant="titleMedium"

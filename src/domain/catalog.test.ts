@@ -12,7 +12,14 @@ import {
 } from './catalog';
 
 function unit(partial: Partial<CatalogUnit> & Pick<CatalogUnit, 'id' | 'name' | 'factor'>) {
-  return { salePrice: null, barcode: null, isDefault: false, sortOrder: 0, ...partial };
+  return {
+    salePrice: null,
+    purchasePrice: null,
+    barcode: null,
+    isDefault: false,
+    sortOrder: 0,
+    ...partial,
+  };
 }
 
 function product(partial: Partial<CatalogProduct> & Pick<CatalogProduct, 'id' | 'name'>) {
