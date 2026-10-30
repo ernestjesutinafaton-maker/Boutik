@@ -11,7 +11,7 @@ import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
 import { AgingChip } from '@/customers/aging-chip';
-import { archiveCustomer, writeOffDebt } from '@/customers/customer-actions';
+import { archiveCustomer, deleteCustomer, writeOffDebt } from '@/customers/customer-actions';
 import { useCustomer, useCustomerLedger } from '@/customers/customer-data';
 import { useActionContext } from '@/data/use-action-context';
 import { debtAging } from '@/domain/credit';
@@ -88,7 +88,12 @@ export default function CustomerScreen() {
         note: note.trim() || null,
       });
     } else if (dialog === 'archive') {
-      await archiveCustomer(db, context, customer);
+      // Le propriétaire supprime même un client qui doit encore (la dette est effacée et notée)
+      if (can('data.delete')) {
+        await deleteCustomer(db, context, customer);
+      } else if (customer.balance === 0) {
+        await archiveCustomer(db, context, customer);
+      }
       router.back();
     }
     setDialog(null);
@@ -252,8 +257,11 @@ export default function CustomerScreen() {
             {t('customers.writeOff')}
           </Button>
         ) : null}
-        {can('customers.edit') && customer.balance === 0 ? (
-          <Button icon="archive" onPress={() => setDialog('archive')}>
+        {can('data.delete') || (can('customers.edit') && customer.balance === 0) ? (
+          <Button
+            icon="delete-outline"
+            textColor={theme.app.colors.danger}
+            onPress={() => setDialog('archive')}>
             {t('customers.archive')}
           </Button>
         ) : null}
@@ -268,7 +276,11 @@ export default function CustomerScreen() {
             <Text variant="bodyLarge">
               {dialog === 'writeOff'
                 ? t('customers.writeOffText', { amount: formatMoney(customer.balance, currency) })
-                : t('customers.archiveText')}
+                : customer.balance > 0
+                  ? t('customers.archiveTextDebt', {
+                      amount: formatMoney(customer.balance, currency),
+                    })
+                  : t('customers.archiveText')}
             </Text>
             {dialog === 'writeOff' ? (
               <TextField

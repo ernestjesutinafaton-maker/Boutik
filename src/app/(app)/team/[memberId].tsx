@@ -1,9 +1,9 @@
 import { usePowerSync } from '@powersync/react';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { Card, Switch, Text } from 'react-native-paper';
+import { Button, Card, Dialog, Portal, Switch, Text } from 'react-native-paper';
 
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
@@ -66,6 +66,25 @@ function MemberEditor({ member }: { member: TeamMember }) {
   const [pinErrors, setPinErrors] = useState<FieldErrors<PinInput>>({});
   const [notice, setNotice] = useState<{ tone: 'info' | 'error'; text: string } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRemoveOpen, setIsRemoveOpen] = useState(false);
+
+  // « Supprimer » une personne = la retirer de l'équipe : son code ne marche plus, elle
+  // disparaît de la liste, mais ses ventes passées gardent son nom (les comptes restent justes).
+  async function handleRemove() {
+    setIsRemoveOpen(false);
+    if (!context || isAccountOwner) return;
+    try {
+      await updateMember(db, context, member, {
+        name: member.name,
+        roles: member.roles,
+        maxDiscountPercent: member.maxDiscountPercent,
+        active: false,
+      });
+      router.back();
+    } catch (error) {
+      setNotice({ tone: 'error', text: t(errorMessageKey(error)) });
+    }
+  }
 
   async function handleSave() {
     const parsed = memberSchema.safeParse(values);
@@ -164,6 +183,30 @@ function MemberEditor({ member }: { member: TeamMember }) {
           </BigButton>
         </Card.Content>
       </Card>
+
+      {!isAccountOwner && member.active ? (
+        <Button
+          icon="delete-outline"
+          textColor={theme.app.colors.danger}
+          onPress={() => setIsRemoveOpen(true)}>
+          {t('team.remove')}
+        </Button>
+      ) : null}
+
+      <Portal>
+        <Dialog visible={isRemoveOpen} onDismiss={() => setIsRemoveOpen(false)}>
+          <Dialog.Title>{t('team.removeTitle', { name: member.name })}</Dialog.Title>
+          <Dialog.Content>
+            <Text variant="bodyLarge">{t('team.removeText')}</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsRemoveOpen(false)}>{t('common.cancel')}</Button>
+            <Button textColor={theme.app.colors.danger} onPress={handleRemove}>
+              {t('team.remove')}
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </Screen>
   );
 }

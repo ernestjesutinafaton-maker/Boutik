@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, List } from 'react-native-paper';
+import { Button, Card, List } from 'react-native-paper';
 
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
@@ -15,6 +16,9 @@ export default function TeamScreen() {
   const { can } = useActiveMember();
   const { shop } = useShop();
   const { members } = useTeamMembers();
+  const [showFormer, setShowFormer] = useState(false);
+  const formerCount = members.filter((member) => !member.active).length;
+  const shown = showFormer ? members : members.filter((member) => member.active);
 
   if (!can('team.manage')) {
     return (
@@ -48,7 +52,7 @@ export default function TeamScreen() {
       </BigButton>
 
       <Card mode="outlined">
-        {members.map((member) => {
+        {shown.map((member) => {
           const details = [
             member.roles.map((role) => t(`roles.${role}`)).join(', '),
             member.hasPin ? t('team.hasPin') : t('team.noPin'),
@@ -72,6 +76,11 @@ export default function TeamScreen() {
           );
         })}
       </Card>
+      {formerCount > 0 ? (
+        <Button icon={showFormer ? 'eye-off' : 'eye'} onPress={() => setShowFormer(!showFormer)}>
+          {showFormer ? t('team.hideFormer') : t('team.showFormer', { count: formerCount })}
+        </Button>
+      ) : null}
     </Screen>
   );
 }

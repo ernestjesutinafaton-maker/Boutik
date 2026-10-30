@@ -85,7 +85,14 @@ describe('Vérification complète : le tableau des droits', () => {
   // Changer un droit oblige à changer ce tableau : rien ne change par accident.
   const EXPECTED: Record<string, string[]> = {
     manager: PERMISSIONS.filter(
-      (p) => !['reports.profit', 'team.manage', 'settings.manage', 'credit.write_off'].includes(p)
+      (p) =>
+        ![
+          'reports.profit',
+          'team.manage',
+          'settings.manage',
+          'credit.write_off',
+          'data.delete',
+        ].includes(p)
     ),
     cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
     seller: ['sale.create', 'credit.repayment', 'customers.edit'],
@@ -113,6 +120,7 @@ describe('Vérification complète : le tableau des droits', () => {
       'team.manage',
       'settings.manage',
       'credit.write_off',
+      'data.delete',
     ] as const) {
       expect(can(['owner'], permission)).toBe(true);
       expect(

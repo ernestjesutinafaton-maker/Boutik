@@ -243,3 +243,60 @@ export async function writeOffDebt(
     );
   });
 }
+
+/**
+ * Supprime un client (propriétaire) : s'il doit encore de l'argent, la dette est d'abord
+ * effacée (notée au journal), puis le client est archivé. Ses anciennes ventes gardent
+ * son nom ; il disparaît des listes et de la caisse. Tout ou rien.
+ */
+export async function deleteCustomer(
+  db: CommonPowerSyncDatabase,
+  context: ActionContext,
+  customer: Pick<Customer, 'id' | 'name'>
+): Promise<void> {
+  const now = nowIso();
+  await db.writeTransaction(async (tx) => {
+    // Le solde est recalculé ici, depuis le carnet : on ne se fie pas au chiffre affiché
+    const { balance } = await tx.get<{ balance: number }>(
+      'SELECT COALESCE(SUM(amount), 0) AS balance FROM customer_ledger WHERE customer_id = ?',
+      [customer.id]
+    );
+    if (balance > 0) {
+      await tx.execute(
+        `INSERT INTO customer_ledger
+           (id, shop_id, customer_id, type, amount, note, occurred_at, created_by, device_id,
+            created_at)
+         VALUES (?, ?, ?, 'write_off', ?, ?, ?, ?, ?, ?)`,
+        [
+          newId(),
+          context.shopId,
+          customer.id,
+          -balance,
+          'Client supprimé',
+          now,
+          context.memberId,
+          context.deviceId,
+          now,
+        ]
+      );
+      await logAction(
+        tx,
+        context,
+        'credit.write_off',
+        { type: 'customer', id: customer.id },
+        { customer: customer.name, amount: balance, note: 'Client supprimé' }
+      );
+    }
+    await tx.execute(
+      'UPDATE customers SET archived_at = ?, updated_at = ? WHERE id = ? AND archived_at IS NULL',
+      [now, now, customer.id]
+    );
+    await logAction(
+      tx,
+      context,
+      'customer.update',
+      { type: 'customer', id: customer.id },
+      { customer: customer.name, deleted: true, writtenOff: balance > 0 ? balance : 0 }
+    );
+  });
+}

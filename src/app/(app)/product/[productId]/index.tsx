@@ -263,7 +263,7 @@ export default function ProductScreen() {
             {t('common.edit')}
           </BigButton>
           <BigButton
-            icon="archive"
+            icon="delete-outline"
             variant="outline"
             style={styles.fill}
             onPress={() => setIsArchiveDialogOpen(true)}>
@@ -277,6 +277,13 @@ export default function ProductScreen() {
           <Dialog.Title>{t('products.archiveConfirmTitle')}</Dialog.Title>
           <Dialog.Content>
             <Text variant="bodyLarge">{t('products.archiveConfirmText')}</Text>
+            {product.stock > 0 ? (
+              <Text variant="bodyLarge" style={{ color: theme.app.colors.danger }}>
+                {t('products.archiveConfirmStock', {
+                  stock: formatQuantityWithUnit(product.stock, product.baseUnit),
+                })}
+              </Text>
+            ) : null}
           </Dialog.Content>
           <Dialog.Actions>
             <Button onPress={() => setIsArchiveDialogOpen(false)}>{t('common.cancel')}</Button>

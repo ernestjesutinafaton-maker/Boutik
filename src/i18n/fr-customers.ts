@@ -54,9 +54,12 @@ export const frCustomers = {
     writeOffText:
       'Les {{amount}} dus seront considérés comme perdus. Ce sera noté dans le journal, avec ton nom.',
     writeOffReason: 'Raison (facultatif)',
-    archive: 'Archiver ce client',
-    archiveTitle: 'Archiver ce client ?',
-    archiveText: 'Il disparaîtra de la liste. Son carnet et ses achats restent dans l’historique.',
+    archive: 'Supprimer ce client',
+    archiveTitle: 'Supprimer ce client ?',
+    archiveText:
+      'Il disparaîtra des listes et de la caisse. Ses anciens achats gardent son nom dans l’historique.',
+    archiveTextDebt:
+      'Il doit encore {{amount}} : cette dette sera effacée (notée dans le journal, avec ton nom). Puis il disparaîtra des listes et de la caisse.',
   },
   repay: {
     title: 'Remboursement',

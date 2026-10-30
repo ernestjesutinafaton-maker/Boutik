@@ -25,10 +25,12 @@ export const frProducts = {
     baseUnit: 'Unité de base (le stock est compté dans cette unité)',
     contains: 'Contient {{quantity}} {{unit}}',
     notSold: 'Pas vendu',
-    archive: 'Archiver',
-    archiveConfirmTitle: 'Archiver ce produit ?',
+    archive: 'Supprimer',
+    archiveConfirmTitle: 'Supprimer ce produit ?',
     archiveConfirmText:
-      'Il disparaîtra du catalogue et de la caisse. Son historique (ventes, mouvements) est conservé.',
+      'Il disparaîtra du catalogue et de la caisse. Les anciennes ventes gardent son nom, pour que tes comptes restent justes.',
+    archiveConfirmStock:
+      'Attention : il reste {{stock}} en stock. Déclare une perte avant, si cette marchandise n’existe plus.',
     receive: 'Recevoir de la marchandise',
     alerts: 'Alertes',
     alertsCount: 'Alertes ({{count}})',

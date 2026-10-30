@@ -90,13 +90,13 @@ export const frSales = {
     dueLabel: 'Reste dû (crédit)',
     newSale: 'Nouvelle vente',
     return: 'Reprendre des articles',
-    cancel: 'Annuler la vente',
-    cancelTitle: 'Annuler cette vente ?',
+    cancel: 'Supprimer la vente',
+    cancelTitle: 'Supprimer cette vente ?',
     cancelText:
-      'La marchandise revient en stock, l’argent encaissé est noté comme rendu au client et la dette éventuelle est effacée. La vente reste visible, marquée « annulée ».',
+      'La marchandise revient en stock, l’argent encaissé est noté comme rendu au client et la dette éventuelle est effacée. La vente est cachée de la liste (marquée « annulée »), pour que la caisse et les comptes restent justes.',
     cancelTextWithReturns:
       'Des articles ont déjà été repris. Le reste de la marchandise revient en stock, et ce qui reste encaissé est noté comme rendu au client.',
-    cancelReason: 'Raison de l’annulation (obligatoire)',
+    cancelReason: 'Raison de la suppression (obligatoire)',
   },
   saleReturn: {
     title: 'Reprendre des articles',
@@ -123,6 +123,8 @@ export const frSales = {
   },
   history: {
     title: 'Ventes et factures',
+    showCancelled: 'Voir les ventes supprimées ({{count}})',
+    hideCancelled: 'Cacher les ventes supprimées',
     today: 'Aujourd’hui',
     previousDay: 'Jour précédent',
     nextDay: 'Jour suivant',

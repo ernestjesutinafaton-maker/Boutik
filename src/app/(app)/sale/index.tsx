@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Card, Divider, IconButton, List, Text, TextInput } from 'react-native-paper';
+import { Button, Card, Divider, IconButton, List, Text, TextInput } from 'react-native-paper';
 
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
@@ -24,16 +24,20 @@ export default function SalesHistoryScreen() {
   const settings = useShopSettings();
   const [day, setDay] = useState(today());
   const [query, setQuery] = useState('');
+  // Les ventes supprimées (annulées) sont cachées ; on peut les revoir d'un geste
+  const [showCancelled, setShowCancelled] = useState(false);
   const sales = useSales(dayRange(day));
   const outbox = useOutbox();
   const currency = settings?.currencyCode ?? 'XOF';
 
   const search = normalizeText(query);
-  const visible = search
-    ? sales.filter((sale) =>
-        normalizeText(`${sale.invoiceNumber} ${sale.customerName ?? ''}`).includes(search)
-      )
-    : sales;
+  const cancelledCount = sales.filter((sale) => sale.status === 'cancelled').length;
+  const visible = sales.filter(
+    (sale) =>
+      (showCancelled || sale.status !== 'cancelled') &&
+      (!search ||
+        normalizeText(`${sale.invoiceNumber} ${sale.customerName ?? ''}`).includes(search))
+  );
   const completed = sales.filter((sale) => sale.status === 'completed');
   const total = completed.reduce((sum, sale) => sum + sale.total, 0);
   const isToday = day === today();
@@ -81,6 +85,16 @@ export default function SalesHistoryScreen() {
         onChangeText={setQuery}
         left={<TextInput.Icon icon="magnify" />}
       />
+
+      {cancelledCount > 0 ? (
+        <Button
+          icon={showCancelled ? 'eye-off' : 'eye'}
+          onPress={() => setShowCancelled(!showCancelled)}>
+          {showCancelled
+            ? t('history.hideCancelled')
+            : t('history.showCancelled', { count: cancelledCount })}
+        </Button>
+      ) : null}
 
       <Card mode="outlined">
         {visible.length === 0 ? (

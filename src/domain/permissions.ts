@@ -37,6 +37,7 @@ export const PERMISSIONS = [
   'reports.profit', // voir les bénéfices et le tableau de bord complet
   'team.manage', // gérer l'équipe et les codes PIN
   'settings.manage', // modifier les paramètres de la boutique
+  'data.delete', // supprimer un client, un produit, une personne, une vente (propriétaire seul)
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -44,10 +45,16 @@ export type Permission = (typeof PERMISSIONS)[number];
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   owner: PERMISSIONS,
   // Le gérant remplace le propriétaire, sauf les bénéfices, l'équipe, les paramètres
-  // et l'effacement des dettes
+  // l'effacement des dettes et les suppressions
   manager: PERMISSIONS.filter(
     (permission) =>
-      !['reports.profit', 'team.manage', 'settings.manage', 'credit.write_off'].includes(permission)
+      ![
+        'reports.profit',
+        'team.manage',
+        'settings.manage',
+        'credit.write_off',
+        'data.delete',
+      ].includes(permission)
   ),
   cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
   seller: ['sale.create', 'credit.repayment', 'customers.edit'],

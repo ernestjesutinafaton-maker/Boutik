@@ -32,6 +32,12 @@ export const frTeam = {
     pinChanged: 'Code PIN enregistré.',
     active: 'Fait partie de l’équipe',
     inactive: 'Ne fait plus partie de l’équipe',
+    remove: 'Supprimer de l’équipe',
+    removeTitle: 'Supprimer {{name}} de l’équipe ?',
+    removeText:
+      'Son code PIN ne marchera plus et cette personne disparaîtra de la liste. Ses ventes passées gardent son nom, pour que tes comptes restent justes. Tu pourras la réactiver plus tard.',
+    showFormer: 'Voir les anciens membres ({{count}})',
+    hideFormer: 'Cacher les anciens membres',
     hasPin: 'Code PIN défini',
     noPin: 'Code PIN à définir',
     you: 'toi',
