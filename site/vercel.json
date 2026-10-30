@@ -14,7 +14,7 @@
       ]
     },
     {
-      "source": "/telecharger/:file*",
+      "source": "/telecharger/:file+",
       "headers": [{ "key": "Content-Disposition", "value": "attachment" }]
     }
   ]
