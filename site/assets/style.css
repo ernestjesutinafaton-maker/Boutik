@@ -922,9 +922,16 @@ h2 {
 .prose li {
   color: #334155;
 }
-.todo {
-  color: var(--red);
-  font-weight: 700;
+/* Fichier pas encore disponible : bouton grisé avec la mention « Bientôt disponible » */
+[data-soon] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+[data-soon]::after {
+  content: ' · Bientôt disponible';
+  font-size: 0.85em;
+  font-weight: 600;
 }
 .faq {
   max-width: 820px;

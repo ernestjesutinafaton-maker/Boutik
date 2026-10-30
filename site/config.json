@@ -4,7 +4,8 @@
   "whatsapp": "+33774813896",
   "editeur": {
     "nom": "Ernest AFATON",
-    "adresse": "",
+    "adresse": null,
+    "rccm": null,
     "pays": "Bénin"
   },
   "version": "1.0.0",

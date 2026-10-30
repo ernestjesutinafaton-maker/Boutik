@@ -18,7 +18,21 @@ const dist = join(root, 'dist');
 const config = JSON.parse(readFileSync(join(site, 'config.json'), 'utf8'));
 const layout = readFileSync(join(site, 'layout.html'), 'utf8');
 
-const todo = '<span class="todo">[à compléter]</span>';
+// Une valeur vide (ou null) dans config.json n'affiche rien sur le site
+const todo = '';
+// Un fichier à télécharger qui n'est pas encore fabriqué (dossier downloads/) : bouton « Bientôt disponible »
+const isAvailable = (href) =>
+  !href.startsWith('/telecharger/') ||
+  existsSync(join(root, 'downloads', decodeURIComponent(href.slice('/telecharger/'.length))));
+const markUnavailable = (html) =>
+  html.replace(/<a([^>]*?)href="([^"]+)"([^>]*)>/g, (tag, before, href, after) =>
+    isAvailable(href)
+      ? tag
+      : `<a${before}href="/telecharger"${after.replace(/\s+download\b/, '')} data-soon aria-disabled="true" title="Bientôt disponible">`
+  );
+// Nettoie ce que laissent les valeurs vides : lignes vides, virgules doublées
+const tidy = (html) =>
+  html.replace(/(<br \/>\s*){2,}/g, '<br />').replace(/,\s*,/g, ',').replace(/<p>\s*<\/p>/g, '');
 const today = new Date().toLocaleDateString('fr-FR', {
   day: 'numeric',
   month: 'long',
@@ -44,6 +58,7 @@ const values = {
   'editeur.nom': config.editeur.nom || todo,
   'editeur.adresse': config.editeur.adresse || todo,
   'editeur.pays': config.editeur.pays || todo,
+  rccmLine: config.editeur.rccm ? `<p>Numéro RCCM / IFU : ${config.editeur.rccm}</p>` : '',
   'downloads.android': config.downloads.android,
   'downloads.windows': config.downloads.windows,
   'downloads.linux': config.downloads.linux,
@@ -61,7 +76,7 @@ for (const file of readdirSync(join(site, 'pages'))) {
   const name = file.replace(/\.html$/, '');
   const path = name === 'index' ? '/' : `/${name}`;
   const content = fill(source.replace(/^<!--[\s\S]*?-->\s*/, ''));
-  writeFileSync(join(dist, file), fill(layout, { title, description, path, content }));
+  writeFileSync(join(dist, file), tidy(markUnavailable(fill(layout, { title, description, path, content }))));
 }
 
 mkdirSync(join(dist, 'site'), { recursive: true });
