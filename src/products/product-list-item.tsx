@@ -61,6 +61,13 @@ export function ProductListItem({ product, onPress, extra }: ProductListItemProp
           ) : lowStock ? (
             <StatusChip tone="warning" icon="alert" label={t('products.lowStock')} />
           ) : null}
+          {product.needsCheck ? (
+            <StatusChip
+              tone="warning"
+              icon="clipboard-check-outline"
+              label={t('products.needsCheck')}
+            />
+          ) : null}
           {extra}
         </View>
       </View>

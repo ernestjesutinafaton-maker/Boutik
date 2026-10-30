@@ -79,6 +79,7 @@ function toProduct(row: ProductRow): CatalogProduct {
     // Affichage : jamais sous 0. Un ancien stock négatif (avant cette règle, ou deux appareils
     // hors ligne qui vendent le même dernier article) se corrige par un inventaire, qui part du vrai calcul.
     stock: Math.max(0, row.stock),
+    needsCheck: row.stock < 0,
     units,
   };
 }

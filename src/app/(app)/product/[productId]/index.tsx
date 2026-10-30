@@ -110,6 +110,11 @@ export default function ProductScreen() {
           ) : isLowStock(product) ? (
             <StatusChip tone="warning" icon="alert" label={t('products.lowStock')} />
           ) : null}
+          {product.needsCheck ? (
+            <Text variant="bodyMedium" style={{ color: theme.colors.error }}>
+              {t('products.needsCheckHelp')}
+            </Text>
+          ) : null}
           {product.lowStockThreshold !== null ? (
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
               {t('products.lowStockThreshold', {

@@ -12,6 +12,9 @@ export const frProducts = {
     perUnit: 'le {{unit}}',
     lowStock: 'Stock bas',
     outOfStock: 'Rupture',
+    needsCheck: 'Stock à vérifier',
+    needsCheckHelp:
+      'Le calcul donne plus de sorties que d’entrées (par exemple, deux téléphones hors ligne ont vendu le même article). Fais un inventaire de ce produit pour corriger.',
     detailTitle: 'Produit',
     archived: 'Ce produit est archivé : il n’apparaît plus dans le catalogue.',
     barcodeLine: 'Code-barres : {{code}}',

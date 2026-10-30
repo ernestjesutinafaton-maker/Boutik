@@ -32,6 +32,8 @@ export type CatalogProduct = {
   photoPath: string | null;
   /** Stock actuel, en millièmes d'unité de base (la somme des mouvements) */
   stock: number;
+  /** Le calcul donne un stock négatif (affiché 0) : un inventaire doit corriger l'écart */
+  needsCheck?: boolean;
   units: CatalogUnit[];
 };
 
