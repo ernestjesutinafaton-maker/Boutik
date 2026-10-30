@@ -1,8 +1,26 @@
 /** Textes du tableau de bord et de la démonstration (étape 16). */
 export const frDashboard = {
+  roleDashboard: {
+    mySales: 'Mes ventes',
+    todayCount_one: 'Aujourd’hui · {{count}} vente',
+    todayCount_other: 'Aujourd’hui · {{count}} ventes',
+    weekCount_one: '7 jours · {{count}} vente',
+    weekCount_other: '7 jours · {{count}} ventes',
+    onCredit: 'Dont à crédit (7 jours)',
+    noSales: 'Pas encore de vente à ton nom.',
+    myCash: 'Ma caisse du jour',
+    cashOpen: 'Caisse ouverte depuis {{time}}',
+    cashClosed: 'La caisse de cet appareil est fermée. Ouvre-la avant de vendre.',
+    openingFloat: 'Fond de caisse',
+    stock: 'Stock',
+    expired: 'Lots périmés',
+    expiringSoon: 'Lots bientôt périmés',
+    openInventories: 'Inventaires en cours',
+    inventory: 'Inventaire',
+  },
   dashboard: {
     description: 'Ventes, bénéfice réel, valeur du stock, dettes et alertes.',
-    forbidden: 'Le tableau de bord est réservé au propriétaire et au gérant.',
+    forbidden: 'Ton rôle n’a pas de tableau de bord. Demande au propriétaire.',
     today: 'Aujourd’hui',
     week: '7 jours',
     month: '30 jours',

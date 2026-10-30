@@ -5,10 +5,10 @@ import { StyleSheet, View } from 'react-native';
 import { Card, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
 
 import { MoneyText } from '@/components/money-text';
-import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
 import { type DashboardPeriod, useDashboard } from '@/dashboard/dashboard-data';
+import { RoleDashboard } from '@/dashboard/role-dashboard';
 import { SalesChart } from '@/dashboard/sales-chart';
 import { isLowStock } from '@/domain/catalog';
 import { today } from '@/domain/dates';
@@ -44,21 +44,11 @@ export default function DashboardScreen() {
   const currency: CurrencyCode = settings?.currencyCode ?? 'XOF';
   const { spacing } = theme.app;
 
+  // Sans accès aux comptes : le tableau de bord de ses rôles (ventes, caisse, stock)
   if (!can('reports.account')) {
     return (
       <Screen title={t('nav.dashboard')}>
-        <Notice tone="info" message={t('dashboard.forbidden')} />
-        {can('cash.session') ? (
-          <Card mode="outlined">
-            <List.Item
-              title={t('cash.title')}
-              titleStyle={styles.bold}
-              left={(props) => <List.Icon {...props} icon="cash-register" />}
-              right={(props) => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => router.push('/cash')}
-            />
-          </Card>
-        ) : null}
+        <RoleDashboard />
       </Screen>
     );
   }
