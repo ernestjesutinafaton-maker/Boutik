@@ -8,6 +8,14 @@ import { allocate, latestCost, receiptLine } from '@/domain/stock';
 import { insertLot, insertMovement, type LossReason } from './movements';
 import { loadLots } from './stock-data';
 
+/** Une perte plus grande que le stock disponible : refusée (un stock n'est jamais négatif). */
+export class LossExceedsStockError extends Error {
+  constructor(readonly available: number) {
+    super('Perte plus grande que le stock disponible.');
+    this.name = 'LossExceedsStockError';
+  }
+}
+
 /** Une ligne de réception, telle que saisie (quantité et prix dans l'unité d'achat). */
 export type ReceiptLineInput = {
   productId: string;
@@ -121,11 +129,23 @@ export async function declareLoss(
   await db.writeTransaction(async (tx) => {
     const lots = await loadLots(tx, input.productId);
     const chosen = input.lotId ? lots.filter((lot) => lot.id === input.lotId) : lots;
-    const { allocations } = allocate(chosen, input.quantity, {
+    const { allocations, shortfall } = allocate(chosen, input.quantity, {
       today: today(),
       allowExpired: true,
       fallbackCost: latestCost(lots),
     });
+    // Lot choisi : pas plus que ce lot. Sinon : pas plus que le stock total (lots + « sans lot »).
+    const available = input.lotId
+      ? input.quantity - shortfall
+      : (
+          await tx.get<{ stock: number }>(
+            'SELECT COALESCE(SUM(quantity), 0) AS stock FROM stock_movements WHERE product_id = ?',
+            [input.productId]
+          )
+        ).stock;
+    if (input.quantity > available) {
+      throw new LossExceedsStockError(Math.max(0, available));
+    }
     for (const part of allocations) {
       await insertMovement(tx, context, {
         productId: input.productId,

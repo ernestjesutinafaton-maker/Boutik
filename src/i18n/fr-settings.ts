@@ -58,8 +58,6 @@ export const frSettings = {
     sellerMaxDiscount: 'Remise maximale des vendeurs (%)',
     sellerMaxDiscountHelp:
       'Limite pour les vendeurs et caissiers (sauf limite propre à la personne, dans « Équipe »). Le propriétaire et le gérant ne sont pas limités.',
-    allowSaleWithoutStock:
-      'Permettre de vendre quand le stock affiché est à 0 (avec avertissement)',
     expiry: 'Alertes de péremption (jours avant la date)',
     expiryFirst: '1re alerte',
     expirySecond: '2e alerte',

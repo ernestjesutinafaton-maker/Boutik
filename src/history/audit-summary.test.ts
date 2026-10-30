@@ -1,12 +1,16 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { AUDIT_ACTIONS } from '@/data/audit';
+import { formatMoney } from '@/domain/money';
 import { fr } from '@/i18n/fr';
 
 import { auditGroup, auditSummary } from './audit-summary';
 
-const NBSP = String.fromCharCode(0xa0);
-const fcfa = (value: string) => value.replace(/ /g, NBSP);
+// expo-crypto ne marche que dans l'appli : on le remplace pour le test
+vi.mock('expo-crypto', () => ({ randomUUID: () => crypto.randomUUID() }));
+
+// Les montants s'écrivent comme dans l'appli (espaces insécables compris)
+const money = (amount: number) => formatMoney(amount, 'XOF');
 
 describe('Journal des actions', () => {
   it('chaque action a un nom en français', () => {
@@ -34,15 +38,15 @@ describe('Journal des actions', () => {
         { invoiceNumber: 'F1-000012', total: 34_450, customer: 'Awa' },
         'XOF'
       )
-    ).toBe(fcfa('F1-000012 · 34 450 FCFA · Awa'));
+    ).toBe(`F1-000012 · ${money(34_450)} · Awa`);
     expect(
       auditSummary(
         'product.price_change',
         { name: 'Riz', changes: [{ unit: 'kg', before: 700, after: 750 }] },
         'XOF'
       )
-    ).toBe(fcfa('Riz · kg : 700 FCFA → 750 FCFA'));
-    expect(auditSummary('cash.close', { difference: -500 }, 'XOF')).toBe(fcfa('-500 FCFA'));
+    ).toBe(`Riz · kg : ${money(700)} → ${money(750)}`);
+    expect(auditSummary('cash.close', { difference: -500 }, 'XOF')).toBe(money(-500));
     expect(auditSummary('member.pin_change', {}, 'XOF')).toBeNull();
   });
 });

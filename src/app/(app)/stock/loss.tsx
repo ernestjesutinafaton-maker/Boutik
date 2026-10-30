@@ -18,7 +18,7 @@ import { useProduct } from '@/products/product-data';
 import { ProductPicker } from '@/products/product-picker';
 import { UnitQuantityField } from '@/products/unit-quantity-field';
 import type { LossReason } from '@/stock/movements';
-import { declareLoss } from '@/stock/stock-actions';
+import { declareLoss, LossExceedsStockError } from '@/stock/stock-actions';
 import { useProductLots } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -128,8 +128,16 @@ function LossForm({
       });
       router.back();
     } catch (saveError) {
-      console.warn('Perte impossible à enregistrer :', saveError);
-      setError(t('errors.unknown'));
+      if (saveError instanceof LossExceedsStockError) {
+        setError(
+          t('losses.moreThanStock', {
+            quantity: formatQuantityWithUnit(saveError.available, product.baseUnit),
+          })
+        );
+      } else {
+        console.warn('Perte impossible à enregistrer :', saveError);
+        setError(t('errors.unknown'));
+      }
       setIsSaving(false);
     }
   }

@@ -187,7 +187,6 @@ export async function loadDemoData(
           customer,
           note: null,
           forceExpired: false,
-          allowShortage: true,
         },
         when
       );

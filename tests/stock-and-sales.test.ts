@@ -12,7 +12,7 @@ vi.mock('@/shop/shop-provider', () => ({ useShop: () => ({ shop: null, device: n
 const { recordRepayment } = await import('@/customers/customer-actions');
 const { createSale, cancelSale, returnSaleItems, SaleStockError } =
   await import('@/sales/sale-actions');
-const { receiveStock, declareLoss } = await import('@/stock/stock-actions');
+const { receiveStock, declareLoss, LossExceedsStockError } = await import('@/stock/stock-actions');
 const { saveCount, startInventory, validateInventory } = await import('@/stock/inventory');
 const { settle } = await import('@/domain/sale');
 
@@ -172,7 +172,6 @@ describe('Réception puis vente', () => {
       customer: null,
       note: null,
       forceExpired: false,
-      allowShortage: true,
     });
 
     expect(invoiceNumber).toBe('F1-000001');
@@ -205,7 +204,6 @@ describe('Réception puis vente', () => {
           customer: null,
           note: null,
           forceExpired: false,
-          allowShortage: true,
         }
       );
     expect((await sell('device-1', 1)).invoiceNumber).toBe('F1-000001');
@@ -227,7 +225,6 @@ describe('Crédit', () => {
       customer: { id: 'awa', name: 'Awa' },
       note: null,
       forceExpired: false,
-      allowShortage: true,
     });
     expect(balanceOf('awa')).toBe(4000);
 
@@ -260,7 +257,6 @@ describe('Crédit', () => {
         customer: null,
         note: null,
         forceExpired: false,
-        allowShortage: true,
       })
     ).rejects.toThrow();
     expect(db.query('SELECT id FROM sales')).toHaveLength(0);
@@ -279,7 +275,6 @@ describe('Retours et annulations', () => {
       customer: null,
       note: null,
       forceExpired: false,
-      allowShortage: true,
     });
     const kgItem = db.query<{ id: string }>("SELECT id FROM sale_items WHERE unit_name = 'kg'")[0];
 
@@ -323,7 +318,6 @@ describe('Retours et annulations', () => {
       customer: { id: 'awa', name: 'Awa' },
       note: null,
       forceExpired: false,
-      allowShortage: true,
     });
     expect(balanceOf('awa')).toBe(1400);
     await cancelSale(db, context, saleId, 'Erreur de saisie');
@@ -362,7 +356,7 @@ describe('Stock insuffisant et produits périmés', () => {
     unitPrice: 500,
   });
 
-  const sellMilk = (boxes: number, options: { forceExpired?: boolean; allowShortage?: boolean }) =>
+  const sellMilk = (boxes: number, options: { forceExpired?: boolean }) =>
     createSale(db, context, {
       deviceNumber: 1,
       lines: [milk(boxes)],
@@ -372,7 +366,6 @@ describe('Stock insuffisant et produits périmés', () => {
       customer: null,
       note: null,
       forceExpired: options.forceExpired ?? false,
-      allowShortage: options.allowShortage ?? true,
     });
 
   it('une vente prise sur deux lots : celui qui périme le plus tôt d’abord', async () => {
@@ -400,18 +393,33 @@ describe('Stock insuffisant et produits périmés', () => {
     expect(auditActions()).toContain('sale.expired_forced');
   });
 
-  it('stock à 0 : vente permise avec avertissement, ou refusée selon le réglage', async () => {
-    await expect(sellMilk(1, { allowShortage: false })).rejects.toBeInstanceOf(SaleStockError);
-    await sellMilk(1, { allowShortage: true });
-    expect(stockOf('lait')).toBe(-1000);
-    // Sortie « sans lot » : aucun lot n'existait
-    expect(db.query("SELECT lot_id FROM stock_movements WHERE type = 'sale'")).toEqual([
-      { lot_id: null },
-    ]);
+  it('stock insuffisant : la vente est toujours refusée, le stock ne devient jamais négatif', async () => {
+    await expect(sellMilk(1, {})).rejects.toBeInstanceOf(SaleStockError);
+    await receiveMilk(1, '2099-01-31');
+    await expect(sellMilk(2, {})).rejects.toBeInstanceOf(SaleStockError);
+    expect(stockOf('lait')).toBe(1000);
+    expect(db.query("SELECT id FROM stock_movements WHERE type = 'sale'")).toEqual([]);
   });
 });
 
 describe('Pertes et inventaire', () => {
+  it('une perte plus grande que le stock est refusée (jamais de stock négatif)', async () => {
+    await receiveRice(1); // 1 sac = 50 kg
+    const loss = (quantity: number) =>
+      declareLoss(db, context, {
+        productId: 'riz',
+        productName: 'Riz parfumé',
+        lotId: null,
+        quantity,
+        reason: 'broken',
+        note: null,
+      });
+    await expect(loss(60_000)).rejects.toBeInstanceOf(LossExceedsStockError);
+    expect(stockOf('riz')).toBe(50_000);
+    await loss(50_000);
+    expect(stockOf('riz')).toBe(0);
+  });
+
   it('une perte sort du stock à son prix d’achat', async () => {
     await receiveRice(1);
     await declareLoss(db, context, {

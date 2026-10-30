@@ -185,7 +185,6 @@ beforeAll(async () => {
     customer: { id: customerId, name: 'Awa' },
     note: null,
     forceExpired: false,
-    allowShortage: true,
   }));
   const customer = {
     id: customerId,

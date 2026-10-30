@@ -115,6 +115,8 @@ export const frProducts = {
     note: 'Remarque (facultatif)',
     save: 'Enregistrer la perte',
     moreThanLot: 'Ce lot ne contient que {{quantity}}.',
+    moreThanStock:
+      'Le stock ne contient que {{quantity}} : une perte ne peut pas dépasser le stock.',
     reasons: {
       expired: 'Périmé',
       broken: 'Cassé ou abîmé',

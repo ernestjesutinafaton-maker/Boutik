@@ -98,8 +98,6 @@ export type NewSale = {
   note: string | null;
   /** Le propriétaire a choisi de vendre quand même des lots périmés (tracé) */
   forceExpired: boolean;
-  /** Vendre même si le stock affiché est insuffisant (réglage de la boutique) */
-  allowShortage: boolean;
 };
 
 /** Enregistre une vente complète. Renvoie son identifiant et son numéro de facture. */
@@ -130,7 +128,8 @@ export async function createSale(
     const blocking = problems.filter(
       (problem) =>
         (problem.kind === 'expired' && !sale.forceExpired) ||
-        (problem.kind === 'shortage' && !sale.allowShortage)
+        // Un stock ne peut jamais devenir négatif : un manque bloque toujours la vente
+        problem.kind === 'shortage'
     );
     if (blocking.length > 0) {
       throw new SaleStockError(blocking);

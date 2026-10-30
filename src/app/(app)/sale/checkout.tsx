@@ -126,9 +126,8 @@ export default function CheckoutScreen() {
 
   const expiredProblems = stockProblems.filter((problem) => problem.kind === 'expired');
   const shortageProblems = stockProblems.filter((problem) => problem.kind === 'shortage');
-  const allowShortage = settings?.allowSaleWithoutStock ?? true;
   const blockedByExpired = expiredProblems.length > 0 && !forceExpired;
-  const blockedByShortage = shortageProblems.length > 0 && !allowShortage;
+  const blockedByShortage = shortageProblems.length > 0;
   const canConfirm =
     problems.length === 0 && !blockedByExpired && !blockedByShortage && Boolean(device?.number);
 
@@ -155,7 +154,6 @@ export default function CheckoutScreen() {
         customer: customer ? { id: customer.id, name: customer.name } : null,
         note: cart.note.trim() || null,
         forceExpired,
-        allowShortage,
       });
       cart.clear();
       router.replace({ pathname: '/sale/[saleId]', params: { saleId, created: '1' } });
@@ -227,8 +225,8 @@ export default function CheckoutScreen() {
       {shortageProblems.map((problem) => (
         <Notice
           key={problem.productId}
-          tone={allowShortage ? 'info' : 'error'}
-          message={t(allowShortage ? 'checkout.shortageWarning' : 'checkout.shortageBlocked', {
+          tone="error"
+          message={t('checkout.shortageBlocked', {
             name: problem.productName,
             quantity: `${formatQuantity(problem.quantity)} ${baseUnitOf(problem.productId)}`,
           })}

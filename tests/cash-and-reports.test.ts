@@ -80,7 +80,6 @@ const sellRice = (
     customer: null,
     note: null,
     forceExpired: false,
-    allowShortage: true,
   });
 
 describe('Caisse du jour et clôture', () => {

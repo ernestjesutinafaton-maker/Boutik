@@ -45,10 +45,8 @@ export const frSales = {
       '« {{name}} » : {{quantity}} ne se trouvent que dans des lots PÉRIMÉS. La vente est bloquée.',
     forceExpired: 'Vendre quand même les lots périmés (ce sera noté dans le journal)',
     askOwner: 'Seul le propriétaire peut forcer la vente d’un produit périmé.',
-    shortageWarning:
-      '« {{name}} » : le stock affiché est insuffisant ({{quantity}} manquants). Tu peux vendre quand même ; pense à recevoir la marchandise ou à faire l’inventaire.',
     shortageBlocked:
-      '« {{name}} » : stock insuffisant ({{quantity}} manquants). La boutique n’autorise pas la vente sans stock.',
+      '« {{name}} » : stock insuffisant ({{quantity}} manquants). Reçois d’abord la marchandise (Stock → Réception) ou corrige le stock par un inventaire.',
     payments: 'Paiement',
     quickCash: 'Le client donne en espèces :',
     cashGiven: '{{label}} (montant donné)',

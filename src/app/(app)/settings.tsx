@@ -157,22 +157,6 @@ function SettingsForm({ settings }: { settings: ShopSettings }) {
               {t('settings.sellerMaxDiscountHelp')}
             </HelperText>
           </View>
-          <View style={[styles.row, { gap: spacing.md }]}>
-            <Text
-              variant="bodyLarge"
-              style={styles.fill}
-              onPress={() =>
-                setValues({ ...values, allowSaleWithoutStock: !values.allowSaleWithoutStock })
-              }>
-              {t('settings.allowSaleWithoutStock')}
-            </Text>
-            <Switch
-              value={values.allowSaleWithoutStock}
-              onValueChange={(allowSaleWithoutStock) =>
-                setValues({ ...values, allowSaleWithoutStock })
-              }
-            />
-          </View>
         </Card.Content>
       </Card>
 

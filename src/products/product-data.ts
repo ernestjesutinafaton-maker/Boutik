@@ -76,7 +76,9 @@ function toProduct(row: ProductRow): CatalogProduct {
     lowStockThreshold: row.low_stock_threshold,
     trackExpiry: row.track_expiry === 1,
     photoPath: row.photo_path,
-    stock: row.stock,
+    // Affichage : jamais sous 0. Un ancien stock négatif (avant cette règle, ou deux appareils
+    // hors ligne qui vendent le même dernier article) se corrige par un inventaire, qui part du vrai calcul.
+    stock: Math.max(0, row.stock),
     units,
   };
 }
