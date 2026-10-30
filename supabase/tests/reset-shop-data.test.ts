@@ -77,3 +77,26 @@ describe('Effacer les données de test', () => {
     expect(await count('customers')).toBe(0);
   });
 });
+
+describe('Tableau de bord administrateur', () => {
+  it('réservé à l’administrateur ; compte les boutiques en essai', async () => {
+    const db = await createTestDatabase();
+    const owner = await createUser(db);
+    const admin = await createUser(db);
+    await db.query('insert into public.platform_admins (user_id) values ($1)', [admin]);
+    await asUser(db, owner, (tx) =>
+      tx.query(
+        'select public.create_shop(\'Chez Maman\', \'BJ\', \'XOF\', \'Awa\', \'[{"code":"cash","label":"Espèces","kind":"cash"}]\'::jsonb)'
+      )
+    );
+    await expect(
+      asUser(db, owner, (tx) => tx.query('select * from public.admin_overview()'))
+    ).rejects.toThrow();
+    const result = await asUser(db, admin, (tx) =>
+      tx.query<{ shops_total: number; shops_trial: number; payments_pending: number }>(
+        'select * from public.admin_overview()'
+      )
+    );
+    expect(result.rows[0]).toMatchObject({ shops_total: 1, shops_trial: 1, payments_pending: 0 });
+  });
+});

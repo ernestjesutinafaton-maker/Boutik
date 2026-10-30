@@ -1654,6 +1654,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_overview: {
+        Args: never
+        Returns: {
+          payments_pending: number
+          revenue_this_month: number
+          revenue_total: number
+          shops_active: number
+          shops_expired: number
+          shops_grace: number
+          shops_new_30_days: number
+          shops_total: number
+          shops_trial: number
+        }[]
+      }
       admin_subscription_payments: {
         Args: never
         Returns: {

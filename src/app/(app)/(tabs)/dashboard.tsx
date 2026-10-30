@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Card, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
 
+import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
@@ -20,6 +21,7 @@ import { useShopSettings } from '@/shop/shop-settings';
 import { useExpiringLots } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';
 import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
+import { useIsPlatformAdmin } from '@/subscription/subscription-data';
 import { useAppTheme } from '@/theme/paper-theme';
 
 /**
@@ -41,6 +43,7 @@ export default function DashboardScreen() {
   );
   const [period, setPeriod] = useState<DashboardPeriod>('today');
   const limited = useIsLimited();
+  const isPlatformAdmin = useIsPlatformAdmin();
   const currency: CurrencyCode = settings?.currencyCode ?? 'XOF';
   const { spacing } = theme.app;
 
@@ -68,6 +71,14 @@ export default function DashboardScreen() {
 
   return (
     <Screen title={t('nav.dashboard')}>
+      {isPlatformAdmin ? (
+        <BigButton
+          icon="shield-account"
+          variant="accent"
+          onPress={() => router.push('/admin-payments')}>
+          {t('subscription.adminMenu')}
+        </BigButton>
+      ) : null}
       <SegmentedButtons
         value={period}
         onValueChange={(value) =>

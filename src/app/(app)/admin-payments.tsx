@@ -25,6 +25,18 @@ type AdminPayment = {
   paid_until: string | null;
 };
 
+type Overview = {
+  shops_total: number;
+  shops_trial: number;
+  shops_active: number;
+  shops_grace: number;
+  shops_expired: number;
+  shops_new_30_days: number;
+  payments_pending: number;
+  revenue_this_month: number;
+  revenue_total: number;
+};
+
 /**
  * Administration (Ernest seulement) : les paiements d'abonnement déclarés par les boutiques.
  * Vérifie la réception sur le téléphone Mobile Money, puis valide ou refuse.
@@ -34,6 +46,7 @@ export default function AdminPaymentsScreen() {
   const { t } = useTranslation();
   const isAdmin = useIsPlatformAdmin();
   const [payments, setPayments] = useState<AdminPayment[]>([]);
+  const [overview, setOverview] = useState<Overview | null>(null);
   const [reload, setReload] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +57,10 @@ export default function AdminPaymentsScreen() {
       if (cancelled) return;
       if (loadError) setError(t('subscription.offline'));
       else setPayments((data ?? []) as AdminPayment[]);
+    });
+    // Les chiffres de la plateforme (calculés par le serveur, réservé à l'administrateur)
+    supabase.rpc('admin_overview').then(({ data }) => {
+      if (!cancelled && data?.[0]) setOverview(data[0]);
     });
     return () => {
       cancelled = true;
@@ -70,6 +87,35 @@ export default function AdminPaymentsScreen() {
 
   return (
     <Screen title={t('subscription.adminTitle')} stack>
+      {overview ? (
+        <Card mode="outlined">
+          <Card.Title title={t('admin.overview')} titleVariant="titleLarge" />
+          <Card.Content style={{ gap: theme.app.spacing.xs }}>
+            {(
+              [
+                ['admin.shopsTotal', String(overview.shops_total)],
+                ['admin.shopsNew', String(overview.shops_new_30_days)],
+                ['admin.shopsTrial', String(overview.shops_trial)],
+                ['admin.shopsActive', String(overview.shops_active)],
+                ['admin.shopsGrace', String(overview.shops_grace)],
+                ['admin.shopsExpired', String(overview.shops_expired)],
+                ['admin.pending', String(overview.payments_pending)],
+                ['admin.revenueMonth', formatMoney(Number(overview.revenue_this_month), 'XOF')],
+                ['admin.revenueTotal', formatMoney(Number(overview.revenue_total), 'XOF')],
+              ] as const
+            ).map(([key, value]) => (
+              <View
+                key={key}
+                style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+                <Text variant="bodyLarge">{t(key)}</Text>
+                <Text variant="bodyLarge" style={{ fontWeight: '700' }}>
+                  {value}
+                </Text>
+              </View>
+            ))}
+          </Card.Content>
+        </Card>
+      ) : null}
       <Notice tone="info" message={t('subscription.adminHelp')} />
       {error ? <Notice message={error} /> : null}
       <Card mode="outlined">

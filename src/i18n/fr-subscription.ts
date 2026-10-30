@@ -1,5 +1,17 @@
 /** Textes de l'abonnement. */
 export const frSubscription = {
+  admin: {
+    overview: 'La plateforme Boutik',
+    shopsTotal: 'Boutiques inscrites',
+    shopsNew: 'Nouvelles (30 jours)',
+    shopsTrial: 'En essai gratuit',
+    shopsActive: 'Abonnées',
+    shopsGrace: 'En délai de grâce',
+    shopsExpired: 'Expirées',
+    pending: 'Paiements à vérifier',
+    revenueMonth: 'Reçu ce mois-ci',
+    revenueTotal: 'Reçu depuis le début',
+  },
   subscription: {
     title: 'Mon abonnement',
     menuHelp: 'Prix, paiement par Mobile Money, historique',
