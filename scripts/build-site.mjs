@@ -32,7 +32,10 @@ const markUnavailable = (html) =>
   );
 // Nettoie ce que laissent les valeurs vides : lignes vides, virgules doublées
 const tidy = (html) =>
-  html.replace(/(<br \/>\s*){2,}/g, '<br />').replace(/,\s*,/g, ',').replace(/<p>\s*<\/p>/g, '');
+  html
+    .replace(/(<br \/>\s*){2,}/g, '<br />')
+    .replace(/,\s*,/g, ',')
+    .replace(/<p>\s*<\/p>/g, '');
 const today = new Date().toLocaleDateString('fr-FR', {
   day: 'numeric',
   month: 'long',
@@ -76,7 +79,10 @@ for (const file of readdirSync(join(site, 'pages'))) {
   const name = file.replace(/\.html$/, '');
   const path = name === 'index' ? '/' : `/${name}`;
   const content = fill(source.replace(/^<!--[\s\S]*?-->\s*/, ''));
-  writeFileSync(join(dist, file), tidy(markUnavailable(fill(layout, { title, description, path, content }))));
+  writeFileSync(
+    join(dist, file),
+    tidy(markUnavailable(fill(layout, { title, description, path, content })))
+  );
 }
 
 mkdirSync(join(dist, 'site'), { recursive: true });
