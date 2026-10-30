@@ -76,7 +76,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "build:web": "expo export --platform web --output-dir dist/app && workbox generateSW workbox-config.js && node scripts/build-site.mjs",
+    "build:web": "expo export --platform web --output-dir dist/app && node scripts/fix-web-assets.mjs dist/app && workbox generateSW workbox-config.js && node scripts/build-site.mjs",
     "deploy:web": "npm run build:web && npx vercel@latest deploy dist --prod",
     "build:desktop-web": "cross-env BOUTIK_DESKTOP=1 expo export --platform web --output-dir dist-desktop",
     "desktop": "tauri dev",
