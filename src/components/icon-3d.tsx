@@ -1,6 +1,9 @@
 import { Image } from 'expo-image';
 import type { ImageStyle, StyleProp } from 'react-native';
 
+import { useAppTheme } from '@/theme/paper-theme';
+import type { ThemeColor } from '@/theme/tokens';
+
 /**
  * Les icônes en 3D de Boutik (collection « Fluent Emoji » de Microsoft, licence MIT :
  * voir assets/images/3d/LICENSE-fluentui-emoji.txt). Images WebP de 160 × 160.
@@ -29,13 +32,19 @@ const SOURCES = {
   scroll: require('@/assets/images/3d/scroll.webp'),
   shield: require('@/assets/images/3d/shield.webp'),
   store: require('@/assets/images/3d/store.webp'),
-  team: require('@/assets/images/3d/team.webp'),
   truck: require('@/assets/images/3d/truck.webp'),
   warning: require('@/assets/images/3d/warning.webp'),
   wastebasket: require('@/assets/images/3d/wastebasket.webp'),
 } as const;
 
-export type Icon3DName = keyof typeof SOURCES;
+/** L'icône « équipe » existe dans la couleur de chaque thème. */
+const TEAM: Record<ThemeColor, number> = {
+  vert: require('@/assets/images/3d/team-vert.webp'),
+  violet: require('@/assets/images/3d/team-violet.webp'),
+  orange: require('@/assets/images/3d/team-orange.webp'),
+};
+
+export type Icon3DName = keyof typeof SOURCES | 'team';
 
 /**
  * Une icône en 3D (décorative : le texte à côté dit déjà de quoi il s'agit).
@@ -50,9 +59,10 @@ export function Icon3D({
   size?: number;
   style?: StyleProp<ImageStyle>;
 }) {
+  const theme = useAppTheme();
   return (
     <Image
-      source={SOURCES[name]}
+      source={name === 'team' ? TEAM[theme.app.themeColor] : SOURCES[name]}
       style={[{ width: size, height: size, alignSelf: 'center' }, style]}
       contentFit="contain"
       accessible={false}

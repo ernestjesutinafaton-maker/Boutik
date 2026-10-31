@@ -3,7 +3,74 @@
 (function () {
   document.documentElement.classList.add('js');
 
+  // Choix du style : couleur (vert, violet, orangé) et mode (clair, sombre).
+  // Mêmes clés que l'application : le style choisi ici est repris par l'appli web.
+  var COLOR_KEY = 'boutik.theme-color';
+  var MODE_KEY = 'boutik.theme-preference';
+  var COLORS = ['vert', 'violet', 'orange'];
+  var BAR_COLORS = { vert: '#047857', violet: '#7138d9', orange: '#c2410c' };
+
+  function read(key) {
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      return null;
+    }
+  }
+  function write(key, value) {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      // Stockage bloqué : le choix vaut seulement pour cette page
+    }
+  }
+  function currentColor() {
+    var color = read(COLOR_KEY);
+    return COLORS.indexOf(color) >= 0 ? color : 'vert';
+  }
+  function isDark() {
+    var mode = read(MODE_KEY);
+    return (
+      mode === 'dark' ||
+      (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    );
+  }
+  function applyTheme() {
+    var root = document.documentElement;
+    var color = currentColor();
+    var dark = isDark();
+    if (color === 'vert') root.removeAttribute('data-theme');
+    else root.setAttribute('data-theme', color);
+    root.setAttribute('data-mode', dark ? 'dark' : 'light');
+    var bar = document.querySelector('meta[name="theme-color"]');
+    if (bar) bar.setAttribute('content', BAR_COLORS[color]);
+    document.querySelectorAll('[data-theme-choice]').forEach(function (button) {
+      button.setAttribute(
+        'aria-pressed',
+        String(button.getAttribute('data-theme-choice') === color)
+      );
+    });
+    document.querySelectorAll('[data-mode-toggle]').forEach(function (button) {
+      button.setAttribute('aria-label', dark ? 'Passer en mode clair' : 'Passer en mode sombre');
+      var label = button.querySelector('.mode-label');
+      if (label) label.textContent = dark ? 'Mode clair' : 'Mode sombre';
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
+    applyTheme();
+    document.querySelectorAll('[data-theme-choice]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        write(COLOR_KEY, button.getAttribute('data-theme-choice'));
+        applyTheme();
+      });
+    });
+    document.querySelectorAll('[data-mode-toggle]').forEach(function (button) {
+      button.addEventListener('click', function () {
+        write(MODE_KEY, isDark() ? 'light' : 'dark');
+        applyTheme();
+      });
+    });
     // Menu sur téléphone
     var button = document.querySelector('.menu-btn');
     var menu = document.getElementById('menu');

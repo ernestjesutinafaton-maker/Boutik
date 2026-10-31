@@ -9,19 +9,21 @@ import {
 import {
   depth,
   type Effects,
-  effects,
   fontFamily,
   fontSize,
   layout,
-  palette,
   type Palette,
+  palettes,
   radius,
   spacing,
+  THEME_COLORS,
+  type ThemeColor,
+  themeEffects,
   touch,
 } from './tokens';
 
 /**
- * Traduit nos couleurs « Vert Boutik 3D » dans le format de React Native Paper
+ * Traduit nos thèmes (vert, violet, orangé ; clair ou sombre) dans le format de React Native Paper
  * (la bibliothèque qui fournit les boutons, champs, cartes…).
  */
 
@@ -65,6 +67,7 @@ const brandFonts = Object.fromEntries(
 
 function buildTheme(
   base: MD3Theme,
+  themeColor: ThemeColor,
   colors: Palette,
   look: Effects,
   isDark: boolean,
@@ -83,8 +86,10 @@ function buildTheme(
       // Paper appelle « secondary » et « tertiary » ce que nous appelons « accent »
       secondary: colors.accent,
       onSecondary: colors.onAccent,
-      secondaryContainer: colors.accentContainer,
-      onSecondaryContainer: colors.onAccentContainer,
+      // …sauf pour ce qui est « sélectionné » (filtres, Clair / Sombre / Auto) :
+      // la version pâle de la couleur du thème, pour que tout suive le thème choisi
+      secondaryContainer: colors.primaryContainer,
+      onSecondaryContainer: colors.onPrimaryContainer,
       tertiary: colors.accent,
       onTertiary: colors.onAccent,
       tertiaryContainer: colors.accentContainer,
@@ -115,17 +120,51 @@ function buildTheme(
       },
     },
     /** Nos propres valeurs, que Paper ne connaît pas : on les range ici. */
-    app: { colors, effects: look, depth, spacing, radius, fontSize, touch, layout },
+    app: { themeColor, colors, effects: look, depth, spacing, radius, fontSize, touch, layout },
   };
 }
 
-export const lightTheme = buildTheme(MD3LightTheme, palette.light, effects.light, false, false);
-export const darkTheme = buildTheme(MD3DarkTheme, palette.dark, effects.dark, true, false);
-/** Les mêmes thèmes, avec la police Nunito (utilisés dès qu'elle est chargée). */
-export const lightBrandTheme = buildTheme(MD3LightTheme, palette.light, effects.light, false, true);
-export const darkBrandTheme = buildTheme(MD3DarkTheme, palette.dark, effects.dark, true, true);
+function themeFor(themeColor: ThemeColor, isDark: boolean, withBrandFont: boolean) {
+  const mode = isDark ? 'dark' : 'light';
+  return buildTheme(
+    isDark ? MD3DarkTheme : MD3LightTheme,
+    themeColor,
+    palettes[themeColor][mode],
+    themeEffects[themeColor][mode],
+    isDark,
+    withBrandFont
+  );
+}
 
-export type AppTheme = typeof lightTheme;
+export type AppTheme = ReturnType<typeof themeFor>;
+
+/**
+ * Tous les thèmes sont préparés une seule fois, au démarrage : 3 couleurs × clair/sombre
+ * × avec ou sans la police Nunito. Changer de thème ne fabrique donc rien de nouveau.
+ */
+const THEMES = new Map<string, AppTheme>();
+for (const themeColor of THEME_COLORS) {
+  for (const isDark of [false, true]) {
+    for (const withBrandFont of [false, true]) {
+      THEMES.set(
+        `${themeColor}-${isDark}-${withBrandFont}`,
+        themeFor(themeColor, isDark, withBrandFont)
+      );
+    }
+  }
+}
+
+/** Le thème à appliquer : couleur choisie, clair ou sombre, police Nunito chargée ou non. */
+export function getAppTheme(
+  themeColor: ThemeColor,
+  isDark: boolean,
+  withBrandFont: boolean
+): AppTheme {
+  return (
+    THEMES.get(`${themeColor}-${isDark}-${withBrandFont}`) ??
+    themeFor(themeColor, isDark, withBrandFont)
+  );
+}
 
 /** À utiliser dans les écrans pour lire le thème actuel (clair ou sombre). */
 export const useAppTheme = () => useTheme<AppTheme>();

@@ -1,19 +1,104 @@
-/* Site vitrine de Boutik — couleurs « Vert Commerce » (les mêmes que l'appli) */
+/* Les couleurs du site : thème vert (par défaut), clair. Les mêmes que l'application.
+   --brand* : fonds (boutons, sections) ; --brand-ink / --brand-heading : textes. */
 :root {
-  --green: #059669;
-  --green-dark: #047857;
-  --green-deep: #064e3b;
-  --green-pale: #d1fae5;
+  --brand: #059669;
+  --brand-dark: #047857;
+  --brand-deep: #064e3b;
+  --brand-ink: #047857;
+  --brand-heading: #064e3b;
+  --brand-pale: #d1fae5;
+  --brand-paler: #ecfdf5;
+  --brand-soft: #a7f3d0;
+  --on-brand-soft: #a7f3d0;
+  --brand-light: #6ee7b7;
+  --brand-bright: #10b981;
+  --brand-glow: rgba(5, 150, 105, 0.8);
+  --night: #0b1210;
   --orange: #f59e0b;
   --orange-pale: #fef3c7;
   --red: #dc2626;
   --ink: #0f172a;
   --muted: #475569;
+  --prose: #334155;
   --line: #e2e8f0;
   --bg: #ffffff;
   --bg-alt: #f6f8f7;
+  --surface: #ffffff;
+  --glass: rgba(255, 255, 255, 0.86);
   --radius: 18px;
   --shadow: 0 20px 50px -20px rgba(6, 78, 59, 0.35);
+  color-scheme: light;
+}
+
+/* Thème violet */
+:root[data-theme='violet'] {
+  --brand: #7138d9;
+  --brand-dark: #5b2bc0;
+  --brand-deep: #35166f;
+  --brand-ink: #5b2bc0;
+  --brand-heading: #35166f;
+  --brand-pale: #ede5fc;
+  --brand-paler: #f7f4fd;
+  --brand-soft: #d9ccf7;
+  --on-brand-soft: #d9ccf7;
+  --brand-light: #c4b5fd;
+  --brand-bright: #a52bff;
+  --brand-glow: rgba(113, 56, 217, 0.7);
+  --night: #130b2b;
+  --bg-alt: #f7f4fd;
+  --shadow: 0 20px 50px -20px rgba(53, 22, 111, 0.4);
+}
+
+/* Thème orangé */
+:root[data-theme='orange'] {
+  --brand: #c2410c;
+  --brand-dark: #9a3412;
+  --brand-deep: #7c2d12;
+  --brand-ink: #c2410c;
+  --brand-heading: #7c2d12;
+  --brand-pale: #ffedd5;
+  --brand-paler: #fff7ed;
+  --brand-soft: #fed7aa;
+  --on-brand-soft: #fed7aa;
+  --brand-light: #fdba74;
+  --brand-bright: #f97316;
+  --brand-glow: rgba(234, 88, 12, 0.7);
+  --night: #1a0d05;
+  --bg-alt: #fbf6f2;
+  --shadow: 0 20px 50px -20px rgba(124, 45, 18, 0.4);
+}
+
+/* Mode sombre (pour les trois thèmes) */
+:root[data-mode='dark'] {
+  --ink: #e8eef5;
+  --muted: #a6b4c4;
+  --prose: #cbd5e1;
+  --line: #26313d;
+  --bg: #0b1016;
+  --bg-alt: #111821;
+  --surface: #151d27;
+  --glass: rgba(11, 16, 22, 0.86);
+  --shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.6);
+  --brand-ink: #6ee7b7;
+  --brand-heading: #a7f3d0;
+  --brand-pale: #0f2e24;
+  --brand-paler: #0b1a15;
+  --brand-soft: #1f4d3d;
+  color-scheme: dark;
+}
+:root[data-mode='dark'][data-theme='violet'] {
+  --brand-ink: #c4b5fd;
+  --brand-heading: #d9ccf7;
+  --brand-pale: #2a1d52;
+  --brand-paler: #16102b;
+  --brand-soft: #3e2c75;
+}
+:root[data-mode='dark'][data-theme='orange'] {
+  --brand-ink: #fdba74;
+  --brand-heading: #fed7aa;
+  --brand-pale: #3a1d0c;
+  --brand-paler: #1d0f07;
+  --brand-soft: #5a2e14;
 }
 
 * {
@@ -40,7 +125,7 @@ img {
   max-width: 100%;
 }
 a {
-  color: var(--green-dark);
+  color: var(--brand-ink);
 }
 code {
   background: var(--bg-alt);
@@ -62,7 +147,7 @@ code {
   left: 12px;
   top: 12px;
   z-index: 99;
-  background: #fff;
+  background: var(--surface);
   padding: 8px 12px;
 }
 
@@ -90,20 +175,20 @@ code {
   font-size: 1.05rem;
 }
 .btn-primary {
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
-  box-shadow: 0 10px 25px -10px rgba(5, 150, 105, 0.8);
+  box-shadow: 0 10px 25px -10px var(--brand-glow);
 }
 .btn-primary:hover {
-  background: var(--green-dark);
+  background: var(--brand-dark);
 }
 .btn-ghost {
-  background: #fff;
-  color: var(--green-deep);
+  background: var(--surface);
+  color: var(--brand-heading);
   border: 1.5px solid var(--line);
 }
 .btn-ghost:hover {
-  border-color: var(--green);
+  border-color: var(--brand);
 }
 
 /* --- En-tête --- */
@@ -111,7 +196,7 @@ code {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--glass);
   backdrop-filter: saturate(160%) blur(12px);
   border-bottom: 1px solid var(--line);
 }
@@ -127,7 +212,7 @@ code {
   gap: 10px;
   font-weight: 800;
   font-size: 1.3rem;
-  color: var(--green-deep);
+  color: var(--brand-heading);
   text-decoration: none;
 }
 .brand img {
@@ -146,7 +231,7 @@ code {
   font-size: 0.95rem;
 }
 .menu a:not(.btn):hover {
-  color: var(--green);
+  color: var(--brand-ink);
 }
 .menu-btn {
   display: none;
@@ -179,7 +264,7 @@ code {
     align-items: stretch;
     gap: 6px;
     padding: 16px 20px 22px;
-    background: #fff;
+    background: var(--surface);
     border-bottom: 1px solid var(--line);
     box-shadow: 0 20px 30px -20px rgba(0, 0, 0, 0.2);
   }
@@ -196,7 +281,7 @@ code {
   position: relative;
   overflow: hidden;
   padding: 72px 0 90px;
-  background: linear-gradient(180deg, #ecfdf5 0%, #fff 70%);
+  background: linear-gradient(180deg, var(--brand-paler) 0%, var(--bg) 70%);
 }
 .hero-bg span {
   position: absolute;
@@ -205,10 +290,14 @@ code {
   opacity: 0.55;
   animation: drift 14s ease-in-out infinite alternate;
 }
+/* En mode sombre, les bulles de couleur restent discrètes */
+:root[data-mode='dark'] .hero-bg span {
+  opacity: 0.18;
+}
 .hero-bg span:nth-child(1) {
   width: 420px;
   height: 420px;
-  background: #a7f3d0;
+  background: var(--brand-soft);
   top: -120px;
   left: -100px;
 }
@@ -223,7 +312,7 @@ code {
 .hero-bg span:nth-child(3) {
   width: 260px;
   height: 260px;
-  background: #6ee7b7;
+  background: var(--brand-light);
   top: 30%;
   right: -60px;
   animation-delay: -9s;
@@ -254,9 +343,9 @@ code {
   margin: 0 0 16px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: #fff;
-  border: 1px solid #a7f3d0;
-  color: var(--green-deep);
+  background: var(--surface);
+  border: 1px solid var(--brand-soft);
+  color: var(--brand-heading);
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -267,7 +356,7 @@ h1 {
   letter-spacing: -0.03em;
 }
 .grad {
-  background: linear-gradient(90deg, var(--green), #10b981, var(--orange));
+  background: linear-gradient(90deg, var(--brand), var(--brand-bright), var(--orange));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -352,7 +441,7 @@ h1 {
   position: relative;
   height: 100%;
   border-radius: 32px;
-  background: #f6f8f7;
+  background: var(--bg-alt);
   overflow: hidden;
   padding: 36px 14px 14px;
   font-size: 13px;
@@ -364,15 +453,15 @@ h1 {
   padding: 6px 10px;
   border-radius: 10px;
   font-size: 11px;
-  background: #d1fae5;
-  color: var(--green-deep);
+  background: var(--brand-pale);
+  color: var(--brand-heading);
   animation: syncbg 12s infinite;
 }
 .sync i {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--brand);
   animation: syncdot 12s infinite;
 }
 .sync {
@@ -427,7 +516,7 @@ h1 {
   margin: 12px 2px;
 }
 .cart {
-  background: #fff;
+  background: var(--surface);
   border-radius: 14px;
   border: 1px solid var(--line);
   padding: 4px 10px;
@@ -450,7 +539,7 @@ h1 {
   font-style: normal;
 }
 .line strong {
-  color: var(--green);
+  color: var(--brand-ink);
 }
 .l2 {
   animation-delay: 0.6s;
@@ -482,7 +571,7 @@ h1 {
 .total strong {
   font-size: 28px;
   font-weight: 800;
-  color: var(--green-deep);
+  color: var(--brand-heading);
 }
 .pay {
   background: var(--orange);
@@ -509,7 +598,7 @@ h1 {
   bottom: 16px;
   padding: 10px 12px;
   border-radius: 12px;
-  background: var(--green-deep);
+  background: var(--brand-deep);
   color: #fff;
   font-size: 12px;
   opacity: 0;
@@ -537,7 +626,7 @@ h1 {
   position: absolute;
   padding: 10px 14px;
   border-radius: 14px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 15px 35px -15px rgba(15, 23, 42, 0.35);
   font-weight: 600;
   font-size: 0.85rem;
@@ -571,7 +660,7 @@ h1 {
 
 /* --- Bandeau de chiffres --- */
 .band {
-  background: var(--green-deep);
+  background: var(--brand-deep);
   color: #fff;
   padding: 34px 0;
 }
@@ -585,7 +674,7 @@ h1 {
   display: block;
   font-size: 2.2rem;
   font-weight: 800;
-  color: #6ee7b7;
+  color: var(--brand-light);
 }
 .stat span {
   opacity: 0.85;
@@ -610,7 +699,7 @@ h1 {
 }
 .kicker {
   margin: 0 0 8px;
-  color: var(--green);
+  color: var(--brand-ink);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -642,7 +731,7 @@ h2 {
   }
 }
 .card {
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 24px;
@@ -654,7 +743,7 @@ h2 {
 .card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow);
-  border-color: #a7f3d0;
+  border-color: var(--brand-soft);
 }
 .card h3 {
   margin: 12px 0 6px;
@@ -670,7 +759,7 @@ h2 {
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: var(--green-pale);
+  background: var(--brand-pale);
   font-size: 1.6rem;
 }
 
@@ -704,7 +793,7 @@ h2 {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
   font-size: 12px;
   display: grid;
@@ -717,7 +806,7 @@ h2 {
   gap: 12px;
   padding: 30px;
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
 }
@@ -747,8 +836,8 @@ h2 {
   }
   55%,
   100% {
-    background: var(--green-pale);
-    color: var(--green-deep);
+    background: var(--brand-pale);
+    color: var(--brand-heading);
   }
 }
 .cloud {
@@ -760,7 +849,7 @@ h2 {
   position: absolute;
   inset: 50% -30px auto;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  background: linear-gradient(90deg, transparent, var(--brand), transparent);
   background-size: 200% 100%;
   animation: wave 1.5s linear infinite;
 }
@@ -789,7 +878,7 @@ h2 {
   padding: 26px;
   border-radius: var(--radius);
   border: 1px solid var(--line);
-  background: #fff;
+  background: var(--surface);
 }
 .steps span {
   display: grid;
@@ -797,7 +886,7 @@ h2 {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: var(--green);
+  background: var(--brand);
   color: #fff;
   font-weight: 800;
 }
@@ -828,7 +917,7 @@ h2 {
   padding: 26px 16px;
   border-radius: var(--radius);
   border: 1.5px solid var(--line);
-  background: #fff;
+  background: var(--surface);
   color: var(--ink);
   text-decoration: none;
   text-align: center;
@@ -840,14 +929,14 @@ h2 {
 .dl:hover,
 .dl.suggested {
   transform: translateY(-4px);
-  border-color: var(--green);
+  border-color: var(--brand);
   box-shadow: var(--shadow);
 }
 .dl.suggested::after {
   content: 'Ton appareil';
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--green);
+  color: var(--brand-ink);
 }
 .dl-ico {
   display: inline-flex;
@@ -867,10 +956,10 @@ h2 {
   color: #0078d4;
 }
 .ico-linux {
-  color: #1f2937;
+  color: var(--ink);
 }
 .ico-web {
-  color: var(--green, #059669);
+  color: var(--brand-ink);
 }
 .ico-web svg {
   fill: none;
@@ -907,11 +996,11 @@ h2 {
   gap: 30px;
   padding: 40px;
   border-radius: 24px;
-  background: linear-gradient(135deg, var(--green-deep), var(--green));
+  background: linear-gradient(135deg, var(--brand-deep), var(--brand));
   color: #fff;
 }
 .pricing .kicker {
-  color: #a7f3d0;
+  color: var(--on-brand-soft);
 }
 .pricing p {
   opacity: 0.9;
@@ -938,7 +1027,7 @@ h2 {
 /* Pages de contenu */
 .page-head {
   padding: 60px 0 20px;
-  background: linear-gradient(180deg, #ecfdf5, #fff);
+  background: linear-gradient(180deg, var(--brand-paler), var(--bg));
 }
 .prose {
   max-width: 780px;
@@ -949,7 +1038,7 @@ h2 {
 }
 .prose p,
 .prose li {
-  color: #334155;
+  color: var(--prose);
 }
 /* Fichier pas encore disponible : bouton grisé avec la mention « Bientôt disponible » */
 [data-soon] {
@@ -974,11 +1063,11 @@ h2 {
   border-radius: 14px;
   padding: 0 18px;
   margin-bottom: 10px;
-  background: #fff;
+  background: var(--surface);
   transition: border-color 0.2s;
 }
 .faq details[open] {
-  border-color: #a7f3d0;
+  border-color: var(--brand-soft);
 }
 .faq summary {
   cursor: pointer;
@@ -996,7 +1085,7 @@ h2 {
   right: 0;
   top: 12px;
   font-size: 1.4rem;
-  color: var(--green);
+  color: var(--brand-ink);
   transition: transform 0.2s;
 }
 .faq details[open] summary::after {
@@ -1020,10 +1109,10 @@ h2 {
   border: 1.5px solid var(--line);
   border-radius: var(--radius);
   padding: 26px;
-  background: #fff;
+  background: var(--surface);
 }
 .install-card.suggested {
-  border-color: var(--green);
+  border-color: var(--brand);
   box-shadow: var(--shadow);
 }
 .install-head {
@@ -1050,7 +1139,7 @@ h2 {
 
 /* Pied de page */
 .footer {
-  background: #0b1210;
+  background: var(--night);
   color: #cbd5e1;
   padding: 56px 0 26px;
 }
@@ -1082,7 +1171,7 @@ h2 {
   padding: 3px 0;
 }
 .footer nav a:hover {
-  color: #6ee7b7;
+  color: var(--brand-light);
 }
 .copyright {
   margin-top: 36px;
@@ -1138,11 +1227,11 @@ h2 {
   border: 1.5px solid var(--line);
   border-radius: var(--radius);
   padding: 28px;
-  background: #fff;
+  background: var(--surface);
   text-align: center;
 }
 .price.featured {
-  border-color: var(--green);
+  border-color: var(--brand);
   box-shadow: var(--shadow);
   transform: translateY(-6px);
 }
@@ -1152,7 +1241,7 @@ h2 {
 .price .amount {
   font-size: 2.2rem;
   font-weight: 800;
-  color: var(--green-deep);
+  color: var(--brand-heading);
   margin: 0 0 8px;
 }
 .price .amount small {
@@ -1168,4 +1257,115 @@ h2 {
 .price-notes {
   max-width: 640px;
   margin: 30px auto;
+}
+
+/* ---------- Choix du style (couleur et mode), en relief comme dans l'application ---------- */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+/* Sur ordinateur, le menu suit directement le choix du style */
+.theme-switch ~ .menu {
+  margin-left: 0;
+}
+.swatch {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px var(--surface);
+  transition: transform 0.15s ease;
+}
+.swatch-vert {
+  background: linear-gradient(180deg, #10b981, #047857);
+  border-bottom-color: #064e3b;
+}
+.swatch-violet {
+  background: linear-gradient(180deg, #a52bff, #7138d9);
+  border-bottom-color: #3b1a8c;
+}
+.swatch-orange {
+  background: linear-gradient(180deg, #f97316, #c2410c);
+  border-bottom-color: #7c2d12;
+}
+.swatch[aria-pressed='true'] {
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--brand);
+}
+.swatch:active,
+.style-option:active {
+  transform: translateY(2px);
+}
+.mode-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1.5px solid var(--line);
+  border-bottom-width: 3px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.icon-sun {
+  display: none;
+}
+:root[data-mode='dark'] .icon-sun {
+  display: block;
+}
+:root[data-mode='dark'] .icon-moon {
+  display: none;
+}
+.style-picker {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+.style-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 130px;
+  padding: 18px 22px;
+  border: 1.5px solid var(--line);
+  border-bottom-width: 5px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.style-option[aria-pressed='true'] {
+  border-color: var(--brand);
+}
+.style-option .swatch {
+  width: 58px;
+  height: 58px;
+  border-bottom-width: 5px;
+  cursor: inherit;
+}
+.style-option .mode-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+}
+.style-option .mode-icon svg {
+  width: 26px;
+  height: 26px;
 }

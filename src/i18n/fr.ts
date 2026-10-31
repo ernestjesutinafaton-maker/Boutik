@@ -59,6 +59,16 @@ export const fr = {
     themeSystem: 'Auto',
     themeHelp:
       'Le mode clair est conseillé en plein soleil. « Auto » suit le réglage du téléphone.',
+    chooseStyle: 'Choisis ton style',
+    styleTitle: 'Couleur',
+    modeTitle: 'Clair ou sombre',
+    colors: {
+      vert: 'Vert',
+      violet: 'Violet',
+      orange: 'Orangé',
+    },
+    switchToDark: 'Passer en mode sombre',
+    switchToLight: 'Passer en mode clair',
     users: 'Équipe et codes PIN',
     usersHelp: 'Rôles et codes PIN des personnes de la boutique',
     salesHelp: 'Retrouver, renvoyer ou réimprimer une facture',

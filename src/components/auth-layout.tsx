@@ -7,8 +7,17 @@ import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAppTheme } from '@/theme/paper-theme';
+import { ThemePicker } from '@/theme/theme-picker';
+import type { ThemeColor } from '@/theme/tokens';
 
 import { Card } from './card';
+
+/** La boutique en 3D (dessin d'Ernest), dans la couleur de chaque thème. */
+const ILLUSTRATIONS: Record<ThemeColor, number> = {
+  vert: require('@/assets/images/boutique-3d-vert.webp'),
+  violet: require('@/assets/images/boutique-3d-violet.webp'),
+  orange: require('@/assets/images/boutique-3d-orange.webp'),
+};
 
 type AuthLayoutProps = {
   title: string;
@@ -18,8 +27,9 @@ type AuthLayoutProps = {
 
 /**
  * Mise en page des écrans d'accueil (connexion, inscription, création de la boutique) :
- * fond « vert nuit », la boutique Boutik en 3D (dessin d'Ernest, passé en vert), puis une carte avec
- * le formulaire, centrée sur grand écran.
+ * fond sombre en dégradé, choix du style (vert, violet ou orangé ; clair ou sombre), la
+ * boutique Boutik en 3D (dessin d'Ernest) dans la couleur choisie, puis une carte avec le
+ * formulaire, centrée sur grand écran.
  */
 export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
   const theme = useAppTheme();
@@ -49,9 +59,11 @@ export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {
           },
         ]}>
         <View style={[styles.inner, { gap: spacing.lg }]}>
+          {/* Dès le premier écran, chacun choisit son style */}
+          <ThemePicker variant="compact" />
           <View style={[styles.brand, { gap: spacing.sm }]}>
             <Image
-              source={require('@/assets/images/boutique-3d.webp')}
+              source={ILLUSTRATIONS[theme.app.themeColor]}
               style={styles.illustration}
               contentFit="contain"
               accessibilityLabel={t('app.name')}

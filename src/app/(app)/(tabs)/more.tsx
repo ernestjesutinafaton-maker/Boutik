@@ -2,7 +2,7 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
-import { Button, Dialog, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
+import { Button, Dialog, List, Portal, Text } from 'react-native-paper';
 
 import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
@@ -18,7 +18,7 @@ import { useIsPlatformAdmin } from '@/subscription/subscription-data';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
-import { useThemePreference } from '@/theme/theme-preference';
+import { ThemePicker } from '@/theme/theme-picker';
 
 /** Rubrique « Plus » : mon compte, réglages et accès aux autres fonctions. */
 export default function MoreScreen() {
@@ -28,7 +28,6 @@ export default function MoreScreen() {
   const { session, signOut } = useAuth();
   const { shop, device } = useShop();
   const { can } = useActiveMember();
-  const { preference, setPreference } = useThemePreference();
   const outbox = useOutbox();
   const isPlatformAdmin = useIsPlatformAdmin();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
@@ -225,15 +224,7 @@ export default function MoreScreen() {
       <Card mode="outlined">
         <Card.Title title={t('more.appearance')} titleVariant="titleLarge" />
         <Card.Content style={{ gap: theme.app.spacing.md }}>
-          <SegmentedButtons
-            value={preference}
-            onValueChange={setPreference}
-            buttons={[
-              { value: 'light', label: t('more.themeLight'), icon: 'weather-sunny' },
-              { value: 'dark', label: t('more.themeDark'), icon: 'weather-night' },
-              { value: 'system', label: t('more.themeSystem'), icon: 'theme-light-dark' },
-            ]}
-          />
+          <ThemePicker />
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
             {t('more.themeHelp')}
           </Text>
