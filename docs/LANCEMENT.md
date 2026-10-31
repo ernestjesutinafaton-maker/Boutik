@@ -87,9 +87,10 @@ et demandent les documents de l'entreprise (RCCM, IFU).
 - une table `subscriptions` (boutique, formule, date de fin) et une fonction serveur qui la met à jour
   quand l'agrégateur confirme le paiement (« webhook ») ;
 - dans l'appli : écran « Mon abonnement », rappel 7 jours avant la fin ;
-- **règle importante pour une appli hors ligne** : à la fin de l'abonnement, ne jamais bloquer les ventes
-  d'un coup. Proposer plutôt un délai de grâce (par exemple 7 jours), puis passer en lecture seule pour les
-  rapports avancés, sans jamais empêcher la boutique de vendre ni de voir ses dettes.
+- **règle choisie par Ernest (01/11/2026)** : 7 jours de grâce après la fin de l'essai ou de l'abonnement,
+  puis la boutique est EN PAUSE (tout bloqué sauf le paiement, vérifié aussi par le serveur : code BK001,
+  l'appareil garde ses données et les envoie après validation). Une déclaration de paiement (capture
+  obligatoire) ouvre 3 jours d'accès provisoire, une fois par 30 jours, jamais juste après un refus.
 
 👉 **Décisions à prendre par Ernest** : la formule et les prix, l'agrégateur (FedaPay ou KKiaPay),
 la durée de l'essai gratuit et le délai de grâce.

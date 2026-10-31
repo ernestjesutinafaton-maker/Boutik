@@ -23,7 +23,6 @@ import {
 } from '@/reports/report-data';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
-import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
 import { useAppTheme } from '@/theme/paper-theme';
 
 type Grouping = 'day' | 'week' | 'month';
@@ -68,7 +67,6 @@ export default function ReportsScreen() {
   const [isWorking, setIsWorking] = useState(false);
   const currency = settings?.currencyCode ?? 'XOF';
   const { spacing } = theme.app;
-  const limited = useIsLimited();
 
   if (!canAccount && !can('cash.session')) {
     return (
@@ -105,8 +103,7 @@ export default function ReportsScreen() {
 
   return (
     <Screen title={t('report.archivesTitle')} stack>
-      {limited ? <LimitedNotice /> : null}
-      {canAccount && !limited ? (
+      {canAccount ? (
         <Card mode="outlined">
           <Card.Content style={{ gap: spacing.sm }}>
             <Text variant="bodyLarge">

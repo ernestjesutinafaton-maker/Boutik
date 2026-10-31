@@ -35,6 +35,7 @@ const shops = new Table({
   allow_sale_without_stock: column.integer,
   return_window_hours: column.integer, // délai pour modifier une vente (24 h par défaut)
   paid_until: column.text, // fin de l'abonnement payé (modifiée seulement par le serveur)
+  provisional_until: column.text, // accès provisoire pendant la vérification d'un paiement (serveur)
   created_at: column.text,
   updated_at: column.text,
 });

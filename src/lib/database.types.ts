@@ -1295,6 +1295,7 @@ export type Database = {
           name: string
           paid_until: string | null
           phone: string | null
+          provisional_until: string | null
           return_window_hours: number
           seller_max_discount_percent: number
           updated_at: string
@@ -1313,6 +1314,7 @@ export type Database = {
           name: string
           paid_until?: string | null
           phone?: string | null
+          provisional_until?: string | null
           return_window_hours?: number
           seller_max_discount_percent?: number
           updated_at?: string
@@ -1331,6 +1333,7 @@ export type Database = {
           name?: string
           paid_until?: string | null
           phone?: string | null
+          provisional_until?: string | null
           return_window_hours?: number
           seller_max_discount_percent?: number
           updated_at?: string
@@ -1612,9 +1615,13 @@ export type Database = {
           created_at: string
           declared_by: string | null
           id: string
+          message: string | null
           monthly_price: number
           months: number
           operator: string
+          paid_at: string | null
+          proof_path: string | null
+          provisional_until: string | null
           reference: string
           review_note: string | null
           reviewed_at: string | null
@@ -1628,9 +1635,13 @@ export type Database = {
           created_at?: string
           declared_by?: string | null
           id?: string
+          message?: string | null
           monthly_price: number
           months: number
           operator: string
+          paid_at?: string | null
+          proof_path?: string | null
+          provisional_until?: string | null
           reference: string
           review_note?: string | null
           reviewed_at?: string | null
@@ -1644,9 +1655,13 @@ export type Database = {
           created_at?: string
           declared_by?: string | null
           id?: string
+          message?: string | null
           monthly_price?: number
           months?: number
           operator?: string
+          paid_at?: string | null
+          proof_path?: string | null
+          provisional_until?: string | null
           reference?: string
           review_note?: string | null
           reviewed_at?: string | null
@@ -1690,13 +1705,20 @@ export type Database = {
           amount: number
           created_at: string
           id: string
+          message: string
           months: number
           operator: string
+          owner_email: string
+          paid_at: string
           paid_until: string
+          proof_path: string
+          provisional_until: string
           reference: string
+          review_note: string
           sender_phone: string
           shop_id: string
           shop_name: string
+          shop_phone: string
           status: string
         }[]
       }
@@ -1714,13 +1736,19 @@ export type Database = {
       }
       declare_subscription_payment: {
         Args: {
+          p_message: string
           p_months: number
           p_operator: string
+          p_paid_at: string
+          p_proof_path: string
           p_reference: string
           p_sender_phone: string
           p_shop_id: string
         }
-        Returns: string
+        Returns: {
+          payment_id: string
+          provisional_until: string
+        }[]
       }
       register_device: {
         Args: {

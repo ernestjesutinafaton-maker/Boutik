@@ -66,13 +66,22 @@ describe('Abonnement', () => {
   });
 
   it('le propriétaire déclare, l’administrateur valide : la fin d’abonnement avance', async () => {
+    // La capture du paiement est d'abord envoyée dans le dossier de la boutique (obligatoire)
+    const proof = await asUser(db, owner, async (tx) => {
+      const name = `${shop}/${crypto.randomUUID()}.jpg`;
+      await tx.query(
+        "insert into storage.objects (bucket_id, name) values ('payment-proofs', $1)",
+        [name]
+      );
+      return name;
+    });
     const declared = await asUser(db, owner, (tx) =>
-      tx.query<{ id: string }>(
-        "select public.declare_subscription_payment($1, 3, 'mtn', '+2290197000000', 'MP123456') as id",
-        [shop]
+      tx.query<{ payment_id: string }>(
+        "select * from public.declare_subscription_payment($1, 3, 'mtn', '+2290197000000', 'MP123456', now(), null, $2)",
+        [shop, proof]
       )
     );
-    const paymentId = declared.rows[0].id;
+    const paymentId = declared.rows[0].payment_id;
     const payment = await db.query<{ amount: string; status: string }>(
       'select amount, status from public.subscription_payments where id = $1',
       [paymentId]
@@ -87,9 +96,10 @@ describe('Abonnement', () => {
     ).rejects.toThrow(/administrateur/);
     await expect(
       asUser(db, stranger, (tx) =>
-        tx.query("select public.declare_subscription_payment($1, 1, 'mtn', '0197000000', 'X123')", [
-          shop,
-        ])
+        tx.query(
+          "select * from public.declare_subscription_payment($1, 1, 'mtn', '0197000000', 'X123', now(), null, null)",
+          [shop]
+        )
       )
     ).rejects.toThrow(/propriétaire/);
 

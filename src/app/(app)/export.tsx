@@ -16,7 +16,6 @@ import { canSharePdf, printHtml, shareHtmlAsPdf } from '@/invoices/invoice-actio
 import { tableHtml } from '@/reports/table-html';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
-import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
 import { useAppTheme } from '@/theme/paper-theme';
 
 const KINDS: ExportKind[] = [
@@ -71,7 +70,6 @@ export default function ExportScreen() {
   const [message, setMessage] = useState<{ text: string; tone: 'info' | 'error' } | null>(null);
   const [isWorking, setIsWorking] = useState(false);
   const { spacing } = theme.app;
-  const limited = useIsLimited();
   // Les produits et les clients sont exportés tels qu'ils sont aujourd'hui (pas de période)
   const usesPeriod = kind !== 'products' && kind !== 'customers';
 
@@ -79,14 +77,6 @@ export default function ExportScreen() {
     return (
       <Screen title={t('export.title')} stack>
         <Notice message={t('common.forbidden')} />
-      </Screen>
-    );
-  }
-
-  if (limited) {
-    return (
-      <Screen title={t('export.title')} stack>
-        <LimitedNotice />
       </Screen>
     );
   }

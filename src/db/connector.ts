@@ -27,6 +27,15 @@ function isFatalError(code: unknown): boolean {
 }
 
 /**
+ * Boutique en pause (abonnement expiré) : le serveur refuse pour l'instant (code BK001).
+ * Ce n'est PAS un refus définitif : rien n'est mis de côté, tout reste dans l'appareil et
+ * repartira dès que le paiement sera validé.
+ */
+const SUBSCRIPTION_BLOCKED = 'BK001';
+/** En pause, inutile d'insister : un nouvel essai toutes les 30 secondes au plus */
+const BLOCKED_RETRY_DELAY_MS = 30_000;
+
+/**
  * Garde dans l'appareil les modifications refusées par le serveur, pour pouvoir les examiner
  * (table locale « local_rejected_changes », jamais envoyée au serveur).
  */
@@ -95,6 +104,11 @@ export const connector: PowerSyncBackendConnector = {
     if (!error) {
       await transaction.complete(); // envoyé : on le retire de la file d'attente
       return;
+    }
+    if (error.code === SUBSCRIPTION_BLOCKED) {
+      // Abonnement expiré : on garde tout et on réessaiera (après validation du paiement)
+      await new Promise((resolve) => setTimeout(resolve, BLOCKED_RETRY_DELAY_MS));
+      throw error;
     }
     if (isFatalError(error.code)) {
       // Refus définitif du serveur : réessayer bloquerait toutes les opérations suivantes.

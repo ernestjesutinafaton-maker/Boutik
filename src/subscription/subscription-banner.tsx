@@ -3,12 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button, Icon, Text } from 'react-native-paper';
 
+import { formatDay, toDay } from '@/domain/dates';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
 import { useSubscription } from './subscription-data';
 
-/** Rappel d'abonnement (propriétaire seulement) : fin de l'essai, délai de grâce, expiration. */
+/**
+ * Rappel d'abonnement (propriétaire seulement) : fin de l'essai, paiement en vérification,
+ * délai de grâce avant la pause. Une boutique en pause a son propre écran (blocked-screen).
+ */
 export function SubscriptionBanner() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -19,13 +23,14 @@ export function SubscriptionBanner() {
   const text =
     status.state === 'trial' && status.daysLeft <= 5
       ? t('subscription.banner.trial', { count: status.daysLeft })
-      : status.state === 'grace'
-        ? t('subscription.banner.grace')
-        : status.state === 'expired'
-          ? t('subscription.banner.expired')
+      : status.state === 'provisional'
+        ? t('subscription.banner.provisional', { date: formatDay(toDay(status.until)) })
+        : status.state === 'grace'
+          ? t('subscription.banner.grace', { count: status.daysLeft })
           : null;
   if (!text) return null;
-  const danger = status.state === 'expired';
+  // Moins de 3 jours avant la pause : en rouge
+  const danger = status.state === 'grace' && status.daysLeft <= 3;
   const color = danger ? theme.app.colors.onDangerContainer : theme.app.colors.onAccentContainer;
   return (
     <View

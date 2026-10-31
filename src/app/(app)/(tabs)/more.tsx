@@ -14,7 +14,7 @@ import { Icon3D } from '@/components/icon-3d';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
 import { useOutbox } from '@/invoices/outbox';
-import { useIsPlatformAdmin } from '@/subscription/subscription-data';
+import { useIsPlatformAdmin, usePendingPaymentsCount } from '@/subscription/subscription-data';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -30,6 +30,8 @@ export default function MoreScreen() {
   const { can } = useActiveMember();
   const outbox = useOutbox();
   const isPlatformAdmin = useIsPlatformAdmin();
+  // Paiements d'abonnement à vérifier : visibles d'un coup d'œil dans le menu
+  const pendingPayments = usePendingPaymentsCount(isPlatformAdmin);
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   // Nombre d'opérations pas encore envoyées qui empêchent la déconnexion (0 = rien de bloqué)
   const [blockingCount, setBlockingCount] = useState(0);
@@ -145,7 +147,11 @@ export default function MoreScreen() {
             <List.Item
               title={t('subscription.adminMenu')}
               titleStyle={{ fontWeight: '700' }}
-              description={t('subscription.adminTitle')}
+              description={
+                pendingPayments
+                  ? t('subscription.adminPending', { count: pendingPayments })
+                  : t('subscription.adminTitle')
+              }
               left={(props) => <Icon3D name="shield" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/admin-payments')}

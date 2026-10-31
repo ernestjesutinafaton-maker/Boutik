@@ -1,10 +1,11 @@
+import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Chip, Divider, List, Text } from 'react-native-paper';
+import { Button, Chip, Divider, List, Text } from 'react-native-paper';
 
-import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
+import { Card } from '@/components/card';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
@@ -15,12 +16,19 @@ import {
   SUBSCRIPTION_PAYEE,
   type SubscriptionOperator,
 } from '@/config/subscription';
-import { formatDay, formatMoment, toDay } from '@/domain/dates';
+import { formatDay, formatMoment, formatTime, toDay, today } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
-import { DURATIONS, type Duration, TIERS } from '@/domain/subscription';
+import { DURATIONS, type Duration, parsePaymentMoment, TIERS } from '@/domain/subscription';
 import { supabase } from '@/lib/supabase';
+import { dataUri } from '@/products/photos';
 import { useShop } from '@/shop/shop-provider';
-import { fetchQuote, type Quote, useSubscription } from '@/subscription/subscription-data';
+import { pickPaymentProof } from '@/subscription/payment-proof';
+import {
+  declarePayment,
+  fetchQuote,
+  type Quote,
+  useSubscription,
+} from '@/subscription/subscription-data';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
@@ -32,9 +40,18 @@ type Payment = {
   reference: string;
   status: 'pending' | 'validated' | 'rejected';
   created_at: string;
+  review_note: string | null;
+  provisional_until: string | null;
 };
 
-/** Mon abonnement : état, prix du moment, comment payer, déclarer un paiement. */
+type Feedback = { text: string; tone: 'info' | 'error' };
+
+/**
+ * Mon abonnement : état, prix du moment, comment payer, déclarer un paiement.
+ * La déclaration demande la capture du paiement (obligatoire), l'heure de l'envoi et un message
+ * facultatif : de quoi vérifier auprès de celui qui a reçu l'argent. Seul écran ouvert quand la
+ * boutique est en pause.
+ */
 export default function SubscriptionScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -47,7 +64,11 @@ export default function SubscriptionScreen() {
   const [operator, setOperator] = useState<SubscriptionOperator>('mtn');
   const [phone, setPhone] = useState('');
   const [reference, setReference] = useState('');
-  const [message, setMessage] = useState<{ text: string; tone: 'info' | 'error' } | null>(null);
+  const [proof, setProof] = useState<string | null>(null);
+  const [payDay, setPayDay] = useState(() => formatDay(today()));
+  const [payTime, setPayTime] = useState(() => formatTime(new Date().toISOString()));
+  const [note, setNote] = useState('');
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [reload, setReload] = useState(0);
   const { spacing } = theme.app;
@@ -58,10 +79,12 @@ export default function SubscriptionScreen() {
     let cancelled = false;
     fetchQuote(shopId)
       .then((value) => !cancelled && setQuote(value))
-      .catch(() => !cancelled && setMessage({ text: t('subscription.offline'), tone: 'error' }));
+      .catch(() => !cancelled && setFeedback({ text: t('subscription.offline'), tone: 'error' }));
     supabase
       .from('subscription_payments')
-      .select('id, months, amount, operator, reference, status, created_at')
+      .select(
+        'id, months, amount, operator, reference, status, created_at, review_note, provisional_until'
+      )
       .eq('shop_id', shopId)
       .order('created_at', { ascending: false })
       .limit(20)
@@ -79,29 +102,62 @@ export default function SubscriptionScreen() {
     );
   }
 
+  async function chooseProof(source: 'camera' | 'library') {
+    try {
+      const picked = await pickPaymentProof(source);
+      if (picked) {
+        setProof(picked);
+        setFeedback(null);
+      }
+    } catch {
+      setFeedback({ text: t('subscription.proof.pickError'), tone: 'error' });
+    }
+  }
+
   async function declare() {
     if (!shopId) return;
     if (phone.trim().length < 6 || reference.trim().length < 3) {
-      setMessage({ text: t('subscription.missing'), tone: 'error' });
+      setFeedback({ text: t('subscription.missing'), tone: 'error' });
+      return;
+    }
+    if (!proof) {
+      setFeedback({ text: t('subscription.proof.missing'), tone: 'error' });
+      return;
+    }
+    const paidAt = parsePaymentMoment(payDay, payTime, new Date());
+    if (!paidAt) {
+      setFeedback({ text: t('subscription.paidAtInvalid'), tone: 'error' });
       return;
     }
     setIsSaving(true);
-    setMessage(null);
-    const { error } = await supabase.rpc('declare_subscription_payment', {
-      p_shop_id: shopId,
-      p_months: months,
-      p_operator: operator,
-      p_sender_phone: phone.trim(),
-      p_reference: reference.trim(),
+    setFeedback(null);
+    const result = await declarePayment({
+      shopId,
+      months,
+      operator,
+      senderPhone: phone.trim(),
+      reference: reference.trim(),
+      paidAt,
+      message: note,
+      proofBase64: proof,
     });
     setIsSaving(false);
-    if (error) {
-      setMessage({ text: t('subscription.declareError'), tone: 'error' });
+    if (!result.ok) {
+      setFeedback({ text: t(`subscription.declareErrors.${result.reason}`), tone: 'error' });
       return;
     }
     setPhone('');
     setReference('');
-    setMessage({ text: t('subscription.declared'), tone: 'info' });
+    setProof(null);
+    setNote('');
+    setFeedback({
+      text: result.provisionalUntil
+        ? t('subscription.declaredProvisional', {
+            date: formatDay(toDay(result.provisionalUntil)),
+          })
+        : t('subscription.declared'),
+      tone: 'info',
+    });
     setReload((value) => value + 1);
   }
 
@@ -113,9 +169,11 @@ export default function SubscriptionScreen() {
         })
       : status.state === 'active'
         ? t('subscription.states.active', { date: formatDay(toDay(status.until)) })
-        : status.state === 'grace'
-          ? t('subscription.states.grace', { count: status.daysLeft })
-          : t('subscription.states.expired')
+        : status.state === 'provisional'
+          ? t('subscription.states.provisional', { count: status.daysLeft })
+          : status.state === 'grace'
+            ? t('subscription.states.grace', { count: status.daysLeft })
+            : t('subscription.states.expired')
     : '';
   const tone =
     status?.state === 'active' ? 'ok' : status?.state === 'expired' ? 'danger' : 'warning';
@@ -158,7 +216,7 @@ export default function SubscriptionScreen() {
             </View>
           ))}
           <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-            {t('subscription.neverBlocked')}
+            {t('subscription.pauseRule')}
           </Text>
         </Card.Content>
       </Card>
@@ -221,7 +279,58 @@ export default function SubscriptionScreen() {
             onChangeText={setReference}
             autoCapitalize="characters"
           />
-          {message ? <Notice tone={message.tone} message={message.text} /> : null}
+          <View style={[styles.row, { gap: spacing.sm }]}>
+            <View style={styles.fill}>
+              <TextField
+                label={t('subscription.paidDay')}
+                value={payDay}
+                onChangeText={setPayDay}
+                keyboardType="numbers-and-punctuation"
+              />
+            </View>
+            <View style={styles.fill}>
+              <TextField
+                label={t('subscription.paidTime')}
+                value={payTime}
+                onChangeText={setPayTime}
+                keyboardType="numbers-and-punctuation"
+              />
+            </View>
+          </View>
+
+          <Text variant="titleMedium">{t('subscription.proof.title')}</Text>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            {t('subscription.proof.help')}
+          </Text>
+          {proof ? (
+            <Image
+              source={{ uri: dataUri(proof) }}
+              style={[
+                styles.proof,
+                { borderRadius: theme.app.radius.md, backgroundColor: theme.colors.surfaceVariant },
+              ]}
+              contentFit="contain"
+              accessibilityLabel={t('subscription.proof.title')}
+            />
+          ) : null}
+          <View style={[styles.wrap, { gap: spacing.sm }]}>
+            <Button mode="outlined" icon="camera" onPress={() => chooseProof('camera')}>
+              {t('subscription.proof.camera')}
+            </Button>
+            <Button mode="outlined" icon="image" onPress={() => chooseProof('library')}>
+              {proof ? t('subscription.proof.change') : t('subscription.proof.library')}
+            </Button>
+          </View>
+
+          <TextField
+            label={t('subscription.note')}
+            placeholder={t('subscription.notePlaceholder')}
+            value={note}
+            onChangeText={setNote}
+            multiline
+            maxLength={500}
+          />
+          {feedback ? <Notice tone={feedback.tone} message={feedback.text} /> : null}
           <BigButton
             icon="check-decagram"
             onPress={declare}
@@ -240,7 +349,20 @@ export default function SubscriptionScreen() {
               {index > 0 ? <Divider /> : null}
               <List.Item
                 title={`${formatMoney(Number(payment.amount), 'XOF')} · ${t('subscription.months', { count: payment.months })}`}
-                description={`${formatMoment(payment.created_at)} · ${payment.reference}`}
+                description={[
+                  `${formatMoment(payment.created_at)} · ${payment.reference}`,
+                  payment.status === 'rejected' && payment.review_note
+                    ? t('subscription.rejectedReason', { reason: payment.review_note })
+                    : null,
+                  payment.status === 'pending' && payment.provisional_until
+                    ? t('subscription.provisionalLine', {
+                        date: formatDay(toDay(new Date(payment.provisional_until))),
+                      })
+                    : null,
+                ]
+                  .filter(Boolean)
+                  .join('\n')}
+                descriptionNumberOfLines={5}
                 right={() => (
                   <View style={styles.center}>
                     <StatusChip
@@ -266,9 +388,11 @@ export default function SubscriptionScreen() {
 
 const styles = StyleSheet.create({
   between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  row: { flexDirection: 'row' },
   fill: { flex: 1 },
   bold: { fontWeight: '700' },
   wrap: { flexDirection: 'row', flexWrap: 'wrap' },
   payee: { alignItems: 'center', gap: 4 },
   center: { justifyContent: 'center' },
+  proof: { width: '100%', height: 320 },
 });

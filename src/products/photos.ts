@@ -74,7 +74,8 @@ export function useProductPhoto(productId: string, photoPath: string | null): st
   return photoPath ? photoUrl(photoPath) : null;
 }
 
-function base64ToBytes(base64: string): Uint8Array {
+/** Une image en base64 → les octets à envoyer dans le stockage Supabase. */
+export function base64ToBytes(base64: string): Uint8Array {
   const binary = atob(base64);
   const bytes = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) {
