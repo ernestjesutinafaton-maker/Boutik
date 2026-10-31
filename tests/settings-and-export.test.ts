@@ -116,23 +116,23 @@ describe('Export Excel / CSV', () => {
       range,
       today: today(),
     });
-    const rice = table.rows.find((row) => row[0] === 'Riz parfumé');
-    expect(rice?.[2]).toBe('kg');
-    expect(Number(String(rice?.[6]))).toBeGreaterThan(0);
+    const cable = table.rows.find((row) => row[0] === 'Câble électrique 2,5 mm²');
+    expect(cable?.[2]).toBe('mètre');
+    expect(Number(String(cable?.[6]))).toBeGreaterThan(0);
   });
 
   it('inventaire : attendu, compté, écart et sa valeur ; aussi en page PDF', async () => {
-    const rice = await db.get<{ id: string; stock: number }>(
+    const cable = await db.get<{ id: string; stock: number }>(
       `SELECT p.id, COALESCE(SUM(m.quantity), 0) AS stock FROM products p
          LEFT JOIN stock_movements m ON m.product_id = p.id
-        WHERE p.name = 'Riz parfumé' GROUP BY p.id`
+        WHERE p.name = 'Câble électrique 2,5 mm²' GROUP BY p.id`
     );
     const countId = await startInventory(db, context, 'Comptage de fin de mois');
-    // Il manque 2 kg dans le rayon
+    // Il manque 2 mètres dans le rayon
     await saveCount(db, context, {
       countId,
-      productId: rice.id,
-      countedQuantity: rice.stock - 2000,
+      productId: cable.id,
+      countedQuantity: cable.stock - 2000,
     });
     await validateInventory(db, context, countId);
 
@@ -147,7 +147,7 @@ describe('Export Excel / CSV', () => {
     expect(forCount.rows).toHaveLength(1);
     const [row] = forCount.rows;
     expect(row).toHaveLength(forCount.headers.length);
-    expect(row.slice(1, 3)).toEqual(['Comptage de fin de mois', 'Riz parfumé']);
+    expect(row.slice(1, 3)).toEqual(['Comptage de fin de mois', 'Câble électrique 2,5 mm²']);
     expect(row[6]).toBe('-2');
     expect(Number(String(row[7]))).toBeLessThan(0);
 
@@ -159,7 +159,7 @@ describe('Export Excel / CSV', () => {
       range,
       today: today(),
     });
-    expect(forPeriod.rows.some((line) => line[2] === 'Riz parfumé')).toBe(true);
+    expect(forPeriod.rows.some((line) => line[2] === 'Câble électrique 2,5 mm²')).toBe(true);
 
     const html = tableHtml({
       table: forCount,

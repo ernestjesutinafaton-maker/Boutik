@@ -86,7 +86,7 @@ describe('Tableau de bord sur la boutique de démonstration', () => {
     expect(data.series).toHaveLength(14);
     expect(data.series.filter((entry) => entry.total > 0).length).toBeGreaterThanOrEqual(12);
     expect(data.sleeping.map((product) => product.name)).toEqual(
-      expect.arrayContaining(['Café soluble 50 g', 'Piles AA'])
+      expect.arrayContaining(['Niveau à bulle 60 cm'])
     );
   }, 120_000);
 });

@@ -116,7 +116,7 @@ export const GUIDE: GuideSection[] = [
       {
         label: 'Nouveau produit',
         icon: 'plus',
-        text: 'Réservé au propriétaire. Nom, photo, code-barres, unités (sac, kg, carton…), prix de vente et prix d’achat de chaque unité. Le bénéfice par unité s’affiche pendant la saisie.',
+        text: 'Réservé au propriétaire. Nom, photo, code-barres, unités (pièce, mètre, carton…), prix de vente et prix d’achat de chaque unité. Le bénéfice par unité s’affiche pendant la saisie.',
       },
       {
         label: 'Recevoir de la marchandise',

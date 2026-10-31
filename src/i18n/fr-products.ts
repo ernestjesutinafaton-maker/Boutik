@@ -1,7 +1,8 @@
 /** Textes des produits, du stock et de l'inventaire (étapes 8 à 10). */
 export const frProducts = {
   products: {
-    description: 'Fiches produits, unités (sac, kilo, carton…), codes-barres, prix et stock.',
+    description:
+      'Fiches produits, unités (pièce, mètre, kilo, carton…), codes-barres, prix et stock.',
     add: 'Nouveau produit',
     search: 'Chercher un produit (nom ou code-barres)',
     all: 'Tous ({{count}})',
@@ -44,15 +45,15 @@ export const frProducts = {
     choosePhoto: 'Choisir une photo',
     photoError: 'Impossible d’utiliser cette photo. Réessaie avec une autre.',
     name: 'Nom du produit',
-    namePlaceholder: 'Ex. Riz parfumé',
+    namePlaceholder: 'Ex. Ciment CPJ 45, Câble 2,5 mm², Cahier 200 pages',
     category: 'Rayon',
     newCategory: 'Nouveau rayon',
-    categoryName: 'Nom du rayon (ex. Boissons)',
+    categoryName: 'Nom du rayon (ex. Plomberie, Électricité, Papeterie)',
     barcode: 'Code-barres (facultatif)',
     scan: 'Scanner un code-barres',
     unitsTitle: 'Unités et prix',
     baseUnitHelp:
-      'L’unité de base est la plus petite unité dans laquelle tu comptes ton stock : kg pour le riz, pièce pour le savon, boîte pour le lait.',
+      'L’unité de base est la plus petite unité dans laquelle tu comptes ton stock : pièce pour un robinet, mètre pour un câble, kg pour des pointes, litre pour une peinture.',
     baseUnit: 'Unité de base',
     baseUnitFallback: 'unité',
     allowDecimal: 'Vendre avec une virgule (ex. 2,5 {{unit}})',
@@ -65,16 +66,16 @@ export const frProducts = {
     marginLoss:
       'Attention : une unité est vendue moins cher qu’elle ne coûte. Vérifie son prix de vente.',
     marginsHelp:
-      'Tape le prix d’achat d’une seule unité (par exemple le sac) : les autres sont calculées. Le bénéfice réel de tes comptes utilise le prix payé à chaque réception, moins les dépenses.',
+      'Tape le prix d’achat d’une seule unité (par exemple le carton) : les autres sont calculées. Le bénéfice réel de tes comptes utilise le prix payé à chaque réception, moins les dépenses.',
     packagingsTitle: 'Autres unités de vente ou d’achat',
     packagingsHelp:
-      'Sac, carton, tine… Indique combien de {{unit}} chacune contient. Laisse le prix vide si tu ne la vends pas (seulement pour acheter).',
+      'Carton, rouleau, botte, paquet… Indique combien de {{unit}} chacune contient. Laisse le prix vide si tu ne la vends pas (seulement pour acheter).',
     packagingName: 'Nom',
-    packagingNamePlaceholder: 'Ex. Sac 50 kg',
+    packagingNamePlaceholder: 'Ex. Rouleau 100 m, Carton 24, Botte 20 barres',
     packagingContains: 'Contient combien de {{unit}} ?',
     packagingPrice: 'Prix de vente (vide = pas vendu ainsi)',
     packagingBarcode: 'Code-barres de cette unité (facultatif)',
-    addPackaging: 'Ajouter une unité (sac, carton…)',
+    addPackaging: 'Ajouter une unité (carton, rouleau…)',
     removePackaging: 'Retirer cette unité',
     defaultUnitHelp: 'Le rond coché = l’unité proposée en premier à la caisse.',
     stockTitle: 'Stock',
@@ -173,7 +174,7 @@ export const frProducts = {
       cancelled: 'Abandonné',
     },
     countHelp:
-      'Touche un produit (ou scanne-le) puis tape ce que tu comptes. Tu peux compter en plusieurs fois : 9 sacs, puis 47 kg.',
+      'Touche un produit (ou scanne-le) puis tape ce que tu comptes. Tu peux compter en plusieurs fois : 2 cartons, puis 7 pièces.',
     notCounted: 'Pas encore compté',
     countedValue: 'Compté : {{quantity}}',
     expectedValue: 'Calculé : {{quantity}}',

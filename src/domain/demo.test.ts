@@ -55,6 +55,6 @@ describe('Boutique de démonstration', () => {
     );
     expect(sold.has('cafe')).toBe(false);
     expect(sold.has('piles')).toBe(false);
-    expect(sold.has('riz')).toBe(true);
+    expect(sold.has('ciment')).toBe(true);
   });
 });
