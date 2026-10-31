@@ -116,3 +116,21 @@ export function matchBarcode<T extends CatalogProduct>(
 export function isLowStock(product: Pick<CatalogProduct, 'stock' | 'lowStockThreshold'>): boolean {
   return product.lowStockThreshold !== null && product.stock <= product.lowStockThreshold;
 }
+
+/**
+ * Les rayons qui contiennent au moins un produit, par ordre alphabétique.
+ * Tirés du catalogue déjà chargé : pas de lecture de plus dans la base.
+ */
+export function productCategories(
+  products: readonly Pick<CatalogProduct, 'categoryId' | 'categoryName'>[]
+): { id: string; name: string }[] {
+  const names = new Map<string, string>();
+  for (const product of products) {
+    if (product.categoryId && product.categoryName && !names.has(product.categoryId)) {
+      names.set(product.categoryId, product.categoryName);
+    }
+  }
+  return [...names]
+    .map(([id, name]) => ({ id, name }))
+    .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+}

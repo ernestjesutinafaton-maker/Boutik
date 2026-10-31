@@ -7,6 +7,7 @@ import {
   isLowStock,
   matchBarcode,
   normalizeText,
+  productCategories,
   searchProducts,
   sellableUnits,
 } from './catalog';
@@ -142,5 +143,21 @@ describe('Stock bas', () => {
 
   it('pas d’alerte sans seuil', () => {
     expect(isLowStock({ stock: 0, lowStockThreshold: null })).toBe(false);
+  });
+});
+
+describe('Rayons de la caisse sur tablette', () => {
+  it('seulement les rayons qui ont des produits, sans doublon, par ordre alphabétique', () => {
+    expect(
+      productCategories([
+        { categoryId: 'plomberie', categoryName: 'Plomberie' },
+        { categoryId: 'electricite', categoryName: 'Électricité' },
+        { categoryId: 'plomberie', categoryName: 'Plomberie' },
+        { categoryId: null, categoryName: null },
+      ])
+    ).toEqual([
+      { id: 'electricite', name: 'Électricité' },
+      { id: 'plomberie', name: 'Plomberie' },
+    ]);
   });
 });

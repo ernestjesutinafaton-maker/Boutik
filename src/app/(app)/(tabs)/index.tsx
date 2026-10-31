@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
   Button,
+  Chip,
   Dialog,
   Divider,
   List,
@@ -16,6 +17,7 @@ import {
 import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
+import { CardList } from '@/components/card-list';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
@@ -26,6 +28,7 @@ import {
   type CatalogProduct,
   type CatalogUnit,
   matchBarcode,
+  productCategories,
   searchProducts,
 } from '@/domain/catalog';
 import { type CurrencyCode, formatMoney, parseMoney } from '@/domain/money';
@@ -48,11 +51,12 @@ import { useAppTheme } from '@/theme/paper-theme';
  * Rubrique « Caisse » : chercher ou scanner, remplir le panier, encaisser.
  * Sert aussi à MODIFIER une vente déjà faite (bandeau en haut), et propose la dernière vente
  * en raccourci pour corriger une erreur tout de suite.
+ * Sur tablette : les produits à gauche (on touche pour ajouter), le panier à droite.
  */
 export default function SellScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { can, member } = useActiveMember();
   const settings = useShopSettings();
   const { products } = useCatalog();
@@ -67,8 +71,14 @@ export default function SellScreen() {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
   const [isDiscountOpen, setIsDiscountOpen] = useState(false);
-  const isLargeScreen = width >= theme.app.layout.largeScreenMinWidth;
-  const { spacing } = theme.app;
+  // Rayon choisi dans la liste des produits sur tablette (null = tous)
+  const [category, setCategory] = useState<string | null>(null);
+  const { spacing, layout } = theme.app;
+  const isLargeScreen = width >= layout.largeScreenMinWidth;
+  // Vraie tablette (ou ordinateur) : assez de place dans les deux sens pour une caisse
+  // « produits à gauche, panier à droite », chaque côté défilant seul.
+  // Un téléphone tourné en paysage garde la mise en page qui défile.
+  const isTabletLayout = isLargeScreen && Math.min(width, height) >= layout.tabletMinSide;
   const currency = settings?.currencyCode ?? 'XOF';
 
   if (!can('sale.create')) {
@@ -87,7 +97,15 @@ export default function SellScreen() {
     member?.maxDiscountPercent ?? null,
     settings?.sellerMaxDiscountPercent ?? 0
   );
-  const results = query.trim() ? searchProducts(products, query).slice(0, 8) : [];
+  // Les produits qui correspondent à la recherche (aucun tant que rien n'est tapé)
+  const matches = query.trim() ? searchProducts(products, query) : [];
+  // Tablette : toute la liste (ou la recherche), filtrée par rayon
+  const categories = isTabletLayout ? productCategories(products) : [];
+  const listed = isTabletLayout
+    ? (query.trim() ? matches : products).filter(
+        (product) => category === null || product.categoryId === category
+      )
+    : [];
 
   function add(product: CatalogProduct, unit: CatalogUnit | null) {
     const added = cart.addProduct(product, unit);
@@ -101,34 +119,39 @@ export default function SellScreen() {
     const found = matchBarcode(products, code);
     if (found) {
       add(found.product, found.unit);
-    } else if (results.length === 1) {
-      add(results[0], null);
+    } else if (matches.length === 1) {
+      add(matches[0], null);
     } else {
       setMessage(t('sell.unknownBarcode', { code }));
     }
   }
 
+  const searchField = (
+    <TextField
+      label={t('sell.search')}
+      value={query}
+      onChangeText={setQuery}
+      onSubmitEditing={() => query.trim() && addByBarcode(query)}
+      returnKeyType="search"
+      left={<TextInput.Icon icon="magnify" />}
+      right={
+        <TextInput.Icon
+          icon="barcode-scan"
+          onPress={() => setIsScannerOpen(true)}
+          accessibilityLabel={t('productForm.scan')}
+        />
+      }
+    />
+  );
+
+  // Téléphone : la recherche, ses 8 premiers résultats, et la liste complète dans une fenêtre
   const searchPanel = (
     <View style={{ gap: spacing.md }}>
-      <TextField
-        label={t('sell.search')}
-        value={query}
-        onChangeText={setQuery}
-        onSubmitEditing={() => query.trim() && addByBarcode(query)}
-        returnKeyType="search"
-        left={<TextInput.Icon icon="magnify" />}
-        right={
-          <TextInput.Icon
-            icon="barcode-scan"
-            onPress={() => setIsScannerOpen(true)}
-            accessibilityLabel={t('productForm.scan')}
-          />
-        }
-      />
+      {searchField}
       {message ? <Notice message={message} /> : null}
-      {results.length > 0 ? (
+      {matches.length > 0 ? (
         <Card mode="outlined">
-          {results.map((product, index) => (
+          {matches.slice(0, 8).map((product, index) => (
             <View key={product.id}>
               {index > 0 ? <Divider /> : null}
               <ProductListItem product={product} onPress={() => add(product, null)} />
@@ -140,6 +163,49 @@ export default function SellScreen() {
         {t('sell.allProducts')}
       </BigButton>
     </View>
+  );
+
+  // Tablette : tous les produits sous la recherche, par rayon ; seules les lignes visibles
+  // sont dessinées (fluide même avec des milliers d'articles)
+  const catalogPanel = (
+    <CardList
+      data={listed}
+      keyExtractor={(product) => product.id}
+      header={
+        <>
+          {searchField}
+          {message ? <Notice message={message} /> : null}
+          {categories.length > 0 ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled">
+              <View style={[styles.chips, { gap: spacing.sm }]}>
+                <Chip selected={category === null} onPress={() => setCategory(null)}>
+                  {t('products.all', { count: products.length })}
+                </Chip>
+                {categories.map((item) => (
+                  <Chip
+                    key={item.id}
+                    selected={category === item.id}
+                    onPress={() => setCategory(item.id)}>
+                    {item.name}
+                  </Chip>
+                ))}
+              </View>
+            </ScrollView>
+          ) : null}
+        </>
+      }
+      empty={
+        <Text variant="bodyLarge" style={styles.centered}>
+          {products.length === 0 ? t('products.empty') : t('products.noResult')}
+        </Text>
+      }
+      renderItem={(product) => (
+        <ProductListItem product={product} onPress={() => add(product, null)} />
+      )}
+    />
   );
 
   const cartPanel = (
@@ -235,54 +301,45 @@ export default function SellScreen() {
     </View>
   );
 
-  return (
-    <Screen title={t('nav.sell')}>
-      {cart.editing ? (
-        <Card mode="outlined" style={{ borderColor: theme.app.colors.accent }}>
-          <Card.Content style={{ gap: spacing.sm }}>
-            <Text variant="titleMedium" style={styles.bold}>
-              {t('modify.banner', { number: cart.editing.invoiceNumber })}
-            </Text>
-            <Text variant="bodyLarge">
-              {t('modify.bannerPaid', {
-                amount: formatMoney(cart.editing.alreadyPaid, currency),
-              })}
-            </Text>
-            <BigButton icon="close" variant="outline" onPress={cart.clear}>
-              {t('modify.cancelEditing')}
-            </BigButton>
-          </Card.Content>
-        </Card>
-      ) : null}
-      <CashSessionNotice />
-      {!cart.editing && cart.lines.length === 0 && lastSale && lastSaleRight?.allowed ? (
-        <Card mode="outlined">
-          <List.Item
-            title={t('modify.lastSale', {
-              number: lastSale.invoiceNumber,
-              amount: formatMoney(lastSale.total, currency),
-            })}
-            titleStyle={styles.bold}
-            description={t('modify.lastSaleHelp')}
-            descriptionNumberOfLines={2}
-            left={(props) => <List.Icon {...props} icon="receipt-text-edit" />}
-            right={(props) => <List.Icon {...props} icon="chevron-right" />}
-            onPress={() => router.push(`/sale/${lastSale.id}`)}
-          />
-        </Card>
-      ) : null}
-      {isLargeScreen ? (
-        <View style={[styles.row, styles.top, { gap: spacing.md }]}>
-          <View style={styles.fill}>{searchPanel}</View>
-          <View style={styles.fill}>{cartPanel}</View>
-        </View>
-      ) : (
-        <>
-          {searchPanel}
-          {cartPanel}
-        </>
-      )}
+  const editingBanner = cart.editing ? (
+    <Card mode="outlined" style={{ borderColor: theme.app.colors.accent }}>
+      <Card.Content style={{ gap: spacing.sm }}>
+        <Text variant="titleMedium" style={styles.bold}>
+          {t('modify.banner', { number: cart.editing.invoiceNumber })}
+        </Text>
+        <Text variant="bodyLarge">
+          {t('modify.bannerPaid', {
+            amount: formatMoney(cart.editing.alreadyPaid, currency),
+          })}
+        </Text>
+        <BigButton icon="close" variant="outline" onPress={cart.clear}>
+          {t('modify.cancelEditing')}
+        </BigButton>
+      </Card.Content>
+    </Card>
+  ) : null;
 
+  const lastSaleShortcut =
+    !cart.editing && cart.lines.length === 0 && lastSale && lastSaleRight?.allowed ? (
+      <Card mode="outlined">
+        <List.Item
+          title={t('modify.lastSale', {
+            number: lastSale.invoiceNumber,
+            amount: formatMoney(lastSale.total, currency),
+          })}
+          titleStyle={styles.bold}
+          titleNumberOfLines={2}
+          description={t('modify.lastSaleHelp')}
+          descriptionNumberOfLines={2}
+          left={(props) => <List.Icon {...props} icon="receipt-text-edit" />}
+          right={(props) => <List.Icon {...props} icon="chevron-right" />}
+          onPress={() => router.push(`/sale/${lastSale.id}`)}
+        />
+      </Card>
+    ) : null;
+
+  const dialogs = (
+    <>
       <BarcodeScanner
         visible={isScannerOpen}
         onClose={() => setIsScannerOpen(false)}
@@ -318,6 +375,47 @@ export default function SellScreen() {
           }}
         />
       ) : null}
+    </>
+  );
+
+  if (isTabletLayout) {
+    // Pas de défilement global : la liste des produits et le panier défilent chacun de leur côté
+    return (
+      <Screen title={t('nav.sell')} scroll={false}>
+        <View style={[styles.columns, { gap: spacing.md }]}>
+          <View style={styles.fill}>{catalogPanel}</View>
+          <ScrollView
+            style={styles.fill}
+            contentContainerStyle={{ gap: spacing.md, paddingBottom: spacing.lg }}
+            keyboardShouldPersistTaps="handled">
+            {editingBanner}
+            <CashSessionNotice />
+            {lastSaleShortcut}
+            {cartPanel}
+          </ScrollView>
+        </View>
+        {dialogs}
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen title={t('nav.sell')}>
+      {editingBanner}
+      <CashSessionNotice />
+      {lastSaleShortcut}
+      {isLargeScreen ? (
+        <View style={[styles.row, styles.top, { gap: spacing.md }]}>
+          <View style={styles.fill}>{searchPanel}</View>
+          <View style={styles.fill}>{cartPanel}</View>
+        </View>
+      ) : (
+        <>
+          {searchPanel}
+          {cartPanel}
+        </>
+      )}
+      {dialogs}
     </Screen>
   );
 }
@@ -411,6 +509,16 @@ const styles = StyleSheet.create({
   },
   fill: {
     flex: 1,
+  },
+  columns: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  chips: {
+    flexDirection: 'row',
+  },
+  centered: {
+    textAlign: 'center',
   },
   bold: {
     fontWeight: '700',

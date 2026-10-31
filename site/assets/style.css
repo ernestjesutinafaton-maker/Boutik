@@ -222,7 +222,7 @@ code {
   margin-left: auto;
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 18px;
 }
 .menu a:not(.btn) {
   color: var(--ink);
@@ -250,7 +250,9 @@ code {
   border-radius: 2px;
   transition: transform 0.2s;
 }
-@media (max-width: 900px) {
+/* Le menu complet a besoin de toute la largeur de la page (1 080 px) :
+   en dessous, il passe dans le bouton « menu » au lieu de déborder */
+@media (max-width: 1120px) {
   .menu-btn {
     display: block;
   }
@@ -633,18 +635,21 @@ h1 {
   white-space: nowrap;
   animation: bob 5s ease-in-out infinite;
 }
+/* Les bulles se placent par rapport au téléphone (centré, 270 px de large) et ne couvrent
+   que son cadre ou une zone vide de l'écran, jamais du texte :
+   f1 au-dessus du coin haut, f3 entre « Encaisser » et le message WhatsApp, f2 sur le bord bas */
 .f1 {
-  top: 60px;
-  left: 0;
+  top: -18px;
+  right: calc(50% + 15px);
 }
 .f2 {
   bottom: -6px;
-  right: 0;
+  right: max(0px, calc(50% - 241px));
   animation-delay: -1.6s;
 }
 .f3 {
-  bottom: 50px;
-  left: 10px;
+  top: 400px;
+  left: calc(50% - 175px);
   animation-delay: -3.2s;
 }
 @keyframes bob {

@@ -471,6 +471,7 @@ export const touch = {
 /** Mise en page selon la taille de l'écran. */
 export const layout = {
   largeScreenMinWidth: 768, // au-delà : tablette ou ordinateur → menu sur le côté
+  tabletMinSide: 600, // plus petit côté d'une tablette (un téléphone tourné n'y arrive pas)
   contentMaxWidth: 960, // largeur maximale du contenu, pour rester lisible sur grand écran
   sideNavWidth: 248, // largeur du menu sur le côté
 } as const;
