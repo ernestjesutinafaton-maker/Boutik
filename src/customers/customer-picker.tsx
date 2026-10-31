@@ -1,7 +1,7 @@
 import { usePowerSync } from '@powersync/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Modal, StyleSheet, View } from 'react-native';
+import { FlatList, Modal, Platform, StyleSheet, View } from 'react-native';
 import { Button, Divider, IconButton, List, Text, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -140,6 +140,11 @@ export function CustomerPicker({ visible, onClose, onPick }: CustomerPickerProps
           data={results}
           keyExtractor={(customer) => customer.id}
           keyboardShouldPersistTaps="handled"
+          // Dessiner peu de lignes à la fois : rapide même sur les vieux téléphones
+          initialNumToRender={12}
+          maxToRenderPerBatch={10}
+          windowSize={7}
+          removeClippedSubviews={Platform.OS === 'android'}
           ItemSeparatorComponent={Divider}
           ListEmptyComponent={
             <Text variant="bodyLarge" style={[styles.centered, { padding: theme.app.spacing.lg }]}>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, Modal, StyleSheet, View } from 'react-native';
+import { FlatList, Modal, Platform, StyleSheet, View } from 'react-native';
 import { Divider, IconButton, Text, TextInput } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -14,7 +14,7 @@ import {
 } from '@/domain/catalog';
 import { useAppTheme } from '@/theme/paper-theme';
 
-import { useCatalog } from './product-data';
+import { useCatalog } from './catalog-provider';
 import { ProductListItem } from './product-list-item';
 
 type ProductPickerProps = {
@@ -89,6 +89,11 @@ export function ProductPicker({ visible, title, onClose, onPick }: ProductPicker
           data={results}
           keyExtractor={(product) => product.id}
           keyboardShouldPersistTaps="handled"
+          // Dessiner peu de lignes à la fois : rapide même sur les vieux téléphones
+          initialNumToRender={12}
+          maxToRenderPerBatch={10}
+          windowSize={7}
+          removeClippedSubviews={Platform.OS === 'android'}
           ItemSeparatorComponent={Divider}
           ListEmptyComponent={
             <Text variant="bodyLarge" style={[styles.centered, { padding: theme.app.spacing.lg }]}>

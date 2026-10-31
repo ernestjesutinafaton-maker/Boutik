@@ -19,7 +19,7 @@ import { today } from '@/domain/dates';
 import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
 import { formatQuantityWithUnit } from '@/domain/quantity';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useExpiringLots } from '@/stock/stock-data';
 import { useActiveMember } from '@/team/active-member-provider';

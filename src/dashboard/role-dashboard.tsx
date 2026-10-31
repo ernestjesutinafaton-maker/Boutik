@@ -11,7 +11,7 @@ import { isLowStock } from '@/domain/catalog';
 import { formatTime, today } from '@/domain/dates';
 import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
 import type { CurrencyCode } from '@/domain/money';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { useOpenCashSession } from '@/sales/cash-session-data';
 import { useSessionTotals } from '@/cash/cash-data';
 import { useShop } from '@/shop/shop-provider';

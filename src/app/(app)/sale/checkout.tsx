@@ -25,7 +25,7 @@ import {
   type SaleProblem,
   settle,
 } from '@/domain/sale';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { useCart } from '@/sales/cart-provider';
 import { usePaymentMethods } from '@/sales/payment-methods';
 import {

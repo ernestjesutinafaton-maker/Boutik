@@ -14,7 +14,7 @@ export function SideNav() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { colors, effects, spacing, layout, fontSize } = theme.app;
+  const { colors, spacing, layout, fontSize } = theme.app;
 
   return (
     <View
@@ -23,7 +23,7 @@ export function SideNav() {
         {
           width: layout.sideNavWidth + insets.left,
           backgroundColor: colors.surface,
-          boxShadow: effects.cardShadow,
+          borderRightColor: colors.border,
           gap: spacing.xs,
           paddingTop: insets.top + spacing.lg,
           paddingBottom: insets.bottom + spacing.md,
@@ -49,8 +49,7 @@ export function SideNav() {
 
 const styles = StyleSheet.create({
   menu: {
-    // Au-dessus du contenu, pour que son ombre se voie
-    zIndex: 1,
+    borderRightWidth: 1,
   },
   brand: {
     fontWeight: '800',

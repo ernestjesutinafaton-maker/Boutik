@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { PinLockScreen } from '@/components/pin-lock-screen';
+import { CatalogProvider } from '@/products/catalog-provider';
 import { usePhotoUploader } from '@/products/photos';
 import { CartProvider } from '@/sales/cart-provider';
 import { ActiveMemberProvider, useActiveMember } from '@/team/active-member-provider';
@@ -13,11 +14,14 @@ import { ActiveMemberProvider, useActiveMember } from '@/team/active-member-prov
  */
 export default function AppLayout() {
   return (
-    <ActiveMemberProvider>
-      <CartProvider>
-        <AppStack />
-      </CartProvider>
-    </ActiveMemberProvider>
+    // Le catalogue est lu une seule fois, pour tous les écrans
+    <CatalogProvider>
+      <ActiveMemberProvider>
+        <CartProvider>
+          <AppStack />
+        </CartProvider>
+      </ActiveMemberProvider>
+    </CatalogProvider>
   );
 }
 

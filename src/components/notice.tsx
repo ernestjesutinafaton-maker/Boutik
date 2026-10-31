@@ -12,7 +12,7 @@ type NoticeProps = {
 /** Encadré de message bien visible : erreur, ou information. */
 export function Notice({ message, tone = 'error' }: NoticeProps) {
   const theme = useAppTheme();
-  const { colors, spacing, radius } = theme.app;
+  const { colors, effects, depth, spacing, radius } = theme.app;
   const isError = tone === 'error';
   const backgroundColor = isError ? colors.dangerContainer : colors.primaryContainer;
   const color = isError ? colors.onDangerContainer : colors.onPrimaryContainer;
@@ -22,7 +22,14 @@ export function Notice({ message, tone = 'error' }: NoticeProps) {
       accessibilityRole={isError ? 'alert' : 'text'}
       style={[
         styles.notice,
-        { backgroundColor, borderRadius: radius.md, padding: spacing.md, gap: spacing.sm },
+        {
+          backgroundColor,
+          borderBottomWidth: depth.chip,
+          borderBottomColor: effects.noticeEdge[tone],
+          borderRadius: radius.md,
+          padding: spacing.md,
+          gap: spacing.sm,
+        },
       ]}>
       <Icon source={isError ? 'alert-circle' : 'information'} size={24} color={color} />
       <Text variant="bodyLarge" style={[styles.text, { color }]}>

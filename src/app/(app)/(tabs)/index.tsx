@@ -31,7 +31,7 @@ import {
 import { type CurrencyCode, formatMoney, parseMoney } from '@/domain/money';
 import { maxDiscountPercent } from '@/domain/permissions';
 import { cartSubtotal, discountAmount, type DiscountInput, maxDiscount } from '@/domain/sale';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { ProductListItem } from '@/products/product-list-item';
 import { ProductPicker } from '@/products/product-picker';
 import { CartLineRow } from '@/sales/cart-line-row';

@@ -12,7 +12,7 @@ import { Screen } from '@/components/screen';
 import { useActionContext } from '@/data/use-action-context';
 import { loadDemoData, ShopNotEmptyError } from '@/demo/load-demo';
 import { today } from '@/domain/dates';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';

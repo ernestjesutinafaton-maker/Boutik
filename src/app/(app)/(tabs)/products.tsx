@@ -2,18 +2,19 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Chip, Divider, Text, TextInput } from 'react-native-paper';
+import { Chip, Text, TextInput } from 'react-native-paper';
 
-import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
+import { CardList } from '@/components/card-list';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
 import { isLowStock, matchBarcode, searchProducts } from '@/domain/catalog';
 import { today } from '@/domain/dates';
 import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
 import { ExpiryChip } from '@/products/expiry-chip';
-import { useCatalog, useCategories } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
+import { useCategories } from '@/products/product-data';
 import { ProductListItem } from '@/products/product-list-item';
 import { useShopSettings } from '@/shop/shop-settings';
 import { expiryLevelsByProduct, useExpiringLots } from '@/stock/stock-data';
@@ -22,7 +23,10 @@ import { useAppTheme } from '@/theme/paper-theme';
 
 const LOW_STOCK_FILTER = 'low-stock';
 
-/** Rubrique « Produits » : chercher, scanner, filtrer par rayon ou stock bas. */
+/**
+ * Rubrique « Produits » : chercher, scanner, filtrer par rayon ou stock bas.
+ * La liste ne dessine que les produits visibles : fluide même avec des milliers d'articles.
+ */
 export default function ProductsScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -68,8 +72,8 @@ export default function ProductsScreen() {
     }
   }
 
-  return (
-    <Screen title={t('nav.products')}>
+  const header = (
+    <>
       <View style={[styles.actions, { gap: spacing.sm }]}>
         {can('catalog.edit') ? (
           <BigButton icon="plus" style={styles.action} onPress={() => router.push('/product/new')}>
@@ -152,26 +156,30 @@ export default function ProductsScreen() {
           ))}
         </View>
       </ScrollView>
+    </>
+  );
 
-      <Card mode="outlined">
-        {filtered.length === 0 && !isLoading ? (
-          <Card.Content style={{ paddingVertical: spacing.lg }}>
+  return (
+    <Screen title={t('nav.products')} scroll={false}>
+      <CardList
+        data={filtered}
+        keyExtractor={(product) => product.id}
+        header={header}
+        empty={
+          isLoading ? null : (
             <Text variant="bodyLarge" style={styles.centered}>
               {products.length === 0 ? t('products.empty') : t('products.noResult')}
             </Text>
-          </Card.Content>
-        ) : null}
-        {filtered.map((product, index) => (
-          <View key={product.id}>
-            {index > 0 ? <Divider /> : null}
-            <ProductListItem
-              product={product}
-              onPress={() => router.push(`/product/${product.id}`)}
-              extra={<ExpiryChip level={expiryLevels.get(product.id) ?? 'ok'} />}
-            />
-          </View>
-        ))}
-      </Card>
+          )
+        }
+        renderItem={(product) => (
+          <ProductListItem
+            product={product}
+            onPress={() => router.push(`/product/${product.id}`)}
+            extra={<ExpiryChip level={expiryLevels.get(product.id) ?? 'ok'} />}
+          />
+        )}
+      />
 
       <BarcodeScanner
         visible={isScannerOpen}

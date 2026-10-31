@@ -18,7 +18,7 @@ type AuthLayoutProps = {
 
 /**
  * Mise en page des écrans d'accueil (connexion, inscription, création de la boutique) :
- * fond « nuit violette », la boutique Boutik en 3D (dessin d'Ernest), puis une carte avec
+ * fond « vert nuit », la boutique Boutik en 3D (dessin d'Ernest, passé en vert), puis une carte avec
  * le formulaire, centrée sur grand écran.
  */
 export function AuthLayout({ title, subtitle, children }: AuthLayoutProps) {

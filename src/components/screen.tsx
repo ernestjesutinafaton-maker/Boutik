@@ -60,27 +60,13 @@ export function Screen({ title, stack = false, scroll = true, children }: Screen
       {stack ? <Stack.Screen options={{ title }} /> : null}
       {scroll ? (
         <ScrollView
-          style={[
-            styles.fill,
-            {
-              backgroundColor: theme.colors.background,
-              backgroundImage: theme.app.effects.screenGradient,
-            },
-          ]}
+          style={[styles.fill, { backgroundColor: theme.colors.background }]}
           contentContainerStyle={containerStyle}
           keyboardShouldPersistTaps="handled">
           {content}
         </ScrollView>
       ) : (
-        <View
-          style={[
-            styles.fill,
-            containerStyle,
-            {
-              backgroundColor: theme.colors.background,
-              backgroundImage: theme.app.effects.screenGradient,
-            },
-          ]}>
+        <View style={[styles.fill, containerStyle, { backgroundColor: theme.colors.background }]}>
           {content}
         </View>
       )}

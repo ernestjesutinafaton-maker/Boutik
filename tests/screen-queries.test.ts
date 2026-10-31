@@ -47,7 +47,8 @@ vi.mock('@powersync/react', () => ({
 }));
 
 const { createProduct } = await import('@/products/product-actions');
-const { useCatalog, useProduct, useCategories } = await import('@/products/product-data');
+const { useCatalogRows, toCatalog, useProduct, useCategories } =
+  await import('@/products/product-data');
 const { useProductPhoto } = await import('@/products/photos');
 const { receiveStock } = await import('@/stock/stock-actions');
 const { useProductLots, useProductMovements, useExpiringLots, expiryLevelsByProduct } =
@@ -219,7 +220,7 @@ beforeAll(async () => {
 
 describe('Lectures des écrans sur une vraie base', () => {
   it('catalogue : produit, unités (JSON), stock, rayon, photo en attente', () => {
-    const { products } = useCatalog();
+    const products = toCatalog(useCatalogRows().rows);
     expect(products).toHaveLength(1);
     expect(products[0]).toMatchObject({
       name: 'Lait concentré',

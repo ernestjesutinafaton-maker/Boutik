@@ -1,11 +1,12 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Chip, Divider, List, Text, TextInput } from 'react-native-paper';
+import { Chip, List, Text, TextInput } from 'react-native-paper';
 
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
+import { CardList } from '@/components/card-list';
 import { MoneyText } from '@/components/money-text';
 import { Screen } from '@/components/screen';
 import { TextField } from '@/components/text-field';
@@ -29,7 +30,10 @@ const FILTER_MATCH: Record<Filter, (bucket: AgingBucket, balance: number) => boo
   over60: (bucket) => bucket === 'over60',
 };
 
-/** Rubrique « Clients » : la liste, ceux qui doivent de l'argent, et depuis combien de temps. */
+/**
+ * Rubrique « Clients » : la liste, ceux qui doivent de l'argent, et depuis combien de temps.
+ * La liste ne dessine que les clients visibles : fluide même avec des centaines de clients.
+ */
 export default function CustomersScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -43,10 +47,16 @@ export default function CustomersScreen() {
   const day = today();
   const { spacing } = theme.app;
 
-  const withAging = customers.map((customer) => ({
-    customer,
-    aging: debtAging(ledger.get(customer.id) ?? [], day),
-  }));
+  // L'ancienneté des dettes : recalculée seulement quand les données changent,
+  // pas à chaque lettre tapée dans la recherche
+  const withAging = useMemo(
+    () =>
+      customers.map((customer) => ({
+        customer,
+        aging: debtAging(ledger.get(customer.id) ?? [], day),
+      })),
+    [customers, ledger, day]
+  );
   const debtors = withAging.filter(({ customer }) => customer.balance > 0);
   const totalOwed = debtors.reduce((sum, { customer }) => sum + customer.balance, 0);
   const count = (wanted: Filter) =>
@@ -72,8 +82,8 @@ export default function CustomersScreen() {
     );
   }
 
-  return (
-    <Screen title={t('nav.customers')}>
+  const header = (
+    <>
       <Card mode="outlined">
         <Card.Content style={[styles.between, { paddingVertical: spacing.sm }]}>
           <View>
@@ -112,49 +122,53 @@ export default function CustomersScreen() {
           ))}
         </View>
       </ScrollView>
+    </>
+  );
 
-      <Card mode="outlined">
-        {visible.length === 0 && !isLoading ? (
-          <Card.Content style={{ paddingVertical: spacing.lg }}>
+  return (
+    <Screen title={t('nav.customers')} scroll={false}>
+      <CardList
+        data={visible}
+        keyExtractor={({ customer }) => customer.id}
+        header={header}
+        empty={
+          isLoading ? null : (
             <Text variant="bodyLarge" style={styles.centered}>
               {customers.length === 0 ? t('customers.empty') : t('customerPicker.empty')}
             </Text>
-          </Card.Content>
-        ) : null}
-        {visible.map(({ customer, aging }, index) => (
-          <View key={customer.id}>
-            {index > 0 ? <Divider /> : null}
-            <List.Item
-              title={customer.name}
-              titleStyle={styles.bold}
-              description={() => (
-                <View style={{ gap: spacing.xs, marginTop: 2 }}>
-                  {customer.phone ? (
-                    <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                      {customer.phone}
-                    </Text>
-                  ) : null}
-                  <AgingChip aging={aging} />
+          )
+        }
+        renderItem={({ customer, aging }) => (
+          <List.Item
+            title={customer.name}
+            titleStyle={styles.bold}
+            description={() => (
+              <View style={{ gap: spacing.xs, marginTop: 2 }}>
+                {customer.phone ? (
+                  <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                    {customer.phone}
+                  </Text>
+                ) : null}
+                <AgingChip aging={aging} />
+              </View>
+            )}
+            left={(props) => <List.Icon {...props} icon="account" />}
+            right={() =>
+              customer.balance !== 0 ? (
+                <View style={styles.center}>
+                  <MoneyText
+                    amount={customer.balance}
+                    currency={currency}
+                    tone={customer.balance > 0 ? 'danger' : 'success'}
+                    style={{ fontSize: theme.app.fontSize.large }}
+                  />
                 </View>
-              )}
-              left={(props) => <List.Icon {...props} icon="account" />}
-              right={() =>
-                customer.balance !== 0 ? (
-                  <View style={styles.center}>
-                    <MoneyText
-                      amount={customer.balance}
-                      currency={currency}
-                      tone={customer.balance > 0 ? 'danger' : 'success'}
-                      style={{ fontSize: theme.app.fontSize.large }}
-                    />
-                  </View>
-                ) : null
-              }
-              onPress={() => router.push(`/customer/${customer.id}`)}
-            />
-          </View>
-        ))}
-      </Card>
+              ) : null
+            }
+            onPress={() => router.push(`/customer/${customer.id}`)}
+          />
+        )}
+      />
     </Screen>
   );
 }

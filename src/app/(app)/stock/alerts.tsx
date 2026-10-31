@@ -10,7 +10,7 @@ import { displayUnits, isLowStock } from '@/domain/catalog';
 import { daysBetween, formatDay, today } from '@/domain/dates';
 import type { ExpiryLevel } from '@/domain/expiry';
 import { formatMixedStock, formatQuantityWithUnit } from '@/domain/quantity';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { ProductListItem } from '@/products/product-list-item';
 import { useShopSettings } from '@/shop/shop-settings';
 import { type DatedLot, useExpiringLots } from '@/stock/stock-data';

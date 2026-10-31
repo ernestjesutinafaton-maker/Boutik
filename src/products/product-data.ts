@@ -9,7 +9,7 @@ import { useShop } from '@/shop/shop-provider';
  * (vente sur cet appareil, ou données reçues d'un autre appareil).
  */
 
-type ProductRow = {
+export type ProductRow = {
   id: string;
   name: string;
   barcode: string | null;
@@ -86,8 +86,12 @@ function toProduct(row: ProductRow): CatalogProduct {
   };
 }
 
-/** Tous les produits actifs de la boutique, avec leur stock et leurs unités. */
-export function useCatalog(): { products: CatalogProduct[]; isLoading: boolean } {
+/**
+ * La requête du catalogue : tous les produits actifs de la boutique (lignes brutes).
+ * Elle n'est lancée qu'UNE fois pour toute l'application, par le CatalogProvider :
+ * les écrans, eux, utilisent useCatalog() (voir catalog-provider.tsx).
+ */
+export function useCatalogRows(): { rows: ProductRow[]; isLoading: boolean } {
   const { shop } = useShop();
   const { data, isLoading } = useQuery<ProductRow>(
     `${PRODUCT_SELECT}
@@ -95,7 +99,12 @@ export function useCatalog(): { products: CatalogProduct[]; isLoading: boolean }
       ORDER BY p.name COLLATE NOCASE`,
     [shop?.id ?? '']
   );
-  return { products: data.map(toProduct), isLoading };
+  return { rows: data, isLoading };
+}
+
+/** Les lignes de la base deviennent les produits du catalogue (unités lues depuis le JSON). */
+export function toCatalog(rows: readonly ProductRow[]): CatalogProduct[] {
+  return rows.map(toProduct);
 }
 
 /** Un produit (même archivé), avec son stock et ses unités. */

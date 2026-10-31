@@ -7,6 +7,7 @@ import {
 } from 'react-native-paper';
 
 import {
+  depth,
   type Effects,
   effects,
   fontFamily,
@@ -20,7 +21,7 @@ import {
 } from './tokens';
 
 /**
- * Traduit nos couleurs « Violet Boutik » dans le format de React Native Paper
+ * Traduit nos couleurs « Vert Boutik 3D » dans le format de React Native Paper
  * (la bibliothèque qui fournit les boutons, champs, cartes…).
  */
 
@@ -114,7 +115,7 @@ function buildTheme(
       },
     },
     /** Nos propres valeurs, que Paper ne connaît pas : on les range ici. */
-    app: { colors, effects: look, spacing, radius, fontSize, touch, layout },
+    app: { colors, effects: look, depth, spacing, radius, fontSize, touch, layout },
   };
 }
 

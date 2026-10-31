@@ -11,7 +11,7 @@ type MoneyTextProps = {
   currency?: CurrencyCode;
   /** normal = gros chiffres, large = très gros chiffres (total à payer) */
   size?: 'normal' | 'large';
-  /** primary = violet, success = vert (bénéfice, rien à devoir), danger = rouge (dettes), default = couleur du texte */
+  /** primary = vert (marque), success = vert (bénéfice, rien à devoir), danger = rouge (dettes), default = couleur du texte */
   tone?: 'default' | 'primary' | 'success' | 'danger';
   style?: StyleProp<TextStyle>;
 };

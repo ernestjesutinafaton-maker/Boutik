@@ -18,25 +18,28 @@ type HeroCardProps = {
 };
 
 /**
- * La grande carte des chiffres clés : fond « nuit violette » en dégradé, montant en
- * blanc et en très gros, icône 3D. Elle attire l'œil en haut du tableau de bord.
+ * La grande carte des chiffres clés, en relief : fond « vert nuit » en dégradé, reflet de
+ * lumière, tranche épaisse en bas, montant en blanc et en très gros, icône 3D.
+ * Elle attire l'œil en haut du tableau de bord (sans ombre floue : rapide partout).
  */
 export function HeroCard({ label, amount, currency, icon, details = [] }: HeroCardProps) {
   const theme = useAppTheme();
-  const { colors, effects, radius, spacing } = theme.app;
+  const { colors, effects, depth, radius, spacing } = theme.app;
 
   return (
     <View
-      style={[
-        {
-          backgroundColor: colors.night,
-          backgroundImage: effects.heroGradient,
-          boxShadow: effects.heroShadow,
-          borderRadius: radius.xl,
-          padding: spacing.lg,
-          gap: spacing.md,
-        },
-      ]}>
+      style={{
+        backgroundColor: colors.night,
+        backgroundImage: effects.heroGradient,
+        borderRadius: radius.xl,
+        borderBottomWidth: depth.hero,
+        borderBottomColor: effects.heroEdge,
+        padding: spacing.lg,
+        gap: spacing.md,
+      }}>
+      <View
+        style={[styles.shine, { borderRadius: radius.xl, backgroundImage: effects.heroShine }]}
+      />
       <View style={[styles.top, { gap: spacing.md }]}>
         <View style={[styles.fill, { gap: spacing.xs }]}>
           <Text variant="titleMedium" style={{ color: colors.onNightSecondary }}>
@@ -80,6 +83,15 @@ export function HeroCard({ label, amount, currency, icon, details = [] }: HeroCa
 }
 
 const styles = StyleSheet.create({
+  // Le reflet de lumière : posé sur toute la carte, il s'efface en douceur (aucun bord visible)
+  shine: {
+    pointerEvents: 'none',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
   top: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,7 +1,6 @@
 // Charge les traductions avant tout le reste
 import '@/i18n';
 
-import { Nunito_400Regular } from '@expo-google-fonts/nunito/400Regular';
 import { Nunito_500Medium } from '@expo-google-fonts/nunito/500Medium';
 import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
 import { Nunito_800ExtraBold } from '@expo-google-fonts/nunito/800ExtraBold';
@@ -21,12 +20,14 @@ import { fontFamily } from '@/theme/tokens';
 // tant qu'on ne sait pas encore qui est connecté.
 SplashScreen.preventAutoHideAsync();
 
-/** La police Nunito, en 4 épaisseurs : normal, moyen, gras et extra-gras (titres). */
+/**
+ * La police Nunito, en 3 épaisseurs : moyen (texte), gras et extra-gras (titres).
+ * Seulement celles qui servent : moins de fichiers à charger au démarrage.
+ */
 const BRAND_FONT = [
   {
     fontFamily: fontFamily.brand,
     fontDefinitions: [
-      { path: Nunito_400Regular, weight: 400 },
       { path: Nunito_500Medium, weight: 500 },
       { path: Nunito_700Bold, weight: 700 },
       { path: Nunito_800ExtraBold, weight: 800 },

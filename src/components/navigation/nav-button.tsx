@@ -16,7 +16,7 @@ type NavButtonProps = Omit<TabTriggerSlotProps, 'ref'> & {
 
 /**
  * Un bouton du menu. Expo Router lui indique s'il correspond à l'écran affiché
- * (isFocused) : il est alors mis en avant par une pilule violette en relief
+ * (isFocused) : il est alors mis en avant par une pilule verte en relief, avec sa tranche
  * (toute la ligne sur grand écran, l'icône seulement sur téléphone).
  */
 export function NavButton({
@@ -27,9 +27,13 @@ export function NavButton({
   ...pressableProps
 }: NavButtonProps) {
   const theme = useAppTheme();
-  const { colors, effects, spacing, radius, touch, fontSize } = theme.app;
+  const { colors, effects, depth, spacing, radius, touch, fontSize } = theme.app;
   const isSide = placement === 'side';
-  const active = { backgroundImage: effects.navActiveGradient, boxShadow: effects.navActiveShadow };
+  const active = {
+    backgroundImage: effects.navActiveGradient,
+    borderBottomWidth: depth.chip + 1,
+    borderBottomColor: effects.navActiveEdge,
+  };
   const labelColor = !isFocused ? colors.textSecondary : isSide ? colors.onPrimary : colors.primary;
   const iconColor = isFocused ? colors.onPrimary : colors.textSecondary;
 
@@ -59,7 +63,7 @@ export function NavButton({
         style={{
           color: labelColor,
           fontSize: isSide ? fontSize.body : fontSize.small,
-          fontWeight: isFocused ? '800' : '600',
+          fontWeight: isFocused ? '800' : '700',
         }}>
         {label}
       </Text>

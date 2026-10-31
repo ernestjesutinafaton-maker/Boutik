@@ -3,11 +3,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Button, Dialog, Divider, List, Portal, Text, TextInput } from 'react-native-paper';
+import { Button, Dialog, List, Portal, Text, TextInput } from 'react-native-paper';
 
 import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
+import { CardList } from '@/components/card-list';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
@@ -29,7 +30,7 @@ import { buildExport } from '@/export/datasets';
 import { shareTextFile } from '@/export/share-file';
 import { canSharePdf, printHtml, shareHtmlAsPdf } from '@/invoices/invoice-actions';
 import { tableHtml } from '@/reports/table-html';
-import { useCatalog } from '@/products/product-data';
+import { useCatalog } from '@/products/catalog-provider';
 import { UnitQuantityField } from '@/products/unit-quantity-field';
 import { useShop } from '@/shop/shop-provider';
 import {
@@ -46,6 +47,7 @@ import { useAppTheme } from '@/theme/paper-theme';
 /**
  * Un inventaire : on compte chaque produit (le compteur ne voit pas le stock calculé),
  * puis le responsable valide et les écarts corrigent le stock.
+ * La liste ne dessine que les produits visibles : fluide même avec tout le catalogue.
  */
 export default function InventoryCountScreen() {
   const theme = useAppTheme();
@@ -162,10 +164,8 @@ export default function InventoryCountScreen() {
     }
   }
 
-  return (
-    <Screen
-      title={count.notes || t('inventory.defaultName', { date: formatMoment(count.startedAt) })}
-      stack>
+  const header = (
+    <>
       <View style={[styles.row, { gap: spacing.sm }]}>
         <StatusChip
           tone={isDraft ? 'warning' : count.status === 'validated' ? 'ok' : 'neutral'}
@@ -207,26 +207,11 @@ export default function InventoryCountScreen() {
           />
         </>
       ) : null}
+    </>
+  );
 
-      <Card mode="outlined">
-        {visible.length === 0 ? (
-          <Card.Content style={{ paddingVertical: spacing.md }}>
-            <Text variant="bodyLarge">{t('products.noResult')}</Text>
-          </Card.Content>
-        ) : null}
-        {visible.map((product, index) => (
-          <View key={product.id}>
-            {index > 0 ? <Divider /> : null}
-            <CountRow
-              product={product}
-              line={lines.get(product.id)}
-              showExpected={showExpected}
-              onPress={isDraft ? () => setCounting(product) : undefined}
-            />
-          </View>
-        ))}
-      </Card>
-
+  const footer = (
+    <>
       {showExpected && counted.length > 0 ? (
         <Card mode="outlined">
           <Card.Content style={{ gap: spacing.sm }}>
@@ -257,6 +242,29 @@ export default function InventoryCountScreen() {
           </BigButton>
         </View>
       ) : null}
+    </>
+  );
+
+  return (
+    <Screen
+      title={count.notes || t('inventory.defaultName', { date: formatMoment(count.startedAt) })}
+      stack
+      scroll={false}>
+      <CardList
+        data={visible}
+        keyExtractor={(product) => product.id}
+        header={header}
+        footer={footer}
+        empty={<Text variant="bodyLarge">{t('products.noResult')}</Text>}
+        renderItem={(product) => (
+          <CountRow
+            product={product}
+            line={lines.get(product.id)}
+            showExpected={showExpected}
+            onPress={isDraft ? () => setCounting(product) : undefined}
+          />
+        )}
+      />
 
       {counting ? (
         <CountDialog

@@ -13,7 +13,7 @@ export function BottomNav() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { colors, effects, radius, spacing } = theme.app;
+  const { colors, radius, spacing } = theme.app;
 
   return (
     <View
@@ -23,7 +23,7 @@ export function BottomNav() {
           backgroundColor: colors.surface,
           borderTopLeftRadius: radius.xl,
           borderTopRightRadius: radius.xl,
-          boxShadow: effects.navShadow,
+          borderColor: colors.border,
           gap: spacing.xs,
           paddingTop: spacing.sm,
           paddingHorizontal: spacing.xs,
@@ -43,5 +43,8 @@ export function BottomNav() {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
   },
 });

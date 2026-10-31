@@ -1,21 +1,22 @@
 /**
- * Thème « Violet Boutik » : TOUTES les valeurs visuelles de l'application.
+ * Thème « Vert Boutik 3D » : TOUTES les valeurs visuelles de l'application.
  *
  * C'est le SEUL endroit du projet où l'on écrit des couleurs, des tailles et
  * des espacements. Pour changer de thème plus tard, il suffit de modifier ce fichier.
  *
- * Inspiré de la charte d'Ernest : violet #7138D9, dégradé vers #A52BFF, nuit violette
- * (#35166F → #160D35), fonds lavande, coins très arrondis et un peu de relief (3D douce).
+ * Le relief (la « 3D ») est fait sans flou, pour rester rapide sur les vieux téléphones :
+ * une tranche plus foncée sous les cartes et les boutons, un reflet clair en haut et des
+ * dégradés de lumière (du clair en haut vers le foncé en bas).
  */
 
 /** Couleurs du mode clair (le mode par défaut, lisible en plein soleil). */
 const light = {
-  primary: '#7138D9', // violet : couleur principale
-  onPrimary: '#FFFFFF', // texte posé sur le violet
-  primaryContainer: '#EDE5FC', // lavande : élément sélectionné, zone mise en avant
-  onPrimaryContainer: '#2E1468',
-  primaryBright: '#A52BFF', // violet vif : fin des dégradés
-  primaryDeep: '#4B1FA8', // violet profond : tranche des boutons en relief
+  primary: '#047857', // vert émeraude profond : couleur principale (bien lisible sur blanc)
+  onPrimary: '#FFFFFF', // texte posé sur le vert
+  primaryContainer: '#D1FAE5', // vert très pâle : élément sélectionné, zone mise en avant
+  onPrimaryContainer: '#064E3B',
+  primaryBright: '#10B981', // vert vif : décorations et dégradés (jamais sous du texte)
+  primaryDeep: '#064E3B', // vert sombre : tranche des boutons en relief
   accent: '#F59E0B', // orange : boutons importants, alertes de stock bas
   onAccent: '#1F2937', // texte foncé sur l'orange (bien plus lisible que du blanc)
   accentContainer: '#FEF3C7',
@@ -24,27 +25,27 @@ const light = {
   onDanger: '#FFFFFF',
   dangerContainer: '#FEE2E2',
   onDangerContainer: '#7F1D1D',
-  success: '#059669', // vert : tout va bien, bénéfice
+  success: '#047857', // vert : tout va bien, bénéfice
   successContainer: '#D1FAE5',
   onSuccessContainer: '#065F46',
-  background: '#F7F4FD', // fond des écrans (lavande très pâle)
+  background: '#F2F6F4', // fond des écrans (gris-vert très pâle)
   surface: '#FFFFFF', // fond des cartes et des barres de navigation
-  surfaceVariant: '#F0EBFA', // fond des zones secondaires
-  text: '#28134F', // texte principal (violet presque noir)
-  textSecondary: '#6E6188', // texte moins important
-  border: '#E6DFF5', // traits fins, contour des cartes
-  outline: '#958AB8', // contour des champs de saisie (assez marqué pour bien les voir)
-  night: '#160D35', // nuit violette : fonds sombres (connexion, grande carte des chiffres)
-  nightMid: '#35166F',
-  onNight: '#FFFFFF', // texte sur la nuit violette
-  onNightSecondary: '#D9CCF7',
-  nightSurface: 'rgba(255, 255, 255, 0.12)', // pastille translucide posée sur la nuit violette
+  surfaceVariant: '#E7F0EC', // fond des zones secondaires
+  text: '#13231D', // texte principal (presque noir, nuance verte)
+  textSecondary: '#4A5C55', // texte moins important
+  border: '#DCE7E1', // traits fins, contour des cartes
+  outline: '#7F948B', // contour des champs de saisie (assez marqué pour bien les voir)
+  night: '#022C22', // vert nuit : fonds sombres (connexion, grande carte des chiffres)
+  nightMid: '#064E3B',
+  onNight: '#FFFFFF', // texte sur le vert nuit
+  onNightSecondary: '#A7F3D0',
+  nightSurface: 'rgba(255, 255, 255, 0.12)', // pastille translucide posée sur le vert nuit
   // Fonds des éléments « surélevés » (du moins au plus haut)
-  elevation1: '#F6F2FD',
-  elevation2: '#F2EDFC',
-  elevation3: '#EFE8FB',
-  elevation4: '#EDE6FA',
-  elevation5: '#EAE2F9',
+  elevation1: '#F1F6F3',
+  elevation2: '#ECF3EF',
+  elevation3: '#E7F0EB',
+  elevation4: '#E5EEE9',
+  elevation5: '#E1ECE6',
 };
 
 /** Le type « Palette » oblige le mode sombre à définir exactement les mêmes couleurs. */
@@ -52,12 +53,12 @@ export type Palette = typeof light;
 
 /** Couleurs du mode sombre (en option, dans « Plus »). */
 const dark: Palette = {
-  primary: '#B79CFF', // violet clair, lisible sur fond sombre
-  onPrimary: '#21104F',
-  primaryContainer: '#3E2384',
-  onPrimaryContainer: '#EDE5FC',
-  primaryBright: '#C084FC',
-  primaryDeep: '#2E1468',
+  primary: '#34D399', // vert plus clair, lisible sur fond sombre
+  onPrimary: '#022C22',
+  primaryContainer: '#065F46',
+  onPrimaryContainer: '#D1FAE5',
+  primaryBright: '#6EE7B7',
+  primaryDeep: '#022C22',
   accent: '#FBBF24',
   onAccent: '#1F2937',
   accentContainer: '#5C3A06',
@@ -69,79 +70,70 @@ const dark: Palette = {
   success: '#34D399',
   successContainer: '#064E3B',
   onSuccessContainer: '#D1FAE5',
-  background: '#110A24',
-  surface: '#1B1236',
-  surfaceVariant: '#261A49',
-  text: '#F4EFFF',
-  textSecondary: '#B9ACD9',
-  border: '#33275C',
-  outline: '#8273AE',
-  night: '#0B0619',
-  nightMid: '#2A1260',
+  background: '#08130F',
+  surface: '#0F1F19',
+  surfaceVariant: '#16291F',
+  text: '#E8F3EE',
+  textSecondary: '#9DB5AB',
+  border: '#1F3A2F',
+  outline: '#5E7D70',
+  night: '#020F0B',
+  nightMid: '#053D2E',
   onNight: '#FFFFFF',
-  onNightSecondary: '#D9CCF7',
+  onNightSecondary: '#A7F3D0',
   nightSurface: 'rgba(255, 255, 255, 0.10)',
-  elevation1: '#1E1440',
-  elevation2: '#22174A',
-  elevation3: '#261A52',
-  elevation4: '#281C56',
-  elevation5: '#2B1E5C',
+  elevation1: '#122219',
+  elevation2: '#15271D',
+  elevation3: '#182C21',
+  elevation4: '#1A2F23',
+  elevation5: '#1D3326',
 };
 
 export const palette = { light, dark };
 
-/** Un bouton en relief : son dégradé, sa tranche (le dessous), son halo et la couleur du texte. */
-export type ButtonLook = {
-  gradient: string;
-  edge: string;
-  glow: string;
-  text: string;
-  border?: string;
-};
+/** Un bouton en relief : son dégradé, sa tranche (le dessous), la couleur du texte. */
+export type ButtonLook = { gradient: string; edge: string; text: string; border?: string };
 
-/**
- * Le relief : dégradés et ombres douces (la « 3D » légère de l'application).
- * Les ombres sont teintées de violet, comme la lumière qui traverse la marque.
- */
+/** Le relief : dégradés de lumière et tranches plus foncées (sans flou : rapide partout). */
 const lightEffects = {
-  /** Fond des écrans : une lueur lavande en haut */
-  screenGradient: 'linear-gradient(180deg, #EEE6FD 0px, #F7F4FD 320px)',
   /** La grande carte des chiffres, et le fond des écrans de connexion */
-  heroGradient: 'linear-gradient(135deg, #7138D9 0%, #35166F 58%, #160D35 100%)',
-  authGradient: 'linear-gradient(180deg, #7138D9 0%, #35166F 42%, #160D35 100%)',
-  cardShadow: '0px 1px 2px rgba(40, 19, 79, 0.06), 0px 10px 24px -8px rgba(113, 56, 217, 0.22)',
-  heroShadow: '0px 18px 32px -12px rgba(53, 22, 111, 0.55)',
-  navShadow: '0px -6px 24px rgba(76, 29, 149, 0.10)',
+  heroGradient: 'linear-gradient(135deg, #059669 0%, #064E3B 55%, #022C22 100%)',
+  authGradient: 'linear-gradient(180deg, #047857 0%, #064E3B 45%, #022C22 100%)',
+  /** Le reflet de lumière en haut à droite de la grande carte */
+  heroShine:
+    'radial-gradient(circle at 90% 0%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 55%)',
+  heroEdge: '#011A14',
+  /** La tranche sous les cartes (elles semblent posées, en relief) */
+  cardEdge: '#C9DCD2',
+  /** Le reflet sur le haut des boutons */
+  buttonShine: 'linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%)',
   /** Le bouton du menu de l'écran affiché */
-  navActiveGradient: 'linear-gradient(135deg, #7138D9 0%, #A52BFF 100%)',
-  navActiveShadow: '0px 6px 14px -4px rgba(113, 56, 217, 0.55)',
-  /** Le reflet sur le haut des boutons en relief */
-  buttonHighlight: 'inset 0px 1px 0px rgba(255, 255, 255, 0.35)',
+  navActiveGradient: 'linear-gradient(180deg, #10B981 0%, #047857 100%)',
+  navActiveEdge: '#064E3B',
+  /** La tranche des petites étiquettes et des encadrés */
+  chipEdge: { danger: '#FCA5A5', warning: '#FCD34D', ok: '#6EE7B7', neutral: '#C9DCD2' },
+  noticeEdge: { error: '#FECACA', info: '#A7F3D0' },
   button: {
     primary: {
-      gradient: 'linear-gradient(90deg, #7138D9 0%, #A52BFF 100%)',
-      edge: '#4B1FA8',
-      glow: 'rgba(113, 56, 217, 0.45)',
+      gradient: 'linear-gradient(180deg, #059669 0%, #047857 55%, #065F46 100%)',
+      edge: '#064E3B',
       text: '#FFFFFF',
     },
     accent: {
-      gradient: 'linear-gradient(90deg, #F59E0B 0%, #FBBF24 100%)',
+      gradient: 'linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)',
       edge: '#B45309',
-      glow: 'rgba(245, 158, 11, 0.45)',
       text: '#1F2937',
     },
     danger: {
-      gradient: 'linear-gradient(90deg, #B91C1C 0%, #DC2626 100%)',
+      gradient: 'linear-gradient(180deg, #EF4444 0%, #DC2626 50%, #B91C1C 100%)',
       edge: '#7F1D1D',
-      glow: 'rgba(220, 38, 38, 0.40)',
       text: '#FFFFFF',
     },
     outline: {
-      gradient: 'linear-gradient(180deg, #FFFFFF 0%, #F7F3FE 100%)',
-      edge: '#D9CCF7',
-      glow: 'rgba(113, 56, 217, 0.12)',
-      text: '#7138D9',
-      border: '#D9CCF7',
+      gradient: 'linear-gradient(180deg, #FFFFFF 0%, #F1F7F4 100%)',
+      edge: '#C9DCD2',
+      text: '#047857',
+      border: '#C9DCD2',
     },
   } satisfies Record<string, ButtonLook>,
 };
@@ -149,25 +141,26 @@ const lightEffects = {
 export type Effects = typeof lightEffects;
 
 const darkEffects: Effects = {
-  screenGradient: 'linear-gradient(180deg, #1C1140 0px, #110A24 320px)',
-  heroGradient: 'linear-gradient(135deg, #5B2BC0 0%, #2A1260 58%, #0B0619 100%)',
-  authGradient: 'linear-gradient(180deg, #5B2BC0 0%, #2A1260 42%, #0B0619 100%)',
-  cardShadow: '0px 10px 24px -10px rgba(0, 0, 0, 0.65)',
-  heroShadow: '0px 18px 32px -12px rgba(0, 0, 0, 0.7)',
-  navShadow: '0px -6px 24px rgba(0, 0, 0, 0.5)',
-  navActiveGradient: 'linear-gradient(135deg, #7138D9 0%, #A52BFF 100%)',
-  navActiveShadow: '0px 6px 14px -4px rgba(0, 0, 0, 0.6)',
-  buttonHighlight: 'inset 0px 1px 0px rgba(255, 255, 255, 0.18)',
+  heroGradient: 'linear-gradient(135deg, #047857 0%, #053D2E 55%, #020F0B 100%)',
+  authGradient: 'linear-gradient(180deg, #065F46 0%, #053D2E 45%, #020F0B 100%)',
+  heroShine:
+    'radial-gradient(circle at 90% 0%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 55%)',
+  heroEdge: '#000805',
+  cardEdge: '#06100C',
+  buttonShine: 'linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%)',
+  navActiveGradient: 'linear-gradient(180deg, #10B981 0%, #047857 100%)',
+  navActiveEdge: '#022C22',
+  chipEdge: { danger: '#450A0A', warning: '#3B2504', ok: '#022C22', neutral: '#06100C' },
+  noticeEdge: { error: '#450A0A', info: '#022C22' },
   button: {
     primary: lightEffects.button.primary,
     accent: lightEffects.button.accent,
     danger: lightEffects.button.danger,
     outline: {
-      gradient: 'linear-gradient(180deg, #2A1D52 0%, #22174A 100%)',
-      edge: '#140C2E',
-      glow: 'rgba(0, 0, 0, 0.4)',
-      text: '#D7C8FF',
-      border: '#4A3A85',
+      gradient: 'linear-gradient(180deg, #1A3328 0%, #142A20 100%)',
+      edge: '#06100C',
+      text: '#6EE7B7',
+      border: '#2A4A3C',
     },
   },
 };
@@ -195,6 +188,14 @@ export const radius = {
   lg: 20,
   xl: 28,
   pill: 999,
+} as const;
+
+/** Épaisseur des tranches (le relief) : cartes, boutons, grande carte des chiffres. */
+export const depth = {
+  card: 3,
+  button: 4,
+  hero: 6,
+  chip: 2,
 } as const;
 
 /** Tailles de texte : volontairement grandes, pour bien lire. */

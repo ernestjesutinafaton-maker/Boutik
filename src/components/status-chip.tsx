@@ -15,7 +15,7 @@ type StatusChipProps = {
 /** Petite étiquette colorée : « Stock bas », « Périmé », « + de 30 jours »… */
 export function StatusChip({ label, tone, icon }: StatusChipProps) {
   const theme = useAppTheme();
-  const { colors, radius, spacing } = theme.app;
+  const { colors, effects, depth, radius, spacing } = theme.app;
   const { backgroundColor, color } = {
     danger: { backgroundColor: colors.dangerContainer, color: colors.onDangerContainer },
     warning: { backgroundColor: colors.accentContainer, color: colors.onAccentContainer },
@@ -29,6 +29,8 @@ export function StatusChip({ label, tone, icon }: StatusChipProps) {
         styles.chip,
         {
           backgroundColor,
+          borderBottomWidth: depth.chip,
+          borderBottomColor: effects.chipEdge[tone],
           borderRadius: radius.pill,
           paddingHorizontal: spacing.sm + 2,
           gap: spacing.xs,
