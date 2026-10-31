@@ -93,7 +93,7 @@ export const fr = {
     firstTimeOnline:
       'La toute première connexion demande internet. Ensuite, Boutik fonctionne aussi sans réseau.',
     checkEmail:
-      'Compte créé ! Ouvre l’e-mail que tu viens de recevoir pour confirmer ton adresse, puis connecte-toi.',
+      'Compte créé ! Ouvre l’e-mail que tu viens de recevoir et touche le lien pour confirmer ton adresse, puis connecte-toi. Pas d’e-mail ? Regarde aussi dans « Spam » ou « Indésirables ».',
   },
   createShop: {
     title: 'Créons ta boutique',

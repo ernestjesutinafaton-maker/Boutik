@@ -9,6 +9,7 @@ import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
 import { PasswordField } from '@/components/password-field';
 import { TextField } from '@/components/text-field';
+import { EMAIL_CONFIRMED_URL } from '@/config/site';
 import type { TranslationKey } from '@/i18n/keys';
 import { errorMessageKey } from '@/lib/error-messages';
 import { supabase } from '@/lib/supabase';
@@ -37,6 +38,9 @@ export default function SignUpScreen() {
     const { data, error } = await supabase.auth.signUp({
       email: parsed.data.email,
       password: parsed.data.password,
+      // Le lien de l'e-mail de confirmation mène à la page « Adresse confirmée » du site
+      // (sans cette adresse, Supabase renvoyait vers sa valeur par défaut : localhost)
+      options: { emailRedirectTo: EMAIL_CONFIRMED_URL },
     });
     setIsSubmitting(false);
     if (error) {

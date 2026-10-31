@@ -1,0 +1,49 @@
+<!--
+title: Adresse e-mail confirmée — Boutik
+description: Ton adresse e-mail est confirmée : connecte-toi à Boutik avec ton e-mail et ton mot de passe.
+-->
+<section class="page-head">
+  <div class="wrap">
+    <!-- Ce que voit la personne qui vient de toucher le lien reçu par e-mail -->
+    <div id="confirme-ok">
+      <h1>Adresse e-mail confirmée ✅</h1>
+      <p class="lead">
+        Ton compte Boutik est prêt. Connecte-toi avec ton adresse e-mail et ton mot de passe.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary btn-lg" href="/app/sign-in">Se connecter</a>
+      </div>
+      <p class="hint">
+        Tu as créé ton compte dans l’appli Android ? Retourne simplement dans Boutik et
+        connecte-toi.
+      </p>
+    </div>
+    <!-- Lien déjà utilisé ou trop vieux : Supabase l'indique dans l'adresse (#error=…) -->
+    <div id="confirme-erreur" hidden>
+      <h1>Ce lien ne marche plus</h1>
+      <p class="lead">
+        Il a peut-être déjà servi, ou il a expiré. Si tu arrives à te connecter, ton adresse est
+        déjà confirmée. Sinon, crée ton compte à nouveau pour recevoir un nouveau lien.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary btn-lg" href="/app/sign-in">Essayer de me connecter</a>
+        <a class="btn btn-ghost btn-lg" href="/app/sign-up">Créer mon compte</a>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  // Supabase ajoute à l'adresse « #error=…&error_code=otp_expired » quand le lien ne marche
+  // plus, ou des jetons de connexion quand tout va bien. Cette page ne s'en sert pas :
+  // elle choisit le bon message, puis nettoie l'adresse (rien ne reste dans l'historique).
+  (function () {
+    var details = window.location.hash + window.location.search;
+    if (/error/.test(details)) {
+      document.getElementById('confirme-ok').hidden = true;
+      document.getElementById('confirme-erreur').hidden = false;
+    }
+    if (details) {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  })();
+</script>
