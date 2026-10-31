@@ -99,13 +99,13 @@ export default function SellScreen() {
   );
   // Les produits qui correspondent à la recherche (aucun tant que rien n'est tapé)
   const matches = query.trim() ? searchProducts(products, query) : [];
-  // Tablette : toute la liste (ou la recherche), filtrée par rayon
+  // Tablette : la recherche cherche dans TOUS les rayons ; sans recherche, le rayon choisi
   const categories = isTabletLayout ? productCategories(products) : [];
-  const listed = isTabletLayout
-    ? (query.trim() ? matches : products).filter(
-        (product) => category === null || product.categoryId === category
-      )
-    : [];
+  const listed = !isTabletLayout
+    ? []
+    : query.trim()
+      ? matches
+      : products.filter((product) => category === null || product.categoryId === category);
 
   function add(product: CatalogProduct, unit: CatalogUnit | null) {
     const added = cart.addProduct(product, unit);
@@ -175,7 +175,8 @@ export default function SellScreen() {
         <>
           {searchField}
           {message ? <Notice message={message} /> : null}
-          {categories.length > 0 ? (
+          {/* Pendant une recherche, les rayons sont cachés : elle porte sur tout le catalogue */}
+          {categories.length > 0 && !query.trim() ? (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
