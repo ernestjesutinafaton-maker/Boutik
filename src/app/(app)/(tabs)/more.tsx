@@ -181,6 +181,17 @@ export default function MoreScreen() {
         </Card>
       ) : null}
 
+      <Card mode="outlined">
+        <List.Item
+          title={t('guide.menu')}
+          titleStyle={{ fontWeight: '700' }}
+          description={t('guide.menuHelp')}
+          left={(props) => <List.Icon {...props} icon="help-circle" />}
+          right={(props) => <List.Icon {...props} icon="chevron-right" />}
+          onPress={() => router.push('/guide')}
+        />
+      </Card>
+
       {can('settings.manage') ? (
         <Card mode="outlined">
           <List.Item

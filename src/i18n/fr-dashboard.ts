@@ -59,5 +59,14 @@ export const frDashboard = {
     open: 'Voir le tableau de bord',
     menu: 'Boutique de démonstration',
     menuHelp: 'Remplir une boutique vide avec des données fictives',
+    guide: 'Guide : à quoi sert chaque bouton',
+  },
+  guide: {
+    title: 'Guide des boutons',
+    menu: 'Guide des boutons',
+    menuHelp: 'Chaque écran et chacun de ses boutons, expliqués simplement',
+    help: 'Touche un écran pour voir ses boutons. « Ouvrir cet écran » t’y emmène pour essayer : avec la boutique de démonstration, tu ne risques rien.',
+    notForYou: 'Pas accessible avec ton rôle',
+    open: 'Ouvrir cet écran',
   },
 } as const;

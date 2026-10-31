@@ -58,7 +58,6 @@ describe('Mes ventes (vendeur)', () => {
         payments: [
           {
             methodId: 'cash',
-            isCash: true,
             amount: kilos * 700,
             cashReceived: null,
             changeGiven: null,

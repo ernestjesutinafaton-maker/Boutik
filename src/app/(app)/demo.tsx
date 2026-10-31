@@ -93,6 +93,9 @@ export default function DemoScreen() {
           {t('demo.load')}
         </BigButton>
       )}
+      <BigButton icon="help-circle" variant="outline" onPress={() => router.push('/guide')}>
+        {t('demo.guide')}
+      </BigButton>
     </Screen>
   );
 }
