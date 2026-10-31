@@ -11,8 +11,10 @@ import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
 import { TextField } from '@/components/text-field';
 import { normalizeText } from '@/domain/catalog';
+import { nowIso } from '@/data/ids';
 import { addDays, dayRange, formatDay, formatTime, today } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
+import { editDeadline } from '@/domain/sale-edit';
 import { useOutbox } from '@/invoices/outbox';
 import { useSales } from '@/sales/sale-data';
 import { useShopSettings } from '@/shop/shop-settings';
@@ -116,10 +118,21 @@ export default function SalesHistoryScreen() {
                   <Text variant="titleMedium" style={styles.bold}>
                     {formatMoney(sale.total, currency)}
                   </Text>
-                  {sale.status === 'cancelled' ? (
+                  {sale.replaced ? (
+                    <StatusChip tone="neutral" icon="pencil" label={t('sale.status.modified')} />
+                  ) : sale.status === 'cancelled' ? (
                     <StatusChip tone="danger" label={t('sale.status.cancelled')} />
                   ) : sale.due > 0 ? (
                     <StatusChip tone="warning" label={t('sale.status.credit')} />
+                  ) : null}
+                  {sale.status === 'completed' && sale.corrected ? (
+                    <StatusChip tone="ok" icon="check" label={t('sale.status.corrected')} />
+                  ) : null}
+                  {/* Après le délai de modification, la vente est archivée (consultable) */}
+                  {sale.status === 'completed' &&
+                  settings &&
+                  nowIso() >= editDeadline(sale.occurredAt, settings.returnWindowHours) ? (
+                    <StatusChip tone="neutral" icon="lock" label={t('sale.status.archived')} />
                   ) : null}
                 </View>
               )}

@@ -49,6 +49,7 @@ describe('Paramètres de la boutique', () => {
         expiryAlertDays: { first: 30, second: 7 },
         sellerMaxDiscountPercent: 0,
         allowSaleWithoutStock: true,
+        returnWindowHours: 24,
       },
       {
         name: 'Boutique Chez Maman',
@@ -59,6 +60,7 @@ describe('Paramètres de la boutique', () => {
         expirySecond: 10,
         sellerMaxDiscount: 5,
         allowSaleWithoutStock: false,
+        returnWindowHours: 72,
       }
     );
     expect(
@@ -66,6 +68,10 @@ describe('Paramètres de la boutique', () => {
     ).toEqual([
       { name: 'Boutique Chez Maman', seller_max_discount_percent: 5, allow_sale_without_stock: 0 },
     ]);
+    // Le délai pour modifier une vente est enregistré lui aussi
+    expect(
+      db.query<{ hours: number }>('SELECT return_window_hours AS hours FROM shops')[0].hours
+    ).toBe(72);
     const log = db.query<{ details: string }>(
       "SELECT details FROM audit_log WHERE action = 'settings.update'"
     )[0];

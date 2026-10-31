@@ -1,6 +1,7 @@
 import { useQuery } from '@powersync/react';
 
 import { DEFAULT_EXPIRY_ALERT_DAYS, type ExpiryAlertDays } from '@/domain/expiry';
+import { DEFAULT_RETURN_WINDOW_HOURS } from '@/domain/sale-edit';
 import type { CurrencyCode } from '@/domain/money';
 
 import { useShop } from './shop-provider';
@@ -19,6 +20,8 @@ export type ShopSettings = {
   sellerMaxDiscountPercent: number;
   /** Vendre même si le stock affiché est à 0 (avec avertissement) */
   allowSaleWithoutStock: boolean;
+  /** Délai (en heures) pendant lequel une vente peut être modifiée */
+  returnWindowHours: number;
 };
 
 type ShopRow = {
@@ -30,6 +33,7 @@ type ShopRow = {
   expiry_alert_days_second: number | null;
   seller_max_discount_percent: number | null;
   allow_sale_without_stock: number | null;
+  return_window_hours: number | null;
 };
 
 /**
@@ -40,7 +44,8 @@ export function useShopSettings(): ShopSettings | null {
   const { shop } = useShop();
   const { data } = useQuery<ShopRow>(
     `SELECT name, phone, address, invoice_footer, expiry_alert_days_first,
-            expiry_alert_days_second, seller_max_discount_percent, allow_sale_without_stock
+            expiry_alert_days_second, seller_max_discount_percent, allow_sale_without_stock,
+            return_window_hours
        FROM shops WHERE id = ?`,
     [shop?.id ?? '']
   );
@@ -62,5 +67,6 @@ export function useShopSettings(): ShopSettings | null {
     },
     sellerMaxDiscountPercent: row?.seller_max_discount_percent ?? 0,
     allowSaleWithoutStock: (row?.allow_sale_without_stock ?? 1) === 1,
+    returnWindowHours: row?.return_window_hours ?? DEFAULT_RETURN_WINDOW_HOURS,
   };
 }

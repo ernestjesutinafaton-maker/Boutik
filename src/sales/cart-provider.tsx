@@ -5,9 +5,13 @@ import { type CatalogProduct, type CatalogUnit, defaultSaleUnit } from '@/domain
 import { MILLI } from '@/domain/quantity';
 import type { CartLine, DiscountInput } from '@/domain/sale';
 
+import type { SaleDetail } from './sale-data';
+import { cartFromSale, type SaleEditing } from './sale-editing';
+
 /**
  * Le panier de la caisse. Il reste en mémoire pendant qu'on navigue
  * (ex. aller créer un client puis revenir), jusqu'à la fin de la vente.
+ * Il sert aussi à MODIFIER une vente déjà faite : il est alors rempli avec ses articles.
  */
 type CartContextValue = {
   lines: CartLine[];
@@ -21,7 +25,12 @@ type CartContextValue = {
   setCustomerId: (customerId: string | null) => void;
   setDiscount: (discount: DiscountInput | null) => void;
   setNote: (note: string) => void;
+  /** Vide le panier (et quitte la modification d'une vente) */
   clear: () => void;
+  /** La vente en cours de modification, ou null pour une vente normale */
+  editing: SaleEditing | null;
+  /** Remplit le panier avec une vente déjà faite, pour la modifier */
+  startEditing: (sale: SaleDetail) => void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -31,6 +40,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [discount, setDiscount] = useState<DiscountInput | null>(null);
   const [note, setNote] = useState('');
+  const [editing, setEditing] = useState<SaleEditing | null>(null);
 
   function addProduct(product: CatalogProduct, unit?: CatalogUnit | null): boolean {
     const chosen = unit && unit.salePrice !== null ? unit : defaultSaleUnit(product);
@@ -79,6 +89,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCustomerId(null);
     setDiscount(null);
     setNote('');
+    setEditing(null);
+  }
+
+  function startEditing(sale: SaleDetail) {
+    const filled = cartFromSale(sale);
+    setLines(filled.lines);
+    setCustomerId(filled.customerId);
+    setDiscount(filled.discount);
+    setNote(filled.note);
+    setEditing(filled.editing);
   }
 
   return (
@@ -95,6 +115,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setDiscount,
         setNote,
         clear,
+        editing,
+        startEditing,
       }}>
       {children}
     </CartContext.Provider>

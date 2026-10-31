@@ -9,6 +9,7 @@ import { BigButton } from '@/components/big-button';
 import { HeroCard } from '@/components/hero-card';
 import { Icon3D, type Icon3DName } from '@/components/icon-3d';
 import { MoneyText } from '@/components/money-text';
+import { QuickActions } from '@/components/quick-actions';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
 import { type DashboardPeriod, useDashboard } from '@/dashboard/dashboard-data';
@@ -74,6 +75,7 @@ export default function DashboardScreen() {
 
   return (
     <Screen title={t('nav.dashboard')}>
+      <QuickActions />
       {isPlatformAdmin ? (
         <BigButton
           icon="shield-account"

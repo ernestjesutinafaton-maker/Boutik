@@ -33,6 +33,7 @@ const shops = new Table({
   expiry_alert_days_second: column.integer,
   seller_max_discount_percent: column.integer,
   allow_sale_without_stock: column.integer,
+  return_window_hours: column.integer, // délai pour modifier une vente (24 h par défaut)
   paid_until: column.text, // fin de l'abonnement payé (modifiée seulement par le serveur)
   created_at: column.text,
   updated_at: column.text,
@@ -255,10 +256,17 @@ const sales = new Table(
     cancelled_at: column.text,
     cancelled_by: column.text,
     cancel_reason: column.text,
+    replaces_sale_id: column.text, // la vente modifiée que celle-ci remplace
     created_at: column.text,
     updated_at: column.text,
   },
-  { indexes: { customer: ['customer_id'], occurred: ['occurred_at'] } }
+  {
+    indexes: {
+      customer: ['customer_id'],
+      occurred: ['occurred_at'],
+      replaces: ['replaces_sale_id'],
+    },
+  }
 );
 
 const sale_items = new Table(

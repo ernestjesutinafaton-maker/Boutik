@@ -13,6 +13,8 @@ export type SettingsInput = {
   expirySecond: string;
   sellerMaxDiscount: string;
   allowSaleWithoutStock: boolean;
+  /** Délai pour modifier une vente, en heures (choisi parmi RETURN_WINDOW_CHOICES) */
+  returnWindowHours: number;
 };
 
 export type SettingsValues = {
@@ -24,6 +26,7 @@ export type SettingsValues = {
   expirySecond: number;
   sellerMaxDiscount: number;
   allowSaleWithoutStock: boolean;
+  returnWindowHours: number;
 };
 
 export type SettingsErrors = Partial<Record<keyof SettingsInput, TranslationKey>>;
@@ -38,6 +41,7 @@ export function settingsToInput(settings: ShopSettings): SettingsInput {
     expirySecond: String(settings.expiryAlertDays.second),
     sellerMaxDiscount: String(settings.sellerMaxDiscountPercent),
     allowSaleWithoutStock: settings.allowSaleWithoutStock,
+    returnWindowHours: settings.returnWindowHours,
   };
 }
 
@@ -92,6 +96,7 @@ export function parseSettingsInput(
       expirySecond: expirySecond ?? 7,
       sellerMaxDiscount: sellerMaxDiscount ?? 0,
       allowSaleWithoutStock: input.allowSaleWithoutStock,
+      returnWindowHours: Math.min(Math.max(Math.round(input.returnWindowHours), 0), 8760),
     },
   };
 }

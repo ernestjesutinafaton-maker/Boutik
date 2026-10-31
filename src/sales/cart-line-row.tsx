@@ -6,7 +6,7 @@ import { Button, Chip, Dialog, IconButton, Portal, Text } from 'react-native-pap
 import { TextField } from '@/components/text-field';
 import { type CatalogProduct, sellableUnits } from '@/domain/catalog';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
-import { formatQuantity, MILLI, parseUnitQuantity } from '@/domain/quantity';
+import { formatQuantity, MILLI, parseUnitQuantity, pluralUnit } from '@/domain/quantity';
 import { type CartLine, lineTotal } from '@/domain/sale';
 import { useAppTheme } from '@/theme/paper-theme';
 
@@ -99,7 +99,7 @@ export function CartLineRow({ line, product, currency, onChange, onRemove }: Car
             {formatQuantity(line.quantity)}
           </Text>
           <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-            {line.unitName}
+            {pluralUnit(line.unitName, line.quantity)}
           </Text>
         </Pressable>
         <IconButton

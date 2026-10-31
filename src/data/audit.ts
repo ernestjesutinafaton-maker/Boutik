@@ -36,6 +36,7 @@ export const AUDIT_ACTIONS = [
   'sale.create',
   'sale.cancel',
   'sale.return',
+  'sale.modify',
   'sale.discount',
   'sale.expired_forced',
   'customer.create',

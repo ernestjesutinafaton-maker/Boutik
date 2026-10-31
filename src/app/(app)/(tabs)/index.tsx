@@ -37,11 +37,18 @@ import { ProductPicker } from '@/products/product-picker';
 import { CartLineRow } from '@/sales/cart-line-row';
 import { useCart } from '@/sales/cart-provider';
 import { CashSessionNotice } from '@/sales/cash-session-notice';
+import { useLastSale } from '@/sales/sale-data';
+import { useSaleEditRight } from '@/sales/use-sale-edit-right';
+import { useShop } from '@/shop/shop-provider';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
-/** Rubrique « Caisse » : chercher ou scanner, remplir le panier, encaisser. */
+/**
+ * Rubrique « Caisse » : chercher ou scanner, remplir le panier, encaisser.
+ * Sert aussi à MODIFIER une vente déjà faite (bandeau en haut), et propose la dernière vente
+ * en raccourci pour corriger une erreur tout de suite.
+ */
 export default function SellScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -51,6 +58,9 @@ export default function SellScreen() {
   const { products } = useCatalog();
   const cart = useCart();
   const { customer } = useCustomer(cart.customerId);
+  const { device } = useShop();
+  const lastSale = useLastSale(device?.id ?? null);
+  const lastSaleRight = useSaleEditRight(lastSale);
   const [query, setQuery] = useState('');
   const [message, setMessage] = useState<string | null>(null);
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -214,12 +224,12 @@ export default function SellScreen() {
           {t('sell.clear')}
         </BigButton>
         <BigButton
-          icon="cash-register"
+          icon={cart.editing ? 'check-bold' : 'cash-register'}
           variant="accent"
           style={styles.fill}
           disabled={cart.lines.length === 0}
           onPress={() => router.push('/sale/checkout')}>
-          {t('sell.checkout')}
+          {cart.editing ? t('modify.validate') : t('sell.checkout')}
         </BigButton>
       </View>
     </View>
@@ -227,7 +237,40 @@ export default function SellScreen() {
 
   return (
     <Screen title={t('nav.sell')}>
+      {cart.editing ? (
+        <Card mode="outlined" style={{ borderColor: theme.app.colors.accent }}>
+          <Card.Content style={{ gap: spacing.sm }}>
+            <Text variant="titleMedium" style={styles.bold}>
+              {t('modify.banner', { number: cart.editing.invoiceNumber })}
+            </Text>
+            <Text variant="bodyLarge">
+              {t('modify.bannerPaid', {
+                amount: formatMoney(cart.editing.alreadyPaid, currency),
+              })}
+            </Text>
+            <BigButton icon="close" variant="outline" onPress={cart.clear}>
+              {t('modify.cancelEditing')}
+            </BigButton>
+          </Card.Content>
+        </Card>
+      ) : null}
       <CashSessionNotice />
+      {!cart.editing && cart.lines.length === 0 && lastSale && lastSaleRight?.allowed ? (
+        <Card mode="outlined">
+          <List.Item
+            title={t('modify.lastSale', {
+              number: lastSale.invoiceNumber,
+              amount: formatMoney(lastSale.total, currency),
+            })}
+            titleStyle={styles.bold}
+            description={t('modify.lastSaleHelp')}
+            descriptionNumberOfLines={2}
+            left={(props) => <List.Icon {...props} icon="receipt-text-edit" />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push(`/sale/${lastSale.id}`)}
+          />
+        </Card>
+      ) : null}
       {isLargeScreen ? (
         <View style={[styles.row, styles.top, { gap: spacing.md }]}>
           <View style={styles.fill}>{searchPanel}</View>
@@ -368,6 +411,9 @@ const styles = StyleSheet.create({
   },
   fill: {
     flex: 1,
+  },
+  bold: {
+    fontWeight: '700',
   },
   totalRow: {
     flexDirection: 'row',

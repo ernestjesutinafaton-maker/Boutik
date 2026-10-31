@@ -19,7 +19,7 @@ export async function updateShopSettings(
       `UPDATE shops
           SET name = ?, phone = ?, address = ?, invoice_footer = ?, expiry_alert_days_first = ?,
               expiry_alert_days_second = ?, seller_max_discount_percent = ?,
-              allow_sale_without_stock = ?, updated_at = ?
+              allow_sale_without_stock = ?, return_window_hours = ?, updated_at = ?
         WHERE id = ?`,
       [
         values.name,
@@ -30,6 +30,7 @@ export async function updateShopSettings(
         values.expirySecond,
         values.sellerMaxDiscount,
         values.allowSaleWithoutStock ? 1 : 0,
+        values.returnWindowHours,
         now,
         context.shopId,
       ]
@@ -45,6 +46,7 @@ export async function updateShopSettings(
           phone: before.phone,
           sellerMaxDiscount: before.sellerMaxDiscountPercent,
           allowSaleWithoutStock: before.allowSaleWithoutStock,
+          returnWindowHours: before.returnWindowHours,
           expiry: before.expiryAlertDays,
         },
         after: values,

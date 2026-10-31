@@ -22,6 +22,7 @@ import { TextField } from '@/components/text-field';
 import { getCountry } from '@/config/countries';
 import { useActionContext } from '@/data/use-action-context';
 import { CURRENCIES } from '@/domain/money';
+import { RETURN_WINDOW_CHOICES } from '@/domain/sale-edit';
 import { type ManagedPaymentMethod, useAllPaymentMethods } from '@/sales/payment-methods';
 import {
   addPaymentMethod,
@@ -157,6 +158,23 @@ function SettingsForm({ settings }: { settings: ShopSettings }) {
             <HelperText type="info" visible>
               {t('settings.sellerMaxDiscountHelp')}
             </HelperText>
+          </View>
+          {/* Le délai pendant lequel l'équipe peut modifier une vente (ensuite : archivée) */}
+          <View style={{ gap: spacing.sm }}>
+            <Text variant="titleMedium">{t('settings.returnWindow')}</Text>
+            <View style={[styles.wrap, { gap: spacing.sm }]}>
+              {RETURN_WINDOW_CHOICES.map((hours) => (
+                <Chip
+                  key={hours}
+                  selected={values.returnWindowHours === hours}
+                  onPress={() => setValues({ ...values, returnWindowHours: hours })}>
+                  {t(`settings.returnWindows.h${hours}`)}
+                </Chip>
+              ))}
+            </View>
+            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+              {t('settings.returnWindowHelp')}
+            </Text>
           </View>
         </Card.Content>
       </Card>

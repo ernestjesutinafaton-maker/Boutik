@@ -16,6 +16,11 @@ export type SaleSummary = {
   occurredAt: string;
   customerName: string | null;
   sellerName: string | null;
+  sellerId: string | null;
+  /** Vrai si cette vente a été modifiée (une vente corrigée la remplace) */
+  replaced: boolean;
+  /** Vrai si cette vente est la version corrigée d'une autre */
+  corrected: boolean;
 };
 
 type SaleSummaryRow = {
@@ -28,11 +33,16 @@ type SaleSummaryRow = {
   occurred_at: string;
   customer_name: string | null;
   seller_name: string | null;
+  seller_id: string | null;
+  replaced: number;
+  corrected: number;
 };
 
 const SUMMARY_SELECT = `
   SELECT s.id, s.invoice_number, s.status, s.total, s.paid_amount, s.due_amount, s.occurred_at,
-         c.name AS customer_name, m.display_name AS seller_name
+         c.name AS customer_name, m.display_name AS seller_name, s.seller_id,
+         EXISTS (SELECT 1 FROM sales r WHERE r.replaces_sale_id = s.id) AS replaced,
+         s.replaces_sale_id IS NOT NULL AS corrected
     FROM sales s
     LEFT JOIN customers c ON c.id = s.customer_id
     LEFT JOIN shop_members m ON m.id = s.seller_id`;
@@ -48,6 +58,9 @@ function toSummary(row: SaleSummaryRow): SaleSummary {
     occurredAt: row.occurred_at,
     customerName: row.customer_name,
     sellerName: row.seller_name,
+    sellerId: row.seller_id,
+    replaced: row.replaced === 1,
+    corrected: row.corrected === 1,
   };
 }
 
@@ -72,9 +85,22 @@ export function useCustomerSales(customerId: string): SaleSummary[] {
   return data.map(toSummary);
 }
 
+/** La dernière vente faite sur cet appareil (raccourci « Dernière vente » de la caisse). */
+export function useLastSale(deviceId: string | null): SaleSummary | null {
+  const { data } = useQuery<SaleSummaryRow>(
+    `${SUMMARY_SELECT}
+      WHERE s.device_id = ? AND s.status = 'completed'
+      ORDER BY s.occurred_at DESC LIMIT 1`,
+    [deviceId ?? '']
+  );
+  return data[0] ? toSummary(data[0]) : null;
+}
+
 export type SaleItem = {
   id: string;
   productId: string;
+  /** L'unité de vente (pour remettre la ligne dans le panier si on modifie la vente) */
+  unitId: string;
   productName: string;
   unitName: string;
   unitFactor: number;
@@ -89,6 +115,7 @@ export type SaleItem = {
 export type SalePayment = {
   id: string;
   kind: 'sale' | 'refund' | 'repayment';
+  methodId: string;
   methodLabel: string;
   amount: number;
   cashReceived: number | null;
@@ -107,6 +134,10 @@ export type SaleDetail = SaleSummary & {
   cancelReason: string | null;
   items: SaleItem[];
   payments: SalePayment[];
+  /** La vente modifiée que celle-ci remplace */
+  replaces: { id: string; invoiceNumber: string } | null;
+  /** La vente corrigée qui remplace celle-ci (si elle a été modifiée) */
+  replacedBy: { id: string; invoiceNumber: string } | null;
 };
 
 type DetailRow = SaleSummaryRow & {
@@ -118,11 +149,16 @@ type DetailRow = SaleSummaryRow & {
   device_number: number | null;
   cancelled_at: string | null;
   cancel_reason: string | null;
+  replaces_id: string | null;
+  replaces_number: string | null;
+  replaced_by_id: string | null;
+  replaced_by_number: string | null;
 };
 
 type ItemRow = {
   id: string;
   product_id: string;
+  product_unit_id: string;
   product_name: string;
   unit_name: string;
   unit_factor: number;
@@ -136,6 +172,7 @@ type ItemRow = {
 type PaymentRow = {
   id: string;
   kind: SalePayment['kind'];
+  payment_method_id: string;
   method_label: string | null;
   amount: number;
   cash_received: number | null;
@@ -147,18 +184,26 @@ type PaymentRow = {
 export function useSale(saleId: string): { sale: SaleDetail | null; isLoading: boolean } {
   const { data: rows, isLoading } = useQuery<DetailRow>(
     `SELECT s.id, s.invoice_number, s.status, s.total, s.paid_amount, s.due_amount, s.occurred_at,
-            c.name AS customer_name, m.display_name AS seller_name, s.subtotal, s.discount_amount,
-            s.note, s.customer_id, c.phone AS customer_phone, d.device_number, s.cancelled_at,
-            s.cancel_reason
+            c.name AS customer_name, m.display_name AS seller_name, s.seller_id, s.subtotal,
+            s.discount_amount, s.note, s.customer_id, c.phone AS customer_phone, d.device_number,
+            s.cancelled_at, s.cancel_reason,
+            EXISTS (SELECT 1 FROM sales r WHERE r.replaces_sale_id = s.id) AS replaced,
+            s.replaces_sale_id IS NOT NULL AS corrected,
+            o.id AS replaces_id, o.invoice_number AS replaces_number,
+            (SELECT r.id FROM sales r WHERE r.replaces_sale_id = s.id LIMIT 1) AS replaced_by_id,
+            (SELECT r.invoice_number FROM sales r WHERE r.replaces_sale_id = s.id LIMIT 1)
+              AS replaced_by_number
        FROM sales s
        LEFT JOIN customers c ON c.id = s.customer_id
        LEFT JOIN shop_members m ON m.id = s.seller_id
        LEFT JOIN devices d ON d.id = s.device_id
+       LEFT JOIN sales o ON o.id = s.replaces_sale_id
       WHERE s.id = ?`,
     [saleId]
   );
-  const { data: items } = useQuery<ItemRow>(
-    `SELECT i.id, i.product_id, i.product_name, i.unit_name, i.unit_factor, i.quantity,
+  const { data: items, isLoading: itemsLoading } = useQuery<ItemRow>(
+    `SELECT i.id, i.product_id, i.product_unit_id, i.product_name, i.unit_name, i.unit_factor,
+            i.quantity,
             i.base_quantity, i.unit_price, i.line_total,
             COALESCE((SELECT SUM(m.quantity) FROM stock_movements m
                        WHERE m.sale_item_id = i.id AND m.type = 'return'), 0) AS returned
@@ -167,8 +212,9 @@ export function useSale(saleId: string): { sale: SaleDetail | null; isLoading: b
       ORDER BY i.created_at, i.id`,
     [saleId]
   );
-  const { data: payments } = useQuery<PaymentRow>(
-    `SELECT p.id, p.kind, pm.label AS method_label, p.amount, p.cash_received, p.change_given,
+  const { data: payments, isLoading: paymentsLoading } = useQuery<PaymentRow>(
+    `SELECT p.id, p.kind, p.payment_method_id, pm.label AS method_label, p.amount,
+            p.cash_received, p.change_given,
             p.occurred_at
        FROM payments p
        LEFT JOIN payment_methods pm ON pm.id = p.payment_method_id
@@ -178,10 +224,10 @@ export function useSale(saleId: string): { sale: SaleDetail | null; isLoading: b
   );
   const row = rows[0];
   if (!row) {
-    return { sale: null, isLoading };
+    return { sale: null, isLoading: isLoading || itemsLoading || paymentsLoading };
   }
   return {
-    isLoading,
+    isLoading: isLoading || itemsLoading || paymentsLoading,
     sale: {
       ...toSummary(row),
       subtotal: row.subtotal,
@@ -192,9 +238,18 @@ export function useSale(saleId: string): { sale: SaleDetail | null; isLoading: b
       deviceNumber: row.device_number,
       cancelledAt: row.cancelled_at,
       cancelReason: row.cancel_reason,
+      replaces:
+        row.replaces_id && row.replaces_number
+          ? { id: row.replaces_id, invoiceNumber: row.replaces_number }
+          : null,
+      replacedBy:
+        row.replaced_by_id && row.replaced_by_number
+          ? { id: row.replaced_by_id, invoiceNumber: row.replaced_by_number }
+          : null,
       items: items.map((item) => ({
         id: item.id,
         productId: item.product_id,
+        unitId: item.product_unit_id,
         productName: item.product_name,
         unitName: item.unit_name,
         unitFactor: item.unit_factor,
@@ -207,6 +262,7 @@ export function useSale(saleId: string): { sale: SaleDetail | null; isLoading: b
       payments: payments.map((payment) => ({
         id: payment.id,
         kind: payment.kind,
+        methodId: payment.payment_method_id,
         methodLabel: payment.method_label ?? '',
         amount: payment.amount,
         cashReceived: payment.cash_received,

@@ -11,6 +11,7 @@ const input: SettingsInput = {
   expirySecond: '7',
   sellerMaxDiscount: '5',
   allowSaleWithoutStock: true,
+  returnWindowHours: 48,
 };
 
 describe('Paramètres de la boutique', () => {
@@ -27,6 +28,7 @@ describe('Paramètres de la boutique', () => {
         expirySecond: 7,
         sellerMaxDiscount: 5,
         allowSaleWithoutStock: true,
+        returnWindowHours: 48,
       },
     });
   });

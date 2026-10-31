@@ -1057,6 +1057,7 @@ export type Database = {
           note: string | null
           occurred_at: string
           paid_amount: number
+          replaces_sale_id: string | null
           seller_id: string
           shop_id: string
           status: string
@@ -1080,6 +1081,7 @@ export type Database = {
           note?: string | null
           occurred_at?: string
           paid_amount: number
+          replaces_sale_id?: string | null
           seller_id: string
           shop_id: string
           status?: string
@@ -1103,6 +1105,7 @@ export type Database = {
           note?: string | null
           occurred_at?: string
           paid_amount?: number
+          replaces_sale_id?: string | null
           seller_id?: string
           shop_id?: string
           status?: string
@@ -1137,6 +1140,13 @@ export type Database = {
             columns: ["device_id"]
             isOneToOne: false
             referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_replaces_sale_id_fkey"
+            columns: ["replaces_sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
             referencedColumns: ["id"]
           },
           {
@@ -1285,6 +1295,7 @@ export type Database = {
           name: string
           paid_until: string | null
           phone: string | null
+          return_window_hours: number
           seller_max_discount_percent: number
           updated_at: string
         }
@@ -1302,6 +1313,7 @@ export type Database = {
           name: string
           paid_until?: string | null
           phone?: string | null
+          return_window_hours?: number
           seller_max_discount_percent?: number
           updated_at?: string
         }
@@ -1319,6 +1331,7 @@ export type Database = {
           name?: string
           paid_until?: string | null
           phone?: string | null
+          return_window_hours?: number
           seller_max_discount_percent?: number
           updated_at?: string
         }

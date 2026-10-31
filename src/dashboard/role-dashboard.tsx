@@ -7,6 +7,7 @@ import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
+import { QuickActions } from '@/components/quick-actions';
 import { isLowStock } from '@/domain/catalog';
 import { formatTime, today } from '@/domain/dates';
 import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
@@ -41,6 +42,7 @@ export function RoleDashboard() {
   }
   return (
     <>
+      <QuickActions />
       {showSales ? <MySalesCard /> : null}
       {showCash ? <MyCashCard /> : null}
       {showStock ? <StockCard /> : null}

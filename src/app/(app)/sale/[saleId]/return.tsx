@@ -17,8 +17,8 @@ import { returnValue } from '@/domain/sale';
 import { usePaymentMethods } from '@/sales/payment-methods';
 import { returnSaleItems } from '@/sales/sale-actions';
 import { type SaleDetail, useSale } from '@/sales/sale-data';
+import { useSaleEditRight } from '@/sales/use-sale-edit-right';
 import { useShopSettings } from '@/shop/shop-settings';
-import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
 /** Retour d'articles : le client rapporte une partie de ce qu'il a acheté. */
@@ -26,9 +26,9 @@ export default function ReturnScreen() {
   const { t } = useTranslation();
   const { saleId } = useLocalSearchParams<{ saleId: string }>();
   const { sale } = useSale(saleId);
-  const { can } = useActiveMember();
+  const right = useSaleEditRight(sale);
 
-  if (!can('sale.cancel')) {
+  if (right && !right.allowed) {
     return (
       <Screen title={t('saleReturn.title')} stack>
         <Notice message={t('common.forbidden')} />

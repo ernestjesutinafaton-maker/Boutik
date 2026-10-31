@@ -46,6 +46,12 @@ export function auditSummary(
       return join(text(details.invoiceNumber), money(details.total), text(details.reason));
     case 'sale.return':
       return join(text(details.invoiceNumber), money(details.value), text(details.reason));
+    case 'sale.modify':
+      return join(
+        `${text(details.invoiceNumber) ?? ''} → ${text(details.newInvoiceNumber) ?? ''}`,
+        money(details.newTotal),
+        text(details.reason)
+      );
     case 'sale.discount':
       return join(text(details.invoiceNumber), money(details.discount));
     case 'sale.expired_forced':

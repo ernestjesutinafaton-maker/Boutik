@@ -18,7 +18,8 @@ export type Role = (typeof ROLES)[number];
 
 export const PERMISSIONS = [
   'sale.create', // vendre et encaisser
-  'sale.cancel', // annuler une vente, faire un retour
+  'sale.cancel', // annuler une vente, faire un retour, modifier les ventes des autres
+  'sale.edit_late', // modifier une vente après le délai de retour (propriétaire seul)
   'sale.discount.unlimited', // accorder une remise au-delà de la limite des vendeurs
   'credit.repayment', // enregistrer un remboursement de crédit
   'credit.write_off', // effacer une dette qui ne sera jamais payée
@@ -45,7 +46,8 @@ export type Permission = (typeof PERMISSIONS)[number];
 const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   owner: PERMISSIONS,
   // Le gérant remplace le propriétaire, sauf les bénéfices, l'équipe, les paramètres
-  // l'effacement des dettes, les suppressions, et le catalogue avec ses prix
+  // l'effacement des dettes, les suppressions, le catalogue avec ses prix, et les
+  // modifications de ventes après le délai de retour
   manager: PERMISSIONS.filter(
     (permission) =>
       ![
@@ -56,6 +58,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
         'data.delete',
         'catalog.edit',
         'prices.edit',
+        'sale.edit_late',
       ].includes(permission)
   ),
   cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],

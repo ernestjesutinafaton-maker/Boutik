@@ -43,6 +43,7 @@ export const frSettings = {
       sale_create: 'Vente',
       sale_cancel: 'Vente annulée',
       sale_return: 'Articles repris',
+      sale_modify: 'Vente modifiée',
       sale_discount: 'Remise accordée',
       sale_expired_forced: 'Produit périmé vendu (forcé)',
       customer_create: 'Client créé',
@@ -70,6 +71,17 @@ export const frSettings = {
     invoiceFooterPlaceholder: 'Ex. Les marchandises vendues ne sont ni reprises ni échangées.',
     sales: 'Ventes',
     sellerMaxDiscount: 'Remise maximale des vendeurs (%)',
+    returnWindow: 'Délai pour modifier une vente',
+    returnWindowHelp:
+      'Pendant ce délai, l’équipe peut modifier une vente (le client échange un article, ou erreur de saisie). Ensuite la vente est archivée : on peut la consulter, mais seul le propriétaire peut encore la modifier.',
+    returnWindows: {
+      h0: 'Jamais',
+      h24: '24 h',
+      h48: '48 h',
+      h72: '3 jours',
+      h168: '7 jours',
+      h720: '30 jours',
+    },
     sellerMaxDiscountHelp:
       'Limite pour les vendeurs et caissiers (sauf limite propre à la personne, dans « Équipe »). Le propriétaire et le gérant ne sont pas limités.',
     expiry: 'Alertes de péremption (jours avant la date)',

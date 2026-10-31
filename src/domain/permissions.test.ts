@@ -98,6 +98,7 @@ describe('Vérification complète : le tableau des droits', () => {
           'data.delete',
           'catalog.edit',
           'prices.edit',
+          'sale.edit_late',
         ].includes(p)
     ),
     cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
@@ -123,6 +124,7 @@ describe('Vérification complète : le tableau des droits', () => {
       'data.delete',
       'catalog.edit',
       'prices.edit',
+      'sale.edit_late',
     ] as const) {
       expect(can(['owner'], permission)).toBe(true);
       expect(

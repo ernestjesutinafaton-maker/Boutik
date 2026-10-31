@@ -25,12 +25,14 @@ import {
   type SaleProblem,
   settle,
 } from '@/domain/sale';
+import { modificationBalance } from '@/domain/sale-edit';
 import { useCatalog } from '@/products/catalog-provider';
 import { useCart } from '@/sales/cart-provider';
 import { usePaymentMethods } from '@/sales/payment-methods';
 import {
   checkCartStock,
   createSale,
+  replaceSale,
   SaleStockError,
   type StockProblem,
 } from '@/sales/sale-actions';
@@ -62,7 +64,14 @@ const PROBLEM_KEYS = {
   creditLimitExceeded: 'checkout.problems.creditLimitExceeded',
 } as const satisfies Record<SaleProblem, `checkout.problems.${string}`>;
 
-/** Encaisser : paiement mixte ou partiel, monnaie à rendre, reste à crédit. */
+/** Les raisons proposées quand on modifie une vente. */
+const REASONS = ['exchange', 'mistake', 'returned'] as const;
+type ReasonKey = (typeof REASONS)[number];
+
+/**
+ * Encaisser : paiement mixte ou partiel, monnaie à rendre, reste à crédit.
+ * Pour une vente MODIFIÉE : seule la différence est à payer (ou le surplus à rendre).
+ */
 export default function CheckoutScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -85,12 +94,19 @@ export default function CheckoutScreen() {
   const [isCustomerPickerOpen, setIsCustomerPickerOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  // Modification d'une vente : mode pour rendre l'argent en trop, et la raison
+  const [refundMethodId, setRefundMethodId] = useState<string | null>(null);
+  const [reasonKey, setReasonKey] = useState<ReasonKey | null>(null);
+  const [reasonText, setReasonText] = useState('');
+  const { editing } = cart;
+  const editingSaleId = editing?.saleId ?? null;
 
-  // Vérifie le stock dès l'arrivée (et si le panier change) pour prévenir avant de valider
+  // Vérifie le stock dès l'arrivée (et si le panier change) pour prévenir avant de valider.
+  // En modification, la marchandise de la vente d'origine compte comme revenue en stock.
   const { lines } = cart;
   useEffect(() => {
     let cancelled = false;
-    checkCartStock(db, lines, { allowExpired: false })
+    checkCartStock(db, lines, { allowExpired: false, returningSaleId: editingSaleId })
       .then((problems) => {
         if (!cancelled) setStockProblems(problems);
       })
@@ -100,19 +116,25 @@ export default function CheckoutScreen() {
     return () => {
       cancelled = true;
     };
-  }, [db, lines]);
+  }, [db, lines, editingSaleId]);
 
   const subtotal = cartSubtotal(cart.lines);
   const discount = discountAmount(subtotal, cart.discount);
   const total = subtotal - discount;
   const cashMethod = methods.find((method) => method.isCash);
+  // En modification : ce qui a déjà été payé compte ; on paie la différence, ou on rend le surplus
+  const balance = editing ? modificationBalance(total, editing.alreadyPaid) : null;
+  const amountToPay = balance ? balance.toPay : total;
+  const refundMethod = refundMethodId ?? editing?.paidMethodIds[0] ?? cashMethod?.id ?? null;
+  const labelOf = (methodId: string) =>
+    methods.find((method) => method.id === methodId)?.label ?? methodId;
 
   const inputs: PaymentInput[] = methods.map((method) => ({
     methodId: method.id,
     isCash: method.isCash,
     amount: parseMoney(amounts[method.id] ?? '', currency) ?? 0,
   }));
-  const settlement = settle(total, inputs);
+  const settlement = settle(amountToPay, inputs);
   const problems = checkSale({
     lines: cart.lines,
     discount,
@@ -123,7 +145,10 @@ export default function CheckoutScreen() {
     ),
     settlement,
     customer: customer ? { balance: customer.balance, creditLimit: customer.creditLimit } : null,
-  });
+  }).filter(
+    // La remise d'origine reste permise quand on corrige la vente (même au-delà d'une limite)
+    (problem) => !(problem === 'discountTooHigh' && editing && discount <= editing.originalDiscount)
+  );
 
   const expiredProblems = stockProblems.filter((problem) => problem.kind === 'expired');
   const shortageProblems = stockProblems.filter((problem) => problem.kind === 'shortage');
@@ -147,6 +172,29 @@ export default function CheckoutScreen() {
     setIsSaving(true);
     setError(null);
     try {
+      if (editing) {
+        const reason =
+          reasonText.trim() ||
+          (reasonKey ? t(`modify.reasons.${reasonKey}`) : t('modify.defaultReason'));
+        const result = await replaceSale(db, context, {
+          originalSaleId: editing.saleId,
+          deviceNumber: device.number,
+          lines: cart.lines,
+          discount,
+          payments: settlement.payments,
+          customer: customer ? { id: customer.id, name: customer.name } : null,
+          note: cart.note.trim() || null,
+          forceExpired,
+          refundMethodId: balance && balance.toRefund > 0 ? refundMethod : null,
+          reason,
+        });
+        cart.clear();
+        router.replace({
+          pathname: '/sale/[saleId]',
+          params: { saleId: result.saleId, created: '1', refunded: String(result.refunded) },
+        });
+        return;
+      }
       const { saleId } = await createSale(db, context, {
         deviceNumber: device.number,
         lines: cart.lines,
@@ -182,18 +230,102 @@ export default function CheckoutScreen() {
   }
 
   return (
-    <Screen title={t('checkout.title')} stack>
-      <Card mode="outlined">
-        <Card.Content style={[styles.center, { gap: spacing.xs, paddingVertical: spacing.md }]}>
-          <Text variant="titleMedium">{t('checkout.toPay')}</Text>
-          <MoneyText amount={total} currency={currency} size="large" tone="primary" />
-          {discount > 0 ? (
-            <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-              {t('checkout.withDiscount', { amount: formatMoney(discount, currency) })}
-            </Text>
-          ) : null}
-        </Card.Content>
-      </Card>
+    <Screen title={editing ? t('modify.button') : t('checkout.title')} stack>
+      {editing && balance ? (
+        <Card mode="outlined">
+          <Card.Title
+            title={t('modify.banner', { number: editing.invoiceNumber })}
+            titleVariant="titleMedium"
+          />
+          <Card.Content style={{ gap: spacing.sm }}>
+            <View style={styles.between}>
+              <Text variant="titleMedium">{t('modify.newTotal')}</Text>
+              <MoneyText amount={total} currency={currency} />
+            </View>
+            <View style={styles.between}>
+              <Text variant="bodyLarge">{t('modify.alreadyPaid')}</Text>
+              <Text variant="titleMedium">{formatMoney(editing.alreadyPaid, currency)}</Text>
+            </View>
+            <Divider />
+            {balance.toPay > 0 ? (
+              <View style={styles.center}>
+                <Text variant="titleMedium">{t('modify.toPay')}</Text>
+                <MoneyText amount={balance.toPay} currency={currency} size="large" tone="primary" />
+              </View>
+            ) : balance.toRefund > 0 ? (
+              <View style={styles.center}>
+                <Text variant="titleMedium">{t('modify.toRefund')}</Text>
+                <MoneyText
+                  amount={balance.toRefund}
+                  currency={currency}
+                  size="large"
+                  tone="danger"
+                />
+              </View>
+            ) : (
+              <Text variant="titleMedium">{t('modify.nothingToPay')}</Text>
+            )}
+          </Card.Content>
+        </Card>
+      ) : (
+        <Card mode="outlined">
+          <Card.Content style={[styles.center, { gap: spacing.xs, paddingVertical: spacing.md }]}>
+            <Text variant="titleMedium">{t('checkout.toPay')}</Text>
+            <MoneyText amount={total} currency={currency} size="large" tone="primary" />
+            {discount > 0 ? (
+              <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+                {t('checkout.withDiscount', { amount: formatMoney(discount, currency) })}
+              </Text>
+            ) : null}
+          </Card.Content>
+        </Card>
+      )}
+
+      {editing && balance && balance.toRefund > 0 ? (
+        <Card mode="outlined">
+          <Card.Content style={{ gap: spacing.sm }}>
+            <Text variant="titleMedium">{t('modify.refundWith')}</Text>
+            <View style={[styles.wrap, { gap: spacing.sm }]}>
+              {(editing.paidMethodIds.length > 0
+                ? editing.paidMethodIds
+                : cashMethod
+                  ? [cashMethod.id]
+                  : []
+              ).map((methodId) => (
+                <Chip
+                  key={methodId}
+                  selected={methodId === refundMethod}
+                  onPress={() => setRefundMethodId(methodId)}>
+                  {labelOf(methodId)}
+                </Chip>
+              ))}
+            </View>
+          </Card.Content>
+        </Card>
+      ) : null}
+
+      {editing ? (
+        <Card mode="outlined">
+          <Card.Content style={{ gap: spacing.sm }}>
+            <Text variant="titleMedium">{t('modify.reasonTitle')}</Text>
+            <View style={[styles.wrap, { gap: spacing.sm }]}>
+              {REASONS.map((key) => (
+                <Chip
+                  key={key}
+                  selected={reasonKey === key}
+                  onPress={() => setReasonKey(reasonKey === key ? null : key)}>
+                  {t(`modify.reasons.${key}`)}
+                </Chip>
+              ))}
+            </View>
+            <TextField
+              label={t('modify.reasonOther')}
+              value={reasonText}
+              onChangeText={setReasonText}
+            />
+          </Card.Content>
+        </Card>
+      ) : null}
 
       {!device?.number ? <Notice message={t('checkout.deviceNotRegistered')} /> : null}
 
@@ -234,90 +366,94 @@ export default function CheckoutScreen() {
         />
       ))}
 
-      <Card mode="outlined">
-        <Card.Title title={t('checkout.payments')} titleVariant="titleLarge" />
-        <Card.Content style={{ gap: spacing.md }}>
-          {cashMethod ? (
-            <View style={{ gap: spacing.sm }}>
-              <Text variant="bodyMedium">{t('checkout.quickCash')}</Text>
-              <View style={[styles.wrap, { gap: spacing.sm }]}>
-                {quickCashAmounts(total).map((amount) => (
-                  <Chip
-                    key={amount}
-                    icon="cash"
-                    onPress={() =>
-                      setAmounts({ [cashMethod.id]: formatMoneyInput(amount, currency) })
-                    }>
-                    {formatMoney(amount, currency)}
-                  </Chip>
-                ))}
+      {amountToPay > 0 ? (
+        <Card mode="outlined">
+          <Card.Title title={t('checkout.payments')} titleVariant="titleLarge" />
+          <Card.Content style={{ gap: spacing.md }}>
+            {cashMethod ? (
+              <View style={{ gap: spacing.sm }}>
+                <Text variant="bodyMedium">{t('checkout.quickCash')}</Text>
+                <View style={[styles.wrap, { gap: spacing.sm }]}>
+                  {quickCashAmounts(amountToPay).map((amount) => (
+                    <Chip
+                      key={amount}
+                      icon="cash"
+                      onPress={() =>
+                        setAmounts({ [cashMethod.id]: formatMoneyInput(amount, currency) })
+                      }>
+                      {formatMoney(amount, currency)}
+                    </Chip>
+                  ))}
+                </View>
               </View>
-            </View>
-          ) : null}
-          {methods.map((method) => (
-            <TextField
-              key={method.id}
-              label={
-                method.isCash ? t('checkout.cashGiven', { label: method.label }) : method.label
-              }
-              value={amounts[method.id] ?? ''}
-              onChangeText={(text) => setAmount(method.id, text)}
-              keyboardType="numeric"
-            />
-          ))}
-          <Button
-            mode="text"
-            icon="eraser"
-            onPress={() => setAmounts({})}
-            disabled={Object.keys(amounts).length === 0}>
-            {t('checkout.clearPayments')}
-          </Button>
-        </Card.Content>
-      </Card>
+            ) : null}
+            {methods.map((method) => (
+              <TextField
+                key={method.id}
+                label={
+                  method.isCash ? t('checkout.cashGiven', { label: method.label }) : method.label
+                }
+                value={amounts[method.id] ?? ''}
+                onChangeText={(text) => setAmount(method.id, text)}
+                keyboardType="numeric"
+              />
+            ))}
+            <Button
+              mode="text"
+              icon="eraser"
+              onPress={() => setAmounts({})}
+              disabled={Object.keys(amounts).length === 0}>
+              {t('checkout.clearPayments')}
+            </Button>
+          </Card.Content>
+        </Card>
+      ) : null}
 
-      <Card mode="outlined">
-        <Card.Content style={{ gap: spacing.sm }}>
-          <View style={styles.between}>
-            <Text variant="titleMedium">{t('checkout.paid')}</Text>
-            <MoneyText amount={settlement.paid} currency={currency} />
-          </View>
-          {settlement.change > 0 ? (
+      {amountToPay > 0 ? (
+        <Card mode="outlined">
+          <Card.Content style={{ gap: spacing.sm }}>
             <View style={styles.between}>
-              <Text variant="titleMedium">{t('checkout.change')}</Text>
-              <MoneyText amount={settlement.change} currency={currency} tone="primary" />
+              <Text variant="titleMedium">{t('checkout.paid')}</Text>
+              <MoneyText amount={settlement.paid} currency={currency} />
             </View>
-          ) : null}
+            {settlement.change > 0 ? (
+              <View style={styles.between}>
+                <Text variant="titleMedium">{t('checkout.change')}</Text>
+                <MoneyText amount={settlement.change} currency={currency} tone="primary" />
+              </View>
+            ) : null}
+            {settlement.due > 0 ? (
+              <View style={styles.between}>
+                <Text variant="titleMedium">{t('checkout.due')}</Text>
+                <MoneyText amount={settlement.due} currency={currency} tone="danger" />
+              </View>
+            ) : null}
+          </Card.Content>
           {settlement.due > 0 ? (
-            <View style={styles.between}>
-              <Text variant="titleMedium">{t('checkout.due')}</Text>
-              <MoneyText amount={settlement.due} currency={currency} tone="danger" />
-            </View>
+            <>
+              <Divider />
+              <List.Item
+                title={customer ? customer.name : t('checkout.chooseCustomer')}
+                description={
+                  customer
+                    ? t('checkout.customerDebt', {
+                        balance: formatMoney(customer.balance, currency),
+                        limit:
+                          customer.creditLimit === null
+                            ? t('checkout.noLimit')
+                            : formatMoney(customer.creditLimit, currency),
+                      })
+                    : t('checkout.creditNeedsCustomer')
+                }
+                descriptionNumberOfLines={2}
+                left={(props) => <List.Icon {...props} icon="account-cash" />}
+                right={(props) => <List.Icon {...props} icon="chevron-right" />}
+                onPress={() => setIsCustomerPickerOpen(true)}
+              />
+            </>
           ) : null}
-        </Card.Content>
-        {settlement.due > 0 ? (
-          <>
-            <Divider />
-            <List.Item
-              title={customer ? customer.name : t('checkout.chooseCustomer')}
-              description={
-                customer
-                  ? t('checkout.customerDebt', {
-                      balance: formatMoney(customer.balance, currency),
-                      limit:
-                        customer.creditLimit === null
-                          ? t('checkout.noLimit')
-                          : formatMoney(customer.creditLimit, currency),
-                    })
-                  : t('checkout.creditNeedsCustomer')
-              }
-              descriptionNumberOfLines={2}
-              left={(props) => <List.Icon {...props} icon="account-cash" />}
-              right={(props) => <List.Icon {...props} icon="chevron-right" />}
-              onPress={() => setIsCustomerPickerOpen(true)}
-            />
-          </>
-        ) : null}
-      </Card>
+        </Card>
+      ) : null}
 
       {problems
         .filter((problem) => problem !== 'customerRequired' && problem !== 'emptyCart')
@@ -332,9 +468,11 @@ export default function CheckoutScreen() {
         onPress={handleConfirm}
         loading={isSaving}
         disabled={!canConfirm || isSaving}>
-        {settlement.due > 0
-          ? t('checkout.confirmCredit', { amount: formatMoney(settlement.due, currency) })
-          : t('checkout.confirm')}
+        {editing
+          ? t('modify.validate')
+          : settlement.due > 0
+            ? t('checkout.confirmCredit', { amount: formatMoney(settlement.due, currency) })
+            : t('checkout.confirm')}
       </BigButton>
 
       <CustomerPicker

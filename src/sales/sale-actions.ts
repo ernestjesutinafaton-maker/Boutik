@@ -4,6 +4,7 @@ import { type ActionContext, logAction, type WhenOptions } from '@/data/audit';
 import { newId, nowIso } from '@/data/ids';
 import { today } from '@/domain/dates';
 import { toBaseQuantity } from '@/domain/quantity';
+import { carryPayments } from '@/domain/sale-edit';
 import {
   type AppliedPayment,
   type CartLine,
@@ -19,7 +20,7 @@ import { loadLots, type Reader } from '@/stock/stock-data';
 import { findOpenCashSession } from './cash-session-data';
 
 /**
- * Les écritures de la caisse : vendre, annuler, reprendre des articles.
+ * Les écritures de la caisse : vendre, modifier une vente, annuler, reprendre des articles.
  * Chaque opération est « tout ou rien » (une transaction) et notée dans le journal.
  */
 
@@ -56,7 +57,11 @@ export class DeviceNotRegisteredError extends Error {
 export async function checkCartStock(
   reader: Reader,
   lines: readonly CartLine[],
-  options: { allowExpired: boolean }
+  options: {
+    allowExpired: boolean;
+    /** Vente en cours de modification : sa marchandise compte comme revenue en stock */
+    returningSaleId?: string | null;
+  }
 ): Promise<StockProblem[]> {
   const byProduct = new Map<string, { name: string; quantity: number }>();
   for (const line of lines) {
@@ -64,9 +69,25 @@ export async function checkCartStock(
     current.quantity += toBaseQuantity(line.quantity, line.unitFactor);
     byProduct.set(line.productId, current);
   }
+  // Ce que la vente modifiée a encore de sorti, lot par lot (il reviendra au stock)
+  const givenBack = new Map<string, number>();
+  if (options.returningSaleId) {
+    const rows = await reader.getAll<{ lot_id: string | null; quantity: number }>(
+      `SELECT lot_id, SUM(quantity) AS quantity FROM stock_movements
+        WHERE sale_id = ? AND type IN ('sale', 'return')
+        GROUP BY lot_id HAVING SUM(quantity) < 0`,
+      [options.returningSaleId]
+    );
+    for (const row of rows) {
+      if (row.lot_id) givenBack.set(row.lot_id, -row.quantity);
+    }
+  }
   const problems: StockProblem[] = [];
   for (const [productId, { name, quantity }] of byProduct) {
-    const lots = await loadLots(reader, productId);
+    const lots = (await loadLots(reader, productId)).map((lot) => ({
+      ...lot,
+      remaining: lot.remaining + (givenBack.get(lot.id) ?? 0),
+    }));
     const result = allocate(lots, quantity, { today: today(), allowExpired: options.allowExpired });
     if (result.expiredAvailable > 0) {
       problems.push({
@@ -107,6 +128,23 @@ export async function createSale(
   sale: NewSale,
   options: WhenOptions = {}
 ): Promise<{ saleId: string; invoiceNumber: string }> {
+  let created = { saleId: '', invoiceNumber: '' };
+  await db.writeTransaction(async (tx) => {
+    created = await insertSale(tx, context, sale, options);
+  });
+  return created;
+}
+
+/**
+ * Enregistre une vente DANS une transaction déjà ouverte (vente normale, ou vente corrigée
+ * qui en remplace une autre : replacesSaleId).
+ */
+async function insertSale(
+  tx: Transaction,
+  context: ActionContext,
+  sale: NewSale,
+  options: WhenOptions & { replacesSaleId?: string } = {}
+): Promise<{ saleId: string; invoiceNumber: string }> {
   const deviceId = context.deviceId;
   if (!deviceId) {
     throw new DeviceNotRegisteredError();
@@ -123,7 +161,7 @@ export async function createSale(
   }
   let invoiceNumber = '';
 
-  await db.writeTransaction(async (tx) => {
+  {
     const problems = await checkCartStock(tx, sale.lines, { allowExpired: sale.forceExpired });
     const blocking = problems.filter(
       (problem) =>
@@ -149,8 +187,8 @@ export async function createSale(
       `INSERT INTO sales
          (id, shop_id, device_id, invoice_number, invoice_seq, customer_id, seller_id,
           cash_session_id, status, subtotal, discount_amount, total, paid_amount, due_amount,
-          note, occurred_at, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          note, replaces_sale_id, occurred_at, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'completed', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         saleId,
         context.shopId,
@@ -166,6 +204,7 @@ export async function createSale(
         paid,
         due,
         sale.note,
+        options.replacesSaleId ?? null,
         now,
         now,
         now,
@@ -309,7 +348,7 @@ export async function createSale(
         now
       );
     }
-  });
+  }
 
   return { saleId, invoiceNumber };
 }
@@ -487,6 +526,142 @@ export async function cancelSale(
       }
     );
   });
+}
+
+/** La vente corrigée : les nouvelles lignes, et l'argent donné maintenant (s'il manque). */
+export type SaleModification = NewSale & {
+  originalSaleId: string;
+  /** Mode pour rendre l'argent en trop au client (si le nouveau total est plus petit) */
+  refundMethodId: string | null;
+  /** Pourquoi : échange, erreur de saisie… (noté sur l'ancienne vente et au journal) */
+  reason: string;
+};
+
+/**
+ * Modifie une vente déjà faite (le client échange ou rend des articles, ou erreur de saisie),
+ * en une seule opération :
+ *   1. l'ancienne vente est annulée : sa marchandise revient dans ses lots, sa dette est effacée ;
+ *   2. l'argent déjà payé est reporté sur la nouvelle vente ; le surplus éventuel est rendu
+ *      avec le mode choisi ;
+ *   3. la vente corrigée est enregistrée (nouvelle facture), liée à l'ancienne.
+ * `payments` = l'argent donné MAINTENANT en plus. Rien n'est effacé : tout reste au journal.
+ */
+export async function replaceSale(
+  db: CommonPowerSyncDatabase,
+  context: ActionContext,
+  change: SaleModification
+): Promise<{ saleId: string; invoiceNumber: string; refunded: number }> {
+  const now = nowIso();
+  let result = { saleId: '', invoiceNumber: '', refunded: 0 };
+
+  await db.writeTransaction(async (tx) => {
+    const original = await tx.get<SaleRow>(
+      'SELECT id, invoice_number, status, customer_id, subtotal, total FROM sales WHERE id = ?',
+      [change.originalSaleId]
+    );
+    if (original.status !== 'completed') {
+      throw new Error('Cette vente est déjà annulée ou modifiée.');
+    }
+
+    // 1. La marchandise de l'ancienne vente revient dans ses lots ; sa dette est effacée
+    for (const movement of await netSaleMovements(tx, original.id)) {
+      await insertMovement(tx, context, {
+        productId: movement.product_id,
+        lotId: movement.lot_id,
+        type: 'return',
+        quantity: -movement.quantity,
+        costAmount: -movement.cost_amount,
+        saleId: original.id,
+        saleItemId: movement.sale_item_id,
+        note: change.reason,
+        occurredAt: now,
+      });
+    }
+    const debt = await tx.get<{ amount: number }>(
+      'SELECT COALESCE(SUM(amount), 0) AS amount FROM customer_ledger WHERE sale_id = ?',
+      [original.id]
+    );
+    if (debt.amount > 0 && original.customer_id) {
+      await reduceSaleDebt(
+        tx,
+        context,
+        {
+          saleId: original.id,
+          customerId: original.customer_id,
+          amount: debt.amount,
+          note: change.reason,
+        },
+        now
+      );
+    }
+
+    // 2. L'argent déjà payé (moins ce qui a déjà été rendu) : sorti de l'ancienne vente…
+    const paidRows = await tx.getAll<{ payment_method_id: string; amount: number }>(
+      `SELECT payment_method_id, SUM(amount) AS amount FROM payments
+        WHERE sale_id = ? GROUP BY payment_method_id ORDER BY MIN(created_at)`,
+      [original.id]
+    );
+    const paid = paidRows
+      .filter((row) => row.amount > 0)
+      .map((row) => ({ methodId: row.payment_method_id, amount: row.amount }));
+    for (const payment of paid) {
+      await insertRefund(
+        tx,
+        context,
+        {
+          saleId: original.id,
+          customerId: original.customer_id,
+          methodId: payment.methodId,
+          amount: payment.amount,
+        },
+        now
+      );
+    }
+    await tx.execute(
+      `UPDATE sales SET status = 'cancelled', cancelled_at = ?, cancelled_by = ?,
+              cancel_reason = ?, updated_at = ?
+        WHERE id = ?`,
+      [now, context.memberId, change.reason, now, original.id]
+    );
+
+    // …et reporté sur la vente corrigée, jusqu'à son total (le surplus reste rendu au client)
+    const newTotal = cartSubtotal(change.lines) - change.discount;
+    const { carried, refund } = carryPayments(paid, newTotal, change.refundMethodId);
+    const created = await insertSale(
+      tx,
+      context,
+      {
+        ...change,
+        payments: [
+          ...carried.map((payment) => ({
+            methodId: payment.methodId,
+            amount: payment.amount,
+            cashReceived: null,
+            changeGiven: null,
+          })),
+          ...change.payments,
+        ],
+      },
+      { replacesSaleId: original.id }
+    );
+    result = { ...created, refunded: refund };
+
+    await logAction(
+      tx,
+      context,
+      'sale.modify',
+      { type: 'sale', id: created.saleId },
+      {
+        invoiceNumber: original.invoice_number,
+        newInvoiceNumber: created.invoiceNumber,
+        oldTotal: original.total,
+        newTotal,
+        refunded: refund,
+        reason: change.reason,
+      }
+    );
+  });
+  return result;
 }
 
 /**

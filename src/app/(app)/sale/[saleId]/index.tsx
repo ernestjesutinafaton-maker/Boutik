@@ -15,15 +15,20 @@ import { TextField } from '@/components/text-field';
 import { useActionContext } from '@/data/use-action-context';
 import { formatMoment } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
-import { formatQuantity } from '@/domain/quantity';
+import { formatQuantity, pluralUnit } from '@/domain/quantity';
 import { SaleDocuments } from '@/invoices/sale-documents';
+import { useCart } from '@/sales/cart-provider';
 import { cancelSale } from '@/sales/sale-actions';
 import { useSale } from '@/sales/sale-data';
+import { useSaleEditRight } from '@/sales/use-sale-edit-right';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
-/** Une vente (la facture à l'écran) : partager, imprimer, annuler ou reprendre des articles. */
+/**
+ * Une vente (la facture à l'écran) : partager, imprimer, MODIFIER (pendant le délai choisi par
+ * le propriétaire), reprendre des articles ou supprimer.
+ */
 export default function SaleScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -31,9 +36,16 @@ export default function SaleScreen() {
   const context = useActionContext();
   const settings = useShopSettings();
   const { can } = useActiveMember();
-  const { saleId, created } = useLocalSearchParams<{ saleId: string; created?: string }>();
+  const { saleId, created, refunded } = useLocalSearchParams<{
+    saleId: string;
+    created?: string;
+    refunded?: string;
+  }>();
   const { sale, isLoading } = useSale(saleId);
+  const cart = useCart();
+  const right = useSaleEditRight(sale);
   const [isCancelOpen, setIsCancelOpen] = useState(false);
+  const [isModifyOpen, setIsModifyOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [isWorking, setIsWorking] = useState(false);
   const currency = settings?.currencyCode ?? 'XOF';
@@ -60,20 +72,58 @@ export default function SaleScreen() {
     }
   }
 
+  /** Remplit le panier avec cette vente, puis va à la caisse pour la modifier */
+  function startModifying() {
+    // La vente doit être chargée en entier (lignes ET paiements) avant de la modifier
+    if (!sale || isLoading) return;
+    cart.startEditing(sale);
+    setIsModifyOpen(false);
+    router.navigate('/');
+  }
+
   const isCancelled = sale.status === 'cancelled';
+  const refundedNow = Number(refunded ?? 0);
   const totalChange = sale.payments.reduce((sum, payment) => sum + (payment.changeGiven ?? 0), 0);
   const hasReturns = sale.items.some((item) => item.returnedQuantity > 0);
 
   return (
     <Screen title={t('sale.titleNumber', { number: sale.invoiceNumber })} stack>
       {created ? <Notice tone="info" message={t('sale.created')} /> : null}
-      {isCancelled ? (
+      {sale.replacedBy ? (
+        <View style={{ gap: spacing.sm }}>
+          <Notice
+            tone="info"
+            message={t('modify.replacedBy', { number: sale.replacedBy.invoiceNumber })}
+          />
+          <BigButton
+            icon="file-document-arrow-right"
+            variant="outline"
+            onPress={() => sale.replacedBy && router.replace(`/sale/${sale.replacedBy.id}`)}>
+            {t('modify.seeNew')}
+          </BigButton>
+        </View>
+      ) : isCancelled ? (
         <Notice
           message={t('sale.cancelledInfo', {
             date: sale.cancelledAt ? formatMoment(sale.cancelledAt) : '',
             reason: sale.cancelReason ?? '',
           })}
         />
+      ) : null}
+      {sale.replaces ? (
+        <Notice
+          tone="info"
+          message={t('modify.replaces', { number: sale.replaces.invoiceNumber })}
+        />
+      ) : null}
+
+      {created && refundedNow > 0 ? (
+        <Card mode="outlined">
+          <Card.Content style={[styles.center, { paddingVertical: spacing.md }]}>
+            <Text variant="titleMedium">{t('modify.refundNow')}</Text>
+            <MoneyText amount={refundedNow} currency={currency} size="large" tone="danger" />
+          </Card.Content>
+        </Card>
       ) : null}
 
       {created && totalChange > 0 ? (
@@ -92,13 +142,23 @@ export default function SaleScreen() {
               {sale.invoiceNumber}
             </Text>
             <StatusChip
-              tone={isCancelled ? 'danger' : sale.due > 0 ? 'warning' : 'ok'}
+              tone={
+                sale.replacedBy
+                  ? 'neutral'
+                  : isCancelled
+                    ? 'danger'
+                    : sale.due > 0
+                      ? 'warning'
+                      : 'ok'
+              }
               label={
-                isCancelled
-                  ? t('sale.status.cancelled')
-                  : sale.due > 0
-                    ? t('sale.status.credit')
-                    : t('sale.status.paid')
+                sale.replacedBy
+                  ? t('sale.status.modified')
+                  : isCancelled
+                    ? t('sale.status.cancelled')
+                    : sale.due > 0
+                      ? t('sale.status.credit')
+                      : t('sale.status.paid')
               }
             />
           </View>
@@ -128,7 +188,7 @@ export default function SaleScreen() {
                 <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
                   {t('sale.itemLine', {
                     quantity: formatQuantity(item.quantity),
-                    unit: item.unitName,
+                    unit: pluralUnit(item.unitName, item.quantity),
                     price: formatMoney(item.unitPrice, currency),
                   })}
                 </Text>
@@ -140,7 +200,10 @@ export default function SaleScreen() {
                     quantity: formatQuantity(
                       Math.round((item.returnedQuantity * 1000) / item.unitFactor)
                     ),
-                    unit: item.unitName,
+                    unit: pluralUnit(
+                      item.unitName,
+                      Math.round((item.returnedQuantity * 1000) / item.unitFactor)
+                    ),
                   })}
                 </Text>
               ) : null}
@@ -188,21 +251,61 @@ export default function SaleScreen() {
         {t('sale.newSale')}
       </BigButton>
 
-      {can('sale.cancel') && !isCancelled ? (
+      {right?.allowed ? (
         <View style={{ gap: spacing.sm }}>
+          <BigButton icon="pencil" disabled={isLoading} onPress={() => setIsModifyOpen(true)}>
+            {t('modify.button')}
+          </BigButton>
+          <Text
+            variant="bodyMedium"
+            style={[
+              styles.centerText,
+              { color: right.late ? theme.app.colors.danger : theme.colors.onSurfaceVariant },
+            ]}>
+            {right.late
+              ? t('modify.lateOwner', { date: formatMoment(right.deadline) })
+              : t('modify.until', { date: formatMoment(right.deadline) })}
+          </Text>
           <BigButton
             icon="keyboard-return"
             variant="outline"
             onPress={() => router.push(`/sale/${sale.id}/return`)}>
             {t('sale.return')}
           </BigButton>
-          <BigButton icon="cancel" variant="danger" onPress={() => setIsCancelOpen(true)}>
-            {t('sale.cancel')}
-          </BigButton>
+          {can('sale.cancel') ? (
+            <BigButton icon="cancel" variant="danger" onPress={() => setIsCancelOpen(true)}>
+              {t('sale.cancel')}
+            </BigButton>
+          ) : null}
         </View>
+      ) : right?.reason === 'late' ? (
+        <Notice
+          tone="info"
+          message={t('modify.archived', { date: formatMoment(right.deadline) })}
+        />
+      ) : right?.reason === 'notOwnSale' ? (
+        <Notice tone="info" message={t('modify.notOwnSale')} />
       ) : null}
 
       <Portal>
+        <Dialog visible={isModifyOpen} onDismiss={() => setIsModifyOpen(false)}>
+          <Dialog.Title>{t('modify.confirmTitle')}</Dialog.Title>
+          <Dialog.Content style={{ gap: spacing.sm }}>
+            <Text variant="bodyLarge">
+              {t('modify.confirmText', { number: sale.invoiceNumber })}
+            </Text>
+            {cart.lines.length > 0 && cart.editing?.saleId !== sale.id ? (
+              <Text variant="bodyMedium" style={{ color: theme.app.colors.danger }}>
+                {t('modify.confirmCartNotEmpty')}
+              </Text>
+            ) : null}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsModifyOpen(false)}>{t('common.back')}</Button>
+            <Button onPress={startModifying}>{t('modify.confirm')}</Button>
+          </Dialog.Actions>
+        </Dialog>
+
         <Dialog visible={isCancelOpen} onDismiss={() => setIsCancelOpen(false)}>
           <Dialog.Title>{t('sale.cancelTitle')}</Dialog.Title>
           <Dialog.Content style={{ gap: spacing.md }}>
@@ -248,6 +351,9 @@ function Row({ label, value, color }: { label: string; value: string; color?: st
 const styles = StyleSheet.create({
   center: {
     alignItems: 'center',
+  },
+  centerText: {
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
