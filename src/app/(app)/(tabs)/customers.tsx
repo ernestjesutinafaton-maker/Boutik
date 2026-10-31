@@ -2,8 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Chip, Divider, List, Text, TextInput } from 'react-native-paper';
+import { Chip, Divider, List, Text, TextInput } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Screen } from '@/components/screen';
@@ -143,7 +144,7 @@ export default function CustomersScreen() {
                     <MoneyText
                       amount={customer.balance}
                       currency={currency}
-                      tone={customer.balance > 0 ? 'danger' : 'primary'}
+                      tone={customer.balance > 0 ? 'danger' : 'success'}
                       style={{ fontSize: theme.app.fontSize.large }}
                     />
                   </View>

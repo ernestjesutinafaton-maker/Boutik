@@ -2,8 +2,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Text } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
 import { formatMoment } from '@/domain/dates';

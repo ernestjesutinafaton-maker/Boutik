@@ -11,8 +11,8 @@ type MoneyTextProps = {
   currency?: CurrencyCode;
   /** normal = gros chiffres, large = très gros chiffres (total à payer) */
   size?: 'normal' | 'large';
-  /** primary = vert, danger = rouge (dettes), default = couleur du texte */
-  tone?: 'default' | 'primary' | 'danger';
+  /** primary = violet, success = vert (bénéfice, rien à devoir), danger = rouge (dettes), default = couleur du texte */
+  tone?: 'default' | 'primary' | 'success' | 'danger';
   style?: StyleProp<TextStyle>;
 };
 
@@ -27,7 +27,12 @@ export function MoneyText({
   const theme = useAppTheme();
   const { colors, fontSize } = theme.app;
 
-  const color = { default: colors.text, primary: colors.primary, danger: colors.danger }[tone];
+  const color = {
+    default: colors.text,
+    primary: colors.primary,
+    success: colors.success,
+    danger: colors.danger,
+  }[tone];
   const textSize = size === 'large' ? fontSize.amountLarge : fontSize.amount;
 
   return (

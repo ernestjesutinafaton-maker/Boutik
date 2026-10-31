@@ -3,8 +3,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Dialog, Divider, List, Portal, Text } from 'react-native-paper';
+import { Button, Dialog, Divider, List, Portal, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
@@ -121,7 +122,7 @@ export default function CustomerScreen() {
             amount={Math.abs(customer.balance)}
             currency={currency}
             size="large"
-            tone={customer.balance > 0 ? 'danger' : 'primary'}
+            tone={customer.balance > 0 ? 'danger' : 'success'}
           />
           <AgingChip aging={aging} />
           {aging.oldestUnpaidDay ? (

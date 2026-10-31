@@ -2,8 +2,9 @@ import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { Button, Card, Divider, List, Text } from 'react-native-paper';
+import { Button, Divider, List, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
 import { formatMoment } from '@/domain/dates';

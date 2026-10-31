@@ -3,8 +3,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { Card, Chip, Divider, Text } from 'react-native-paper';
+import { Chip, Divider, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';

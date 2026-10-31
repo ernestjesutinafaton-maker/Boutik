@@ -3,8 +3,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Card, Chip, Text } from 'react-native-paper';
+import { Chip, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';

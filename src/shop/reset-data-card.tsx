@@ -1,8 +1,9 @@
 import { usePowerSync } from '@powersync/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Dialog, Portal, Text } from 'react-native-paper';
+import { Button, Dialog, Portal, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
 import { TextField } from '@/components/text-field';

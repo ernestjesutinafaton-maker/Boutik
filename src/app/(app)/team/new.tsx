@@ -2,8 +2,8 @@ import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
 import { PasswordField } from '@/components/password-field';

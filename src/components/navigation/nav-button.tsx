@@ -1,5 +1,5 @@
 import type { TabTriggerSlotProps } from 'expo-router/ui';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon, Text } from 'react-native-paper';
 
 import type { IconName } from '@/components/icon-name';
@@ -16,7 +16,8 @@ type NavButtonProps = Omit<TabTriggerSlotProps, 'ref'> & {
 
 /**
  * Un bouton du menu. Expo Router lui indique s'il correspond à l'écran affiché
- * (isFocused) : il est alors surligné en vert.
+ * (isFocused) : il est alors mis en avant par une pilule violette en relief
+ * (toute la ligne sur grand écran, l'icône seulement sur téléphone).
  */
 export function NavButton({
   icon,
@@ -26,9 +27,11 @@ export function NavButton({
   ...pressableProps
 }: NavButtonProps) {
   const theme = useAppTheme();
-  const { colors, spacing, radius, touch, fontSize } = theme.app;
+  const { colors, effects, spacing, radius, touch, fontSize } = theme.app;
   const isSide = placement === 'side';
-  const color = isFocused ? colors.onPrimaryContainer : colors.textSecondary;
+  const active = { backgroundImage: effects.navActiveGradient, boxShadow: effects.navActiveShadow };
+  const labelColor = !isFocused ? colors.textSecondary : isSide ? colors.onPrimary : colors.primary;
+  const iconColor = isFocused ? colors.onPrimary : colors.textSecondary;
 
   return (
     <Pressable
@@ -38,19 +41,25 @@ export function NavButton({
         {
           minHeight: touch.minHeight,
           borderRadius: radius.md,
-          gap: isSide ? spacing.md : spacing.xs,
+          gap: isSide ? spacing.md : 2,
           paddingHorizontal: isSide ? spacing.md : spacing.xs,
         },
-        isFocused && { backgroundColor: colors.primaryContainer },
+        isFocused && isSide && active,
         pressed && styles.pressed,
       ]}>
-      <Icon source={icon} size={isSide ? 26 : 28} color={color} />
+      <View
+        style={[
+          !isSide && [styles.iconPill, { borderRadius: radius.pill }],
+          isFocused && !isSide && active,
+        ]}>
+        <Icon source={icon} size={26} color={iconColor} />
+      </View>
       <Text
         numberOfLines={1}
         style={{
-          color,
+          color: labelColor,
           fontSize: isSide ? fontSize.body : fontSize.small,
-          fontWeight: isFocused ? '700' : '500',
+          fontWeight: isFocused ? '800' : '600',
         }}>
         {label}
       </Text>
@@ -67,6 +76,12 @@ const styles = StyleSheet.create({
   side: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconPill: {
+    width: 60,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   pressed: {
     opacity: 0.7,

@@ -3,8 +3,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Dialog, Divider, List, Portal, Text, TextInput } from 'react-native-paper';
+import { Button, Dialog, Divider, List, Portal, Text, TextInput } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';

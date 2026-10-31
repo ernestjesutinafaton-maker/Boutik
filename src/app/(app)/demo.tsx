@@ -2,10 +2,12 @@ import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, ProgressBar, Text } from 'react-native-paper';
+import { ProgressBar, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
+import { Icon3D } from '@/components/icon-3d';
 import { Screen } from '@/components/screen';
 import { useActionContext } from '@/data/use-action-context';
 import { loadDemoData, ShopNotEmptyError } from '@/demo/load-demo';
@@ -65,6 +67,7 @@ export default function DemoScreen() {
 
   return (
     <Screen title={t('demo.title')} stack>
+      <Icon3D name={isDone ? 'party' : 'store'} size={112} />
       <Notice tone="info" message={t('demo.help')} />
       {notEmpty ? <Notice message={t('demo.notEmpty')} /> : null}
       {progress ? (

@@ -3,6 +3,7 @@ import { type CurrencyCode, formatMoney } from '@/domain/money';
 import { formatQuantity } from '@/domain/quantity';
 import type { ReportData } from '@/domain/report';
 import { escapeHtml } from '@/invoices/invoice-html';
+import { palette } from '@/theme/tokens';
 
 /** Les noms des catégories de dépenses, pour l'affichage. */
 export const EXPENSE_LABELS: Record<string, string> = {
@@ -67,7 +68,7 @@ export function reportHtml(input: {
   @page { margin: 12mm; }
   body { font-family: Arial, Helvetica, sans-serif; font-size: 12px; color: #111827; }
   h1 { font-size: 20px; margin: 0; }
-  h2 { font-size: 14px; margin: 16px 0 4px; color: #059669; border-bottom: 2px solid #059669; }
+  h2 { font-size: 14px; margin: 16px 0 4px; color: ${palette.light.primary}; border-bottom: 2px solid ${palette.light.primary}; }
   table { width: 100%; border-collapse: collapse; }
   td { padding: 3px 2px; border-bottom: 1px solid #E5E7EB; }
   .num { text-align: right; white-space: nowrap; }

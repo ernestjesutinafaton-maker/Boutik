@@ -13,7 +13,7 @@ export function BottomNav() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { colors, spacing } = theme.app;
+  const { colors, effects, radius, spacing } = theme.app;
 
   return (
     <View
@@ -21,9 +21,11 @@ export function BottomNav() {
         styles.bar,
         {
           backgroundColor: colors.surface,
-          borderTopColor: colors.border,
+          borderTopLeftRadius: radius.xl,
+          borderTopRightRadius: radius.xl,
+          boxShadow: effects.navShadow,
           gap: spacing.xs,
-          paddingTop: spacing.xs,
+          paddingTop: spacing.sm,
           paddingHorizontal: spacing.xs,
           // Laisse la place à la barre de gestes du téléphone
           paddingBottom: insets.bottom + spacing.xs,
@@ -41,6 +43,5 @@ export function BottomNav() {
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

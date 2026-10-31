@@ -2,8 +2,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Chip, Divider, Text, TextInput } from 'react-native-paper';
+import { Chip, Divider, Text, TextInput } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
 import { Screen } from '@/components/screen';

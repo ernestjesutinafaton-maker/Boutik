@@ -1,5 +1,6 @@
 import type { ExportTable } from '@/export/datasets';
 import { escapeHtml } from '@/invoices/invoice-html';
+import { palette } from '@/theme/tokens';
 
 /**
  * Un tableau d'export (ventes, stock, inventaire…) en page HTML, pour le PDF ou l'impression.
@@ -31,7 +32,7 @@ export function tableHtml(input: {
   h1 { font-size: 18px; margin: 0; }
   .muted { color: #4B5563; margin-bottom: 8px; }
   table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; background: #ECFDF5; color: #065F46; border-bottom: 2px solid #059669; }
+  th { text-align: left; background: ${palette.light.primaryContainer}; color: ${palette.light.onPrimaryContainer}; border-bottom: 2px solid ${palette.light.primary}; }
   th, td { padding: 3px 4px; }
   td { border-bottom: 1px solid #E5E7EB; vertical-align: top; }
   tr { page-break-inside: avoid; }

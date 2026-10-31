@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import {
   Button,
-  Card,
   Chip,
   Dialog,
   IconButton,
@@ -15,6 +14,7 @@ import {
   TextInput,
 } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';

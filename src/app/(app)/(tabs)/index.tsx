@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, useWindowDimensions, View } from 'react-native';
 import {
   Button,
-  Card,
   Dialog,
   Divider,
   List,
@@ -14,6 +13,7 @@ import {
   TextInput,
 } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';

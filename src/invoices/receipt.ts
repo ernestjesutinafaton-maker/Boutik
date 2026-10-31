@@ -2,6 +2,7 @@ import { formatDay, formatMoment } from '@/domain/dates';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
 
 import { escapeHtml, type InvoiceFormat } from './invoice-html';
+import { palette } from '@/theme/tokens';
 
 /**
  * Le reçu d'un remboursement de crédit, et le message de relance d'une dette.
@@ -58,7 +59,7 @@ export function receiptHtml(data: ReceiptData, format: InvoiceFormat = 'a4'): st
   h1 { font-size: 22px; margin: 0 0 4px; }
   .muted { color: #4B5563; }
   .title { margin: 16px 0 8px; font-weight: bold; font-size: 16px; }
-  .amount { font-size: 28px; font-weight: bold; color: #059669; margin: 12px 0; }
+  .amount { font-size: 28px; font-weight: bold; color: ${palette.light.primary}; margin: 12px 0; }
   .due { color: #DC2626; font-weight: bold; }
 </style></head>
 <body><div class="page">

@@ -4,7 +4,8 @@
 module.exports = {
   globDirectory: 'dist/app/',
   // Tous les fichiers de l'appli, dont le moteur SQLite de PowerSync (.wasm)
-  globPatterns: ['**/*.{js,mjs,html,css,ttf,otf,woff,woff2,ico,json,png,jpg,svg,wasm}'],
+  // et les images 3D (.webp)
+  globPatterns: ['**/*.{js,mjs,html,css,ttf,otf,woff,woff2,ico,json,png,jpg,webp,svg,wasm}'],
   globIgnores: ['vercel.json', '**/*.map'],
   swDest: 'dist/app/sw.js',
   // Appli « une seule page » : toute adresse ouvre index.html (même hors ligne)

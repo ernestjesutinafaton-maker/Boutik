@@ -17,7 +17,11 @@ export function TextField({ errorMessage, style, ...rest }: TextFieldProps) {
       <TextInput
         mode="outlined"
         error={Boolean(errorMessage)}
-        style={[{ fontSize: theme.app.fontSize.large }, style]}
+        outlineStyle={{ borderRadius: theme.app.radius.md }}
+        style={[
+          { fontSize: theme.app.fontSize.large, backgroundColor: theme.colors.surface },
+          style,
+        ]}
         {...rest}
       />
       {errorMessage ? (

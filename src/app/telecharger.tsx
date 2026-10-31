@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
-import { Card, Text } from 'react-native-paper';
+import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { ANDROID_APK_URL } from '@/config/downloads';
 import { useInstallPrompt } from '@/pwa/web-app';

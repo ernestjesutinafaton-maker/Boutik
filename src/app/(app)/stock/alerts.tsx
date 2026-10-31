@@ -1,8 +1,9 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { Card, Divider, List, Text } from 'react-native-paper';
+import { Divider, List, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
 import { displayUnits, isLowStock } from '@/domain/catalog';

@@ -1,6 +1,7 @@
 import { formatMoment } from '@/domain/dates';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
 import { formatQuantity } from '@/domain/quantity';
+import { palette } from '@/theme/tokens';
 
 /**
  * Les factures, fabriquées DANS l'appareil (même hors ligne) :
@@ -111,7 +112,7 @@ export function invoiceHtml(data: InvoiceData, format: InvoiceFormat): string {
   .muted { color: #4B5563; ${isTicket ? 'text-align: center;' : ''} }
   .title { margin: ${isTicket ? '6px' : '16px'} 0 4px; font-weight: bold; font-size: ${baseSize + 2}px; }
   table { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  th { text-align: left; border-bottom: 2px solid #059669; padding: 4px 2px; }
+  th { text-align: left; border-bottom: 2px solid ${palette.light.primary}; padding: 4px 2px; }
   td { padding: ${isTicket ? '1px' : '4px'} 2px; vertical-align: top; }
   ${isTicket ? '' : 'tbody tr td { border-bottom: 1px solid #E5E7EB; }'}
   .name { font-weight: bold; padding-top: 4px; }

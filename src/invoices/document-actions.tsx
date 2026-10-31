@@ -2,8 +2,9 @@ import { usePowerSync } from '@powersync/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import type { PaperWidth } from '@/printing/escpos';
 import { useAppTheme } from '@/theme/paper-theme';

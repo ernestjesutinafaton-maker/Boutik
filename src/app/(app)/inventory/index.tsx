@@ -2,8 +2,9 @@ import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, List } from 'react-native-paper';
+import { List } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';

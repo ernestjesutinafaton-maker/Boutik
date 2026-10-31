@@ -7,7 +7,7 @@ import type { IconName } from './icon-name';
 
 type StatusChipProps = {
   label: string;
-  /** danger = rouge (périmé, dette ancienne), warning = orange (bientôt, stock bas), ok = vert */
+  /** danger = rouge (périmé, dette ancienne), warning = orange (bientôt, stock bas), ok = vert (tout va bien) */
   tone: 'danger' | 'warning' | 'ok' | 'neutral';
   icon?: IconName;
 };
@@ -19,7 +19,7 @@ export function StatusChip({ label, tone, icon }: StatusChipProps) {
   const { backgroundColor, color } = {
     danger: { backgroundColor: colors.dangerContainer, color: colors.onDangerContainer },
     warning: { backgroundColor: colors.accentContainer, color: colors.onAccentContainer },
-    ok: { backgroundColor: colors.primaryContainer, color: colors.onPrimaryContainer },
+    ok: { backgroundColor: colors.successContainer, color: colors.onSuccessContainer },
     neutral: { backgroundColor: colors.surfaceVariant, color: colors.textSecondary },
   }[tone];
 
@@ -29,8 +29,8 @@ export function StatusChip({ label, tone, icon }: StatusChipProps) {
         styles.chip,
         {
           backgroundColor,
-          borderRadius: radius.sm,
-          paddingHorizontal: spacing.sm,
+          borderRadius: radius.pill,
+          paddingHorizontal: spacing.sm + 2,
           gap: spacing.xs,
         },
       ]}>

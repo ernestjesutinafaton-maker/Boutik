@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
-import { Card, Icon, Text } from 'react-native-paper';
+import { Icon, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import type { IconName } from '@/components/icon-name';
 import { useAppTheme } from '@/theme/paper-theme';
 

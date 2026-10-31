@@ -2,10 +2,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import { Card, Divider, List, Text } from 'react-native-paper';
+import { Divider, List, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
+import { Icon3D } from '@/components/icon-3d';
 import { Screen } from '@/components/screen';
 import { GUIDE, type GuideSection } from '@/guide/guide-content';
 import { useActiveMember } from '@/team/active-member-provider';
@@ -54,7 +56,7 @@ function SectionCard({
         title={section.title}
         titleStyle={{ fontWeight: '700' }}
         description={allowed ? undefined : t('guide.notForYou')}
-        left={(props) => <List.Icon {...props} icon={section.icon} />}
+        left={(props) => <Icon3D name={section.icon3d} style={props.style} />}
         expanded={isOpen}
         onPress={onToggle}>
         <Card.Content style={{ gap: theme.app.spacing.sm }}>

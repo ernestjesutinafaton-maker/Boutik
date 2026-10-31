@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';

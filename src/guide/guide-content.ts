@@ -1,5 +1,7 @@
 import type { Href } from 'expo-router';
 
+import type { Icon3DName } from '@/components/icon-3d';
+
 import type { Permission } from '@/domain/permissions';
 
 /**
@@ -18,7 +20,8 @@ export type GuideButton = {
 export type GuideSection = {
   id: string;
   title: string;
-  icon: string;
+  /** L'icône 3D de la rubrique */
+  icon3d: Icon3DName;
   /** À quoi sert l'écran */
   intro: string;
   /** L'écran à ouvrir pour essayer (absent : pas de lien) */
@@ -32,7 +35,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'sell',
     title: 'Vendre',
-    icon: 'cart',
+    icon3d: 'cart',
     intro:
       'Le premier onglet : la caisse enregistreuse. On ajoute les produits au panier, puis on encaisse.',
     href: '/',
@@ -73,7 +76,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'sale',
     title: 'Une vente (facture)',
-    icon: 'receipt-text',
+    icon3d: 'receipt',
     intro: 'Ouvre une vente depuis « Ventes et factures du jour ».',
     href: '/sale',
     permission: 'sale.create',
@@ -108,7 +111,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'products',
     title: 'Produits et stock',
-    icon: 'package-variant',
+    icon3d: 'package',
     intro:
       'Tous les produits, avec leur stock. Les puces rouges ou orange signalent une rupture, un stock bas ou un stock à vérifier.',
     href: '/products',
@@ -148,7 +151,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'inventory',
     title: 'Inventaire',
-    icon: 'clipboard-list',
+    icon3d: 'clipboard',
     intro:
       'Le compteur compte sans voir le stock calculé (pour un comptage honnête). Le responsable valide ensuite.',
     href: '/inventory',
@@ -184,7 +187,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'customers',
     title: 'Clients et crédit',
-    icon: 'account-group',
+    icon3d: 'ledger',
     intro: 'Le carnet de crédit : qui doit combien, et depuis quand.',
     href: '/customers',
     buttons: [
@@ -218,7 +221,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'cash',
     title: 'Caisse du jour',
-    icon: 'cash-register',
+    icon3d: 'coin',
     intro: 'L’argent du jour : ce qui entre, ce qui sort, et le compte du soir.',
     href: '/cash',
     permission: 'cash.session',
@@ -243,7 +246,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'dashboard',
     title: 'Tableau de bord',
-    icon: 'view-dashboard',
+    icon3d: 'chart-increasing',
     intro:
       'Le résumé : ventes du jour, de la semaine, du mois, bénéfice, dettes et alertes. Chaque rôle voit ce qui le concerne.',
     href: '/dashboard',
@@ -263,7 +266,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'reports',
     title: 'Rapports et comptes',
-    icon: 'archive-clock',
+    icon3d: 'bar-chart',
     intro: 'Les fiches des journées clôturées et des comptes, et les rapports à télécharger.',
     href: '/report',
     permission: 'reports.account',
@@ -283,7 +286,7 @@ export const GUIDE: GuideSection[] = [
   {
     id: 'team',
     title: 'Équipe et réglages',
-    icon: 'account-key',
+    icon3d: 'team',
     intro: 'Réservé au propriétaire.',
     href: '/team',
     permission: 'team.manage',

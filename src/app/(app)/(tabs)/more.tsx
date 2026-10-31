@@ -2,13 +2,15 @@ import Constants from 'expo-constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet } from 'react-native';
-import { Button, Card, Dialog, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
+import { Button, Dialog, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
 
 import { usePowerSync } from '@powersync/react';
 import { router } from 'expo-router';
 
+import { Card } from '@/components/card';
 import { useAuth } from '@/auth/auth-provider';
 import { BigButton } from '@/components/big-button';
+import { Icon3D } from '@/components/icon-3d';
 import { Screen } from '@/components/screen';
 import { deviceName } from '@/device/device';
 import { useOutbox } from '@/invoices/outbox';
@@ -52,7 +54,11 @@ export default function MoreScreen() {
   return (
     <Screen title={t('nav.more')}>
       <Card mode="outlined">
-        <Card.Title title={t('account.title')} titleVariant="titleLarge" />
+        <Card.Title
+          title={t('account.title')}
+          titleVariant="titleLarge"
+          left={() => <Icon3D name="locked" size={36} />}
+        />
         <Card.Content style={{ gap: theme.app.spacing.sm }}>
           <Text variant="bodyLarge">{session?.user.email}</Text>
           {shop ? (
@@ -78,7 +84,7 @@ export default function MoreScreen() {
               title={t('cash.title')}
               titleStyle={{ fontWeight: '700' }}
               description={t('more.cashHelp')}
-              left={(props) => <List.Icon {...props} icon="cash-register" />}
+              left={(props) => <Icon3D name="coin" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/cash')}
             />
@@ -88,7 +94,7 @@ export default function MoreScreen() {
               title={t('report.archivesTitle')}
               titleStyle={{ fontWeight: '700' }}
               description={t('more.reportsHelp')}
-              left={(props) => <List.Icon {...props} icon="archive-clock" />}
+              left={(props) => <Icon3D name="bar-chart" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/report')}
             />
@@ -101,7 +107,7 @@ export default function MoreScreen() {
           title={t('history.title')}
           titleStyle={{ fontWeight: '700' }}
           description={t('more.salesHelp')}
-          left={(props) => <List.Icon {...props} icon="receipt-text" />}
+          left={(props) => <Icon3D name="receipt" style={props.style} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => router.push('/sale')}
         />
@@ -109,7 +115,7 @@ export default function MoreScreen() {
           title={t('printer.title')}
           titleStyle={{ fontWeight: '700' }}
           description={t('more.printerHelp')}
-          left={(props) => <List.Icon {...props} icon="printer-pos" />}
+          left={(props) => <Icon3D name="printer" style={props.style} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => router.push('/printer')}
         />
@@ -117,9 +123,7 @@ export default function MoreScreen() {
           <List.Item
             title={t('history.outbox', { count: outbox.length })}
             titleStyle={{ fontWeight: '700', color: theme.app.colors.accent }}
-            left={(props) => (
-              <List.Icon {...props} icon="send-clock" color={theme.app.colors.accent} />
-            )}
+            left={(props) => <Icon3D name="outbox" style={props.style} />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/sale/outbox')}
           />
@@ -133,7 +137,7 @@ export default function MoreScreen() {
               title={t('subscription.title')}
               titleStyle={{ fontWeight: '700' }}
               description={t('subscription.menuHelp')}
-              left={(props) => <List.Icon {...props} icon="crown" />}
+              left={(props) => <Icon3D name="crown" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/subscription')}
             />
@@ -143,7 +147,7 @@ export default function MoreScreen() {
               title={t('subscription.adminMenu')}
               titleStyle={{ fontWeight: '700' }}
               description={t('subscription.adminTitle')}
-              left={(props) => <List.Icon {...props} icon="shield-crown" />}
+              left={(props) => <Icon3D name="shield" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/admin-payments')}
             />
@@ -153,7 +157,7 @@ export default function MoreScreen() {
               title={t('settings.title')}
               titleStyle={{ fontWeight: '700' }}
               description={t('settings.menuHelp')}
-              left={(props) => <List.Icon {...props} icon="store-cog" />}
+              left={(props) => <Icon3D name="gear" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/settings')}
             />
@@ -163,7 +167,7 @@ export default function MoreScreen() {
               title={t('audit.title')}
               titleStyle={{ fontWeight: '700' }}
               description={t('audit.menuHelp')}
-              left={(props) => <List.Icon {...props} icon="history" />}
+              left={(props) => <Icon3D name="scroll" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/history')}
             />
@@ -173,7 +177,7 @@ export default function MoreScreen() {
               title={t('export.title')}
               titleStyle={{ fontWeight: '700' }}
               description={t('export.menuHelp')}
-              left={(props) => <List.Icon {...props} icon="file-excel" />}
+              left={(props) => <Icon3D name="bookmark-tabs" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/export')}
             />
@@ -186,7 +190,7 @@ export default function MoreScreen() {
           title={t('guide.menu')}
           titleStyle={{ fontWeight: '700' }}
           description={t('guide.menuHelp')}
-          left={(props) => <List.Icon {...props} icon="help-circle" />}
+          left={(props) => <Icon3D name="light-bulb" style={props.style} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => router.push('/guide')}
         />
@@ -198,7 +202,7 @@ export default function MoreScreen() {
             title={t('demo.menu')}
             titleStyle={{ fontWeight: '700' }}
             description={t('demo.menuHelp')}
-            left={(props) => <List.Icon {...props} icon="store-plus" />}
+            left={(props) => <Icon3D name="store" style={props.style} />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/demo')}
           />
@@ -211,7 +215,7 @@ export default function MoreScreen() {
             title={t('more.users')}
             titleStyle={{ fontWeight: '700' }}
             description={t('more.usersHelp')}
-            left={(props) => <List.Icon {...props} icon="account-key" />}
+            left={(props) => <Icon3D name="team" style={props.style} />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/team')}
           />

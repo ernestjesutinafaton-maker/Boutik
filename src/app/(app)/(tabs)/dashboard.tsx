@@ -2,9 +2,12 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Card, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
+import { Divider, List, SegmentedButtons, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
+import { HeroCard } from '@/components/hero-card';
+import { Icon3D, type Icon3DName } from '@/components/icon-3d';
 import { MoneyText } from '@/components/money-text';
 import { Screen } from '@/components/screen';
 import { StatusChip } from '@/components/status-chip';
@@ -95,26 +98,28 @@ export default function DashboardScreen() {
         <Text variant="bodyLarge">{isLoading ? t('dashboard.loading') : ''}</Text>
       ) : (
         <>
+          <HeroCard
+            label={t('report.revenue')}
+            amount={report.sales.revenue}
+            currency={currency}
+            icon="chart-increasing"
+            details={[
+              { label: t('dashboard.salesCount'), value: String(report.sales.count) },
+              {
+                label: t('dashboard.cashedIn'),
+                value: formatMoney(report.payments.total, currency),
+              },
+            ]}
+          />
           <View style={[styles.tiles, { gap: spacing.sm }]}>
-            <Tile label={t('report.revenue')} amount={report.sales.revenue} currency={currency} />
-            <Tile
-              label={t('dashboard.salesCount')}
-              value={String(report.sales.count)}
-              currency={currency}
-            />
             {can('reports.profit') ? (
               <Tile
                 label={t('report.netProfit')}
                 amount={report.netProfit}
                 currency={currency}
-                tone={report.netProfit < 0 ? 'danger' : 'primary'}
+                tone={report.netProfit < 0 ? 'danger' : 'success'}
               />
             ) : null}
-            <Tile
-              label={t('dashboard.cashedIn')}
-              amount={report.payments.total}
-              currency={currency}
-            />
             <Tile
               label={t('report.expensesTotal')}
               amount={report.expenses.total}
@@ -141,7 +146,11 @@ export default function DashboardScreen() {
 
           {data ? (
             <Card mode="outlined">
-              <Card.Title title={t('dashboard.chartTitle')} titleVariant="titleLarge" />
+              <Card.Title
+                title={t('dashboard.chartTitle')}
+                titleVariant="titleLarge"
+                left={() => <TitleIcon name="bar-chart" />}
+              />
               <Card.Content>
                 <SalesChart series={data.series} currency={currency} />
               </Card.Content>
@@ -149,7 +158,11 @@ export default function DashboardScreen() {
           ) : null}
 
           <Card mode="outlined">
-            <Card.Title title={t('dashboard.alerts')} titleVariant="titleLarge" />
+            <Card.Title
+              title={t('dashboard.alerts')}
+              titleVariant="titleLarge"
+              left={() => <TitleIcon name="warning" />}
+            />
             <Card.Content style={[styles.wrap, { gap: spacing.sm }]}>
               <StatusChip
                 tone={expired > 0 ? 'danger' : 'ok'}
@@ -175,7 +188,11 @@ export default function DashboardScreen() {
           </Card>
 
           <Card mode="outlined">
-            <Card.Title title={t('report.sections.topProducts')} titleVariant="titleLarge" />
+            <Card.Title
+              title={t('report.sections.topProducts')}
+              titleVariant="titleLarge"
+              left={() => <TitleIcon name="cart" />}
+            />
             <Card.Content style={{ gap: spacing.xs }}>
               {report.topProducts.length === 0 ? (
                 <Text variant="bodyLarge">{t('dashboard.noSales')}</Text>
@@ -196,6 +213,7 @@ export default function DashboardScreen() {
                 title={t('dashboard.sleeping')}
                 subtitle={t('dashboard.sleepingHelp')}
                 titleVariant="titleLarge"
+                left={() => <TitleIcon name="hourglass" />}
               />
               <Card.Content style={{ gap: spacing.xs }}>
                 {data.sleeping.slice(0, 8).map((product) => (
@@ -214,7 +232,11 @@ export default function DashboardScreen() {
           ) : null}
 
           <Card mode="outlined">
-            <Card.Title title={t('report.sections.debtors')} titleVariant="titleLarge" />
+            <Card.Title
+              title={t('report.sections.debtors')}
+              titleVariant="titleLarge"
+              left={() => <TitleIcon name="ledger" />}
+            />
             <Card.Content style={{ gap: spacing.xs }}>
               {report.debtors.length === 0 ? (
                 <Text variant="bodyLarge">{t('report.noDebtors')}</Text>
@@ -243,7 +265,7 @@ export default function DashboardScreen() {
             title={t('cash.title')}
             titleStyle={styles.bold}
             description={t('more.cashHelp')}
-            left={(props) => <List.Icon {...props} icon="cash-register" />}
+            left={(props) => <Icon3D name="coin" style={props.style} />}
             right={(props) => <List.Icon {...props} icon="chevron-right" />}
             onPress={() => router.push('/cash')}
           />
@@ -253,7 +275,7 @@ export default function DashboardScreen() {
           title={t('report.archivesTitle')}
           titleStyle={styles.bold}
           description={t('more.reportsHelp')}
-          left={(props) => <List.Icon {...props} icon="archive-clock" />}
+          left={(props) => <Icon3D name="bar-chart" style={props.style} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" />}
           onPress={() => router.push('/report')}
         />
@@ -268,7 +290,7 @@ function Tile(props: {
   amount?: number;
   value?: string;
   currency: CurrencyCode;
-  tone?: 'default' | 'primary' | 'danger';
+  tone?: 'default' | 'primary' | 'success' | 'danger';
 }) {
   const theme = useAppTheme();
   return (
@@ -292,6 +314,11 @@ function Tile(props: {
       </Card.Content>
     </Card>
   );
+}
+
+/** L'icône 3D d'un titre de carte. */
+function TitleIcon({ name }: { name: Icon3DName }) {
+  return <Icon3D name={name} size={36} />;
 }
 
 function Row({ label, value, danger }: { label: string; value: string; danger?: boolean }) {

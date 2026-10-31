@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
-import { Card, Divider, Text } from 'react-native-paper';
+import { Divider, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { MoneyText } from '@/components/money-text';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
 import { formatQuantity } from '@/domain/quantity';

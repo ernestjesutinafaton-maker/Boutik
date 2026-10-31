@@ -5,7 +5,8 @@ import { createContext, type ReactNode, useContext, useEffect, useState } from '
 import { useColorScheme } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
 
-import { darkTheme, lightTheme } from './paper-theme';
+import { darkBrandTheme, darkTheme, lightBrandTheme, lightTheme } from './paper-theme';
+import { fontFamily } from './tokens';
 
 /** Choix de l'utilisateur : clair (par défaut), sombre, ou comme le réglage du téléphone. */
 export type ThemePreference = 'light' | 'dark' | 'system';
@@ -27,8 +28,15 @@ function isThemePreference(value: unknown): value is ThemePreference {
 /**
  * Applique le thème clair ou sombre à toute l'application
  * et se souvient du choix de l'utilisateur, même hors ligne.
+ * brandFont : la police Nunito est chargée (sinon, la police du téléphone en attendant).
  */
-export function ThemePreferenceProvider({ children }: { children: ReactNode }) {
+export function ThemePreferenceProvider({
+  brandFont = false,
+  children,
+}: {
+  brandFont?: boolean;
+  children: ReactNode;
+}) {
   const systemScheme = useColorScheme();
   // Thème clair par défaut : lisible en plein soleil
   const [preference, setPreferenceState] = useState<ThemePreference>('light');
@@ -54,12 +62,27 @@ export function ThemePreferenceProvider({ children }: { children: ReactNode }) {
   }
 
   const isDark = preference === 'dark' || (preference === 'system' && systemScheme === 'dark');
-  const paperTheme = isDark ? darkTheme : lightTheme;
+  const paperTheme = brandFont
+    ? isDark
+      ? darkBrandTheme
+      : lightBrandTheme
+    : isDark
+      ? darkTheme
+      : lightTheme;
 
   // Les mêmes couleurs pour la navigation d'Expo Router (fond derrière les écrans…)
   const baseNavigationTheme = isDark ? DarkTheme : DefaultTheme;
   const navigationTheme = {
     ...baseNavigationTheme,
+    // Les titres des barres du haut avec la police de l'application
+    fonts: brandFont
+      ? {
+          regular: { fontFamily: fontFamily.brand, fontWeight: '500' as const },
+          medium: { fontFamily: fontFamily.brand, fontWeight: '700' as const },
+          bold: { fontFamily: fontFamily.brand, fontWeight: '800' as const },
+          heavy: { fontFamily: fontFamily.brand, fontWeight: '800' as const },
+        }
+      : baseNavigationTheme.fonts,
     colors: {
       ...baseNavigationTheme.colors,
       primary: paperTheme.app.colors.primary,

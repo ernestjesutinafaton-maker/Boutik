@@ -3,17 +3,9 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import {
-  Button,
-  Card,
-  Dialog,
-  Divider,
-  List,
-  Portal,
-  SegmentedButtons,
-  Text,
-} from 'react-native-paper';
+import { Button, Dialog, Divider, List, Portal, SegmentedButtons, Text } from 'react-native-paper';
 
+import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
