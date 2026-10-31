@@ -35,7 +35,11 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
 
 ### Site et version web
 - [x] Adresse choisie par Ernest (26/10/2026) : **https://boutik-services.vercel.app** (hébergement Vercel, réglages dans `public/vercel.json`, publication avec `npm run deploy:web`).
-- [ ] Publier `dist/` (après `npm run build:web`) ; vérifier l'installation sur Android, iPhone et ordinateur.
+- [x] Site et appli web publiés le 31/10/2026 (`npm run deploy:web`) ; aucune page ne déborde de 320 à 1 280 px.
+- [ ] Vérifier l'installation sur Android, iPhone et ordinateur.
+- [ ] Avant de vendre des abonnements : passer Vercel à l'offre **Pro** (payante) ou changer d'hébergeur.
+      L'offre gratuite « Hobby » est réservée à un usage personnel non commercial ; un site qui
+      présente un service payant est un usage commercial (règles d'usage de Vercel, « Commercial usage »).
 
 ### Essais en boutique
 - [ ] Une semaine d'essai dans une vraie boutique : ventes, crédit, clôtures, inventaire, coupures de réseau.
