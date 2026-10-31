@@ -5,6 +5,7 @@ import {
   formatMixedStock,
   formatQuantity,
   formatQuantityWithUnit,
+  pluralUnit,
   lineAmount,
   mulDiv,
   parseQuantity,
@@ -125,7 +126,31 @@ describe('Afficher le stock de façon lisible', () => {
   });
 
   it('sans conditionnement, ou stock négatif : dans l’unité de base', () => {
-    expect(formatMixedStock(12_000, 'boîte', [])).toBe(nbsp('12 boîte'));
+    expect(formatMixedStock(12_000, 'boîte', [])).toBe(nbsp('12 boîtes'));
     expect(formatMixedStock(-3000, 'kg', [SAC_50])).toBe(nbsp('-3 kg'));
+  });
+});
+
+describe('Pluriel des unités (à partir de 2, comme en français)', () => {
+  it('les noms prennent un s (ou un x), les symboles ne changent pas', () => {
+    expect(pluralUnit('sac', 3000)).toBe('sacs');
+    expect(pluralUnit('pièce', 10_000)).toBe('pièces');
+    expect(pluralUnit('rouleau', 2000)).toBe('rouleaux');
+    expect(pluralUnit('mètre', 2500)).toBe('mètres');
+    expect(pluralUnit('kg', 5000)).toBe('kg');
+    expect(pluralUnit('L', 5000)).toBe('L');
+    expect(pluralUnit('tas', 5000)).toBe('tas');
+  });
+
+  it('au singulier sous 2 (1 ; 1,5) et pour les pertes, selon la quantité', () => {
+    expect(pluralUnit('sac', 1000)).toBe('sac');
+    expect(pluralUnit('litre', 1500)).toBe('litre');
+    expect(pluralUnit('sac', -2000)).toBe('sacs');
+  });
+
+  it('un conditionnement : seul le premier mot change', () => {
+    expect(pluralUnit('sac 50 kg', 3000)).toBe('sacs 50 kg');
+    expect(pluralUnit('Palette 40 sacs', 2000)).toBe('Palettes 40 sacs');
+    expect(formatQuantityWithUnit(3000, 'sac')).toBe(`3${NBSP}sacs`);
   });
 });

@@ -63,7 +63,7 @@ export const frSettings = {
     menuHelp: 'Coordonnées, factures, remises, péremption, modes de paiement',
     shop: 'La boutique',
     phone: 'Téléphone de la boutique',
-    address: 'Adresse (ex. Carrefour Saint-Michel, Cotonou)',
+    address: 'Adresse (quartier, ville)',
     countryCurrency: 'Pays : {{country}} · Monnaie : {{currency}}',
     invoices: 'Factures',
     invoiceFooter: 'Mention en bas des factures',

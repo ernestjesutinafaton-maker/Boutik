@@ -62,9 +62,29 @@ export function formatQuantity(milli: number): string {
   return `${sign}${grouped}${decimals ? `,${decimals}` : ''}`;
 }
 
-/** Quantité suivie de son unité : 2500 et « kg » → « 2,5 kg ». */
+/**
+ * Le nom d'une unité, au pluriel à partir de 2 (comme en français) : « 3 sacs », « 10 pièces »,
+ * « 2 rouleaux ». Les symboles (kg, m, L…) ne changent pas, et seul le premier mot d'un
+ * conditionnement prend la marque du pluriel (« 2 sacs 50 kg »).
+ */
+export function pluralUnit(unitName: string, milli: number): string {
+  if (Math.abs(milli) < 2 * MILLI) {
+    return unitName;
+  }
+  const match = /^(\p{L}+)(.*)$/u.exec(unitName);
+  if (!match) {
+    return unitName;
+  }
+  const [, word, rest] = match;
+  if (word.length < 3 || /[sxz]$/i.test(word) || word === word.toUpperCase()) {
+    return unitName;
+  }
+  return `${word}${/(eau|eu)$/i.test(word) ? 'x' : 's'}${rest}`;
+}
+
+/** Quantité suivie de son unité : 2500 et « kg » → « 2,5 kg » ; 3000 et « sac » → « 3 sacs ». */
 export function formatQuantityWithUnit(milli: number, unitName: string): string {
-  return `${formatQuantity(milli)}${NBSP}${unitName}`;
+  return `${formatQuantity(milli)}${NBSP}${pluralUnit(unitName, milli)}`;
 }
 
 /**

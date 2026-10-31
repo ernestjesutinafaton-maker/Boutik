@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { balanceOf, debtAging, type LedgerEntry } from './credit';
-import { normalizePhone, whatsappLink } from './phone';
+import { formatPhone, normalizePhone, whatsappLink } from './phone';
 
 const TODAY = '2026-10-25';
 
@@ -101,5 +101,18 @@ describe('Téléphone et WhatsApp', () => {
     expect(whatsappLink('+2290197000000', 'Bonjour Awa, 5 000 FCFA')).toBe(
       'https://wa.me/2290197000000?text=Bonjour%20Awa%2C%205%20000%20FCFA'
     );
+  });
+});
+
+describe('Numéro de téléphone lisible', () => {
+  it('indicatif puis groupes de 2 chiffres', () => {
+    expect(formatPhone('+2290197000001')).toBe('+229 01 97 00 00 01');
+    expect(formatPhone('+22890123456')).toBe('+228 90 12 34 56');
+  });
+
+  it('tout autre format reste tel quel', () => {
+    expect(formatPhone('0197000001')).toBe('0197000001');
+    expect(formatPhone('+221771234567')).toBe('+221771234567');
+    expect(formatPhone('+33612345678')).toBe('+33612345678');
   });
 });

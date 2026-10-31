@@ -24,6 +24,7 @@ import { newId } from '@/data/ids';
 import { formatMoney } from '@/domain/money';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
+import { MILLI, pluralUnit } from '@/domain/quantity';
 import { useAppTheme } from '@/theme/paper-theme';
 
 import { createCategory } from './product-actions';
@@ -84,6 +85,8 @@ export function ProductForm(props: ProductFormProps) {
   const [photoError, setPhotoError] = useState<string | null>(null);
 
   const unitName = values.baseUnit.trim() || t('productForm.baseUnitFallback');
+  // « Indique combien de pièces… » : le nom au pluriel
+  const unitPlural = pluralUnit(unitName, 2 * MILLI);
 
   function updatePackaging(key: string, changes: Partial<PackagingInput>) {
     onChange({
@@ -277,7 +280,7 @@ export function ProductForm(props: ProductFormProps) {
 
           <Text variant="titleMedium">{t('productForm.packagingsTitle')}</Text>
           <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-            {t('productForm.packagingsHelp', { unit: unitName })}
+            {t('productForm.packagingsHelp', { unit: unitPlural })}
           </Text>
 
           {values.packagings.map((packaging) => {
@@ -317,7 +320,7 @@ export function ProductForm(props: ProductFormProps) {
                   />
                 </View>
                 <TextField
-                  label={t('productForm.packagingContains', { unit: unitName })}
+                  label={t('productForm.packagingContains', { unit: unitPlural })}
                   value={packaging.contains}
                   onChangeText={(contains) => updatePackaging(packaging.key, { contains })}
                   keyboardType="numeric"

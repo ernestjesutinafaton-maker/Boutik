@@ -4,7 +4,7 @@ export const frSales = {
     description:
       'Vendre en quelques touches : chercher ou scanner un produit, remplir le panier, encaisser.',
     forbidden: 'Ton rôle ne permet pas de vendre. Demande au propriétaire.',
-    search: 'Chercher ou scanner un produit',
+    search: 'Chercher ou scanner',
     allProducts: 'Tous les produits',
     noPrice: '« {{name}} » n’a pas de prix de vente : il ne peut pas être vendu.',
     unknownBarcode: 'Code-barres inconnu : {{code}}.',

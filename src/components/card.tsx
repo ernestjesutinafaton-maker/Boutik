@@ -37,8 +37,13 @@ function AppCard({ style, mode: _mode, ...rest }: CardProps) {
   );
 }
 
+/** Le titre d'une carte : jusqu'à 2 lignes (le sous-titre 3), plutôt que coupé par « … ». */
+function CardTitle(props: ComponentProps<typeof PaperCard.Title>) {
+  return <PaperCard.Title titleNumberOfLines={2} subtitleNumberOfLines={3} {...props} />;
+}
+
 export const Card = Object.assign(AppCard, {
-  Title: PaperCard.Title,
+  Title: CardTitle,
   Content: PaperCard.Content,
   Actions: PaperCard.Actions,
   Cover: PaperCard.Cover,

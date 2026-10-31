@@ -104,7 +104,7 @@ export default function DashboardScreen() {
             currency={currency}
             icon="chart-increasing"
             details={[
-              { label: t('dashboard.salesCount'), value: String(report.sales.count) },
+              { label: t('dashboard.salesShort'), value: String(report.sales.count) },
               {
                 label: t('dashboard.cashedIn'),
                 value: formatMoney(report.payments.total, currency),
@@ -132,7 +132,7 @@ export default function DashboardScreen() {
               tone={report.totalDebt > 0 ? 'danger' : 'default'}
             />
             <Tile
-              label={t('report.stockValue')}
+              label={t('dashboard.stockValue')}
               amount={report.stock.valueAtEnd}
               currency={currency}
             />

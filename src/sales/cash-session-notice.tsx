@@ -1,7 +1,6 @@
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'react-native-paper';
-
+import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { useShop } from '@/shop/shop-provider';
@@ -34,9 +33,9 @@ export function CashSessionNotice() {
           message={can('cash.session') ? t('cash.notOpen') : t('cash.notOpenAskCashier')}
         />
         {can('cash.session') ? (
-          <Button mode="contained" icon="lock-open-variant" onPress={() => router.push('/cash')}>
+          <BigButton icon="lock-open-variant" onPress={() => router.push('/cash')}>
             {t('cash.open')}
-          </Button>
+          </BigButton>
         ) : null}
       </Card.Content>
     </Card>

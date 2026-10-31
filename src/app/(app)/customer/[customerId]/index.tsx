@@ -19,6 +19,7 @@ import { debtAging } from '@/domain/credit';
 import { canSeeCustomers } from '@/domain/permissions';
 import { formatDay, formatMoment, today } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
+import { formatPhone } from '@/domain/phone';
 import { openWhatsApp } from '@/invoices/invoice-actions';
 import { addToOutbox } from '@/invoices/outbox';
 import { reminderText } from '@/invoices/receipt';
@@ -108,7 +109,7 @@ export default function CustomerScreen() {
           <Text variant="titleLarge" style={styles.bold}>
             {customer.name}
           </Text>
-          {customer.phone ? <Text variant="bodyLarge">{customer.phone}</Text> : null}
+          {customer.phone ? <Text variant="bodyLarge">{formatPhone(customer.phone)}</Text> : null}
           {customer.notes ? (
             <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
               {customer.notes}

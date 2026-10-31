@@ -17,6 +17,7 @@ import { type AgingBucket, debtAging } from '@/domain/credit';
 import { Notice } from '@/components/notice';
 import { canSeeCustomers } from '@/domain/permissions';
 import { today } from '@/domain/dates';
+import { formatPhone } from '@/domain/phone';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -146,7 +147,7 @@ export default function CustomersScreen() {
               <View style={{ gap: spacing.xs, marginTop: 2 }}>
                 {customer.phone ? (
                   <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                    {customer.phone}
+                    {formatPhone(customer.phone)}
                   </Text>
                 ) : null}
                 <AgingChip aging={aging} />

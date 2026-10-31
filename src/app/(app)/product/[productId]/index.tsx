@@ -18,6 +18,7 @@ import {
   formatMixedStock,
   formatQuantity,
   formatQuantityWithUnit,
+  pluralUnit,
 } from '@/domain/quantity';
 import { formatDay, formatMoment, today } from '@/domain/dates';
 import { isExpired } from '@/domain/stock';
@@ -152,14 +153,14 @@ export default function ProductScreen() {
                 ? t('products.baseUnit')
                 : t('products.contains', {
                     quantity: formatQuantity(unit.factor),
-                    unit: product.baseUnit,
+                    unit: pluralUnit(product.baseUnit, unit.factor),
                   }),
               // Prix d'achat et bénéfice : seulement pour qui voit les coûts
               marginLine(unit.id),
             ]
               .filter(Boolean)
               .join('\n')}
-            descriptionNumberOfLines={2}
+            descriptionNumberOfLines={4}
             right={() => (
               <Text
                 variant="titleMedium"

@@ -26,6 +26,8 @@ export const frDashboard = {
     month: '30 jours',
     loading: 'Calcul en cours…',
     salesCount: 'Nombre de ventes',
+    salesShort: 'Ventes',
+    stockValue: 'Valeur du stock',
     cashedIn: 'Argent encaissé',
     debts: 'Dettes des clients',
     cashDifferences: 'Écarts de caisse',
