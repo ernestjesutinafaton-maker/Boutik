@@ -46,7 +46,7 @@ const contact = [
   config.whatsapp &&
     `<a class="btn btn-primary btn-lg" href="https://wa.me/${config.whatsapp.replace(/\D/g, '')}">💬 WhatsApp</a>`,
   config.contactEmail &&
-    `<a class="btn btn-ghost btn-lg" href="mailto:${config.contactEmail}">✉️ ${config.contactEmail}</a>`,
+    `<a class="btn btn-ghost btn-lg" href="mailto:${config.contactEmail}">✉️ ${config.contactEmail.replace('@', '@<wbr>')}</a>`,
 ]
   .filter(Boolean)
   .join('\n');
