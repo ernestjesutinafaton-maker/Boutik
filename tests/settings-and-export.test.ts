@@ -8,6 +8,8 @@ vi.mock('@/shop/shop-provider', () => ({ useShop: () => ({ shop: null, device: n
 const { loadDemoData } = await import('@/demo/load-demo');
 const { buildExport } = await import('@/export/datasets');
 const { toCsv } = await import('@/export/csv');
+const { tableHtml } = await import('@/reports/table-html');
+const { startInventory, saveCount, validateInventory } = await import('@/stock/inventory');
 const { addPaymentMethod, updatePaymentMethod, updateShopSettings } =
   await import('@/shop/settings-actions');
 const { today, dayRange, addDays } = await import('@/domain/dates');
@@ -117,5 +119,56 @@ describe('Export Excel / CSV', () => {
     const rice = table.rows.find((row) => row[0] === 'Riz parfumé');
     expect(rice?.[2]).toBe('kg');
     expect(Number(String(rice?.[6]))).toBeGreaterThan(0);
+  });
+
+  it('inventaire : attendu, compté, écart et sa valeur ; aussi en page PDF', async () => {
+    const rice = await db.get<{ id: string; stock: number }>(
+      `SELECT p.id, COALESCE(SUM(m.quantity), 0) AS stock FROM products p
+         LEFT JOIN stock_movements m ON m.product_id = p.id
+        WHERE p.name = 'Riz parfumé' GROUP BY p.id`
+    );
+    const countId = await startInventory(db, context, 'Comptage de fin de mois');
+    // Il manque 2 kg dans le rayon
+    await saveCount(db, context, {
+      countId,
+      productId: rice.id,
+      countedQuantity: rice.stock - 2000,
+    });
+    await validateInventory(db, context, countId);
+
+    const forCount = await buildExport(db, {
+      kind: 'inventory',
+      shopId: SHOP,
+      currency: 'XOF',
+      range,
+      today: today(),
+      countId,
+    });
+    expect(forCount.rows).toHaveLength(1);
+    const [row] = forCount.rows;
+    expect(row).toHaveLength(forCount.headers.length);
+    expect(row.slice(1, 3)).toEqual(['Comptage de fin de mois', 'Riz parfumé']);
+    expect(row[6]).toBe('-2');
+    expect(Number(String(row[7]))).toBeLessThan(0);
+
+    // Sans comptage précis : les inventaires validés de la période
+    const forPeriod = await buildExport(db, {
+      kind: 'inventory',
+      shopId: SHOP,
+      currency: 'XOF',
+      range,
+      today: today(),
+    });
+    expect(forPeriod.rows.some((line) => line[2] === 'Riz parfumé')).toBe(true);
+
+    const html = tableHtml({
+      table: forCount,
+      title: 'Inventaire',
+      shopName: 'Chez <Maman>',
+      subtitle: 'Validé',
+    });
+    expect(html).toContain('Chez &lt;Maman&gt;');
+    expect(html).toContain('<td class="num">-2</td>');
+    expect(html).toContain('1 ligne');
   });
 });

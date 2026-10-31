@@ -7,7 +7,8 @@ import type { Reader } from '@/stock/stock-data';
 import { type CsvCell, moneyCell, quantityCell } from './csv';
 
 /** Les tableaux qu'on peut exporter vers Excel. */
-export type ExportKind = 'products' | 'sales' | 'saleLines' | 'customers' | 'expenses';
+export type ExportKind =
+  'products' | 'sales' | 'saleLines' | 'customers' | 'expenses' | 'inventory';
 
 export type ExportTable = { headers: string[]; rows: CsvCell[][] };
 
@@ -38,6 +39,8 @@ export async function buildExport(
     currency: CurrencyCode;
     range: { start: string; end: string };
     today: string;
+    /** Inventaire : un seul comptage (sinon, les inventaires validés de la période) */
+    countId?: string;
   }
 ): Promise<ExportTable> {
   const money = (amount: number) => moneyCell(amount, input.currency);
@@ -276,6 +279,69 @@ export async function buildExport(
           row.note,
           row.member,
         ]),
+      };
+    }
+
+    case 'inventory': {
+      // Le dernier comptage de chaque produit ; le coût vient du dernier lot reçu
+      const filter = input.countId
+        ? 'c.id = ?'
+        : "c.status = 'validated' AND c.validated_at >= ? AND c.validated_at < ?";
+      const rows = await reader.getAll<{
+        started_at: string;
+        notes: string | null;
+        status: string;
+        name: string;
+        base_unit: string;
+        expected_quantity: number;
+        counted_quantity: number;
+        cost_price: number | null;
+        cost_quantity: number | null;
+      }>(
+        `SELECT c.started_at, c.notes, c.status, p.name, p.base_unit,
+                l.expected_quantity, l.counted_quantity, lot.cost_price, lot.cost_quantity
+           FROM inventory_lines l
+           JOIN inventory_counts c ON c.id = l.inventory_count_id
+           JOIN products p ON p.id = l.product_id
+           LEFT JOIN stock_lots lot ON lot.id = (
+             SELECT x.id FROM stock_lots x WHERE x.product_id = p.id
+              ORDER BY x.received_at DESC LIMIT 1)
+          WHERE c.shop_id = ? AND ${filter}
+            AND l.updated_at = (SELECT MAX(o.updated_at) FROM inventory_lines o
+                                 WHERE o.inventory_count_id = l.inventory_count_id
+                                   AND o.product_id = l.product_id)
+          ORDER BY c.started_at, p.name COLLATE NOCASE`,
+        input.countId ? [shopId, input.countId] : [shopId, range.start, range.end]
+      );
+      return {
+        headers: [
+          'Date',
+          'Inventaire',
+          'Produit',
+          'Unité de base',
+          'Stock attendu',
+          'Compté',
+          'Écart',
+          'Valeur de l’écart (prix d’achat)',
+        ],
+        rows: rows.map((row) => {
+          const difference = row.counted_quantity - row.expected_quantity;
+          const value =
+            row.cost_price !== null && row.cost_quantity
+              ? Math.sign(difference) *
+                costForQuantity(row.cost_price, row.cost_quantity, Math.abs(difference))
+              : null;
+          return [
+            formatDay(dayOfMoment(row.started_at)),
+            row.notes ?? (row.status === 'draft' ? 'En cours' : null),
+            row.name,
+            row.base_unit,
+            quantityCell(row.expected_quantity),
+            quantityCell(row.counted_quantity),
+            quantityCell(difference),
+            value === null ? null : money(value),
+          ];
+        }),
       };
     }
   }

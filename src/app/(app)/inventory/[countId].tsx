@@ -20,9 +20,14 @@ import {
   searchProducts,
   sortUnits,
 } from '@/domain/catalog';
-import { formatMoment } from '@/domain/dates';
+import { formatMoment, today } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
 import { formatMixedStock, parseUnitQuantity } from '@/domain/quantity';
+import { csvFileName, toCsv } from '@/export/csv';
+import { buildExport } from '@/export/datasets';
+import { shareTextFile } from '@/export/share-file';
+import { canSharePdf, printHtml, shareHtmlAsPdf } from '@/invoices/invoice-actions';
+import { tableHtml } from '@/reports/table-html';
 import { useCatalog } from '@/products/product-data';
 import { UnitQuantityField } from '@/products/unit-quantity-field';
 import { useShop } from '@/shop/shop-provider';
@@ -58,6 +63,7 @@ export default function InventoryCountScreen() {
   const [confirm, setConfirm] = useState<'validate' | 'cancel' | null>(null);
   const [result, setResult] = useState<number | null>(null);
   const [isWorking, setIsWorking] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
   // Le compteur compte « à l'aveugle » : seuls les responsables voient le stock calculé
   const showExpected = can('stock.adjust');
   const { spacing } = theme.app;
@@ -110,6 +116,48 @@ export default function InventoryCountScreen() {
     } finally {
       setConfirm(null);
       setIsWorking(false);
+    }
+  }
+
+  const title = count.notes || t('inventory.defaultName', { date: formatMoment(count.startedAt) });
+
+  /** Le rapport de ce comptage, en Excel ou en PDF (sans la valeur pour qui ne voit pas les coûts). */
+  async function handleDownload(format: 'csv' | 'pdf') {
+    if (!shop) return;
+    setDownloadError(null);
+    try {
+      const day = today();
+      const table = await buildExport(db, {
+        kind: 'inventory',
+        shopId: shop.id,
+        currency: shop.currencyCode,
+        range: { start: '', end: '' },
+        today: day,
+        countId,
+      });
+      if (!can('stock.view_costs')) {
+        table.headers = table.headers.slice(0, -1);
+        table.rows = table.rows.map((row) => row.slice(0, -1));
+      }
+      if (format === 'csv') {
+        const fileName = csvFileName(
+          shop.name,
+          `inventaire-${count?.startedAt.slice(0, 10) ?? day}`
+        );
+        await shareTextFile(fileName, toCsv(table.headers, table.rows), 'text/csv');
+        return;
+      }
+      const html = tableHtml({
+        table,
+        title,
+        shopName: shop.name,
+        subtitle: t(`inventory.status.${count?.status ?? 'draft'}`),
+      });
+      const landscape = { width: 842, height: 595 };
+      await (canSharePdf() ? shareHtmlAsPdf(html, title, landscape) : printHtml(html, landscape));
+    } catch (error) {
+      console.warn('Rapport d’inventaire impossible :', error);
+      setDownloadError(t('errors.unknown'));
     }
   }
 
@@ -177,6 +225,23 @@ export default function InventoryCountScreen() {
           </View>
         ))}
       </Card>
+
+      {showExpected && counted.length > 0 ? (
+        <Card mode="outlined">
+          <Card.Content style={{ gap: spacing.sm }}>
+            <Text variant="bodyLarge">{t('export.countHelp')}</Text>
+            <View style={[styles.row, { gap: spacing.sm }]}>
+              <Button mode="contained" icon="file-pdf-box" onPress={() => handleDownload('pdf')}>
+                {canSharePdf() ? t('export.buttonPdf') : t('export.buttonPrint')}
+              </Button>
+              <Button mode="outlined" icon="file-excel" onPress={() => handleDownload('csv')}>
+                {t('export.button')}
+              </Button>
+            </View>
+            {downloadError ? <Notice message={downloadError} /> : null}
+          </Card.Content>
+        </Card>
+      ) : null}
 
       {isDraft && can('stock.adjust') ? (
         <View style={{ gap: spacing.sm }}>

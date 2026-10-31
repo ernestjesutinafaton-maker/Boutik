@@ -11,12 +11,24 @@ import { addDays, dayRange, today } from '@/domain/dates';
 import { csvFileName, toCsv } from '@/export/csv';
 import { buildExport, type ExportKind } from '@/export/datasets';
 import { shareTextFile } from '@/export/share-file';
+import { canSharePdf, printHtml, shareHtmlAsPdf } from '@/invoices/invoice-actions';
+import { tableHtml } from '@/reports/table-html';
 import { useShopSettings } from '@/shop/shop-settings';
 import { useActiveMember } from '@/team/active-member-provider';
 import { LimitedNotice, useIsLimited } from '@/subscription/limited-notice';
 import { useAppTheme } from '@/theme/paper-theme';
 
-const KINDS: ExportKind[] = ['sales', 'saleLines', 'products', 'customers', 'expenses'];
+const KINDS: ExportKind[] = [
+  'sales',
+  'saleLines',
+  'products',
+  'inventory',
+  'customers',
+  'expenses',
+];
+
+/** A4 couché : les tableaux ont beaucoup de colonnes. */
+const LANDSCAPE = { width: 842, height: 595 };
 type Period = 'thisMonth' | 'lastMonth' | 'last30' | 'all';
 const PERIODS: Period[] = ['thisMonth', 'lastMonth', 'last30', 'all'];
 
@@ -43,7 +55,10 @@ function periodRange(period: Period, day: string): { start: string; end: string;
   }
 }
 
-/** Export Excel / CSV : ventes, lignes vendues, produits et stock, clients et dettes, dépenses. */
+/**
+ * Rapports téléchargeables, en Excel (CSV) ou en PDF : ventes, lignes vendues, produits et
+ * stock, inventaires, clients et dettes, dépenses.
+ */
 export default function ExportScreen() {
   const theme = useAppTheme();
   const { t } = useTranslation();
@@ -57,7 +72,7 @@ export default function ExportScreen() {
   const { spacing } = theme.app;
   const limited = useIsLimited();
   // Les produits et les clients sont exportés tels qu'ils sont aujourd'hui (pas de période)
-  const usesPeriod = kind === 'sales' || kind === 'saleLines' || kind === 'expenses';
+  const usesPeriod = kind !== 'products' && kind !== 'customers';
 
   if (!can('reports.account')) {
     return (
@@ -75,7 +90,7 @@ export default function ExportScreen() {
     );
   }
 
-  async function handleExport() {
+  async function handleExport(format: 'csv' | 'pdf') {
     if (!settings) return;
     setMessage(null);
     setIsWorking(true);
@@ -89,11 +104,23 @@ export default function ExportScreen() {
         range,
         today: day,
       });
-      const fileName = csvFileName(
-        settings.name,
-        `${t(`export.files.${kind}`)}-${usesPeriod ? range.label : day}`
-      );
-      await shareTextFile(fileName, toCsv(table.headers, table.rows), 'text/csv');
+      if (format === 'pdf') {
+        const html = tableHtml({
+          table,
+          title: t(`export.kinds.${kind}`),
+          shopName: settings.name,
+          subtitle: usesPeriod ? t(`export.periods.${period}`) : t('export.asOfToday'),
+        });
+        await (canSharePdf()
+          ? shareHtmlAsPdf(html, t(`export.kinds.${kind}`), LANDSCAPE)
+          : printHtml(html, LANDSCAPE));
+      } else {
+        const fileName = csvFileName(
+          settings.name,
+          `${t(`export.files.${kind}`)}-${usesPeriod ? range.label : day}`
+        );
+        await shareTextFile(fileName, toCsv(table.headers, table.rows), 'text/csv');
+      }
       setMessage({ text: t('export.done', { count: table.rows.length }), tone: 'info' });
     } catch (error) {
       console.warn('Export impossible :', error);
@@ -137,8 +164,19 @@ export default function ExportScreen() {
         </Card.Content>
       </Card>
       {message ? <Notice tone={message.tone} message={message.text} /> : null}
-      <BigButton icon="file-excel" onPress={handleExport} loading={isWorking} disabled={isWorking}>
+      <BigButton
+        icon="file-excel"
+        onPress={() => handleExport('csv')}
+        loading={isWorking}
+        disabled={isWorking}>
         {t('export.button')}
+      </BigButton>
+      <BigButton
+        icon="file-pdf-box"
+        variant="outline"
+        onPress={() => handleExport('pdf')}
+        disabled={isWorking}>
+        {canSharePdf() ? t('export.buttonPdf') : t('export.buttonPrint')}
       </BigButton>
     </Screen>
   );
