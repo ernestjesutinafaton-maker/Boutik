@@ -10,7 +10,7 @@
   },
   "version": "1.0.0",
   "downloads": {
-    "android": "/telecharger/boutik.apk",
+    "android": "https://github.com/ernestjesutinafaton-maker/Boutik-presentation/releases/latest/download/boutik.apk",
     "windows": "/telecharger/Boutik-setup.exe",
     "linux": "/telecharger/Boutik.AppImage"
   }

@@ -7,6 +7,7 @@ import {
   mkdirSync,
   readdirSync,
   readFileSync,
+  rmSync,
   writeFileSync,
 } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -111,11 +112,17 @@ writeFileSync(
   })
 );
 
-// Les fichiers à télécharger (APK, installateurs), s'ils ont été fabriqués (dossier downloads/, hors Git)
+// Les fichiers à télécharger que le site sert lui-même (liens « /telecharger/… » de config.json),
+// s'ils ont été fabriqués (dossier downloads/, hors Git). Les autres fichiers de downloads/ ne
+// sont PAS copiés : l'APK (plus de 100 Mo) est hébergé sur GitHub, car Vercel refuse un envoi
+// de plus de 100 Mo au total.
 const downloads = join(root, 'downloads');
-if (existsSync(downloads)) {
-  mkdirSync(join(dist, 'telecharger'), { recursive: true });
-  for (const file of readdirSync(downloads)) {
+rmSync(join(dist, 'telecharger'), { recursive: true, force: true });
+mkdirSync(join(dist, 'telecharger'), { recursive: true });
+for (const href of Object.values(config.downloads)) {
+  if (!href.startsWith('/telecharger/')) continue;
+  const file = decodeURIComponent(href.slice('/telecharger/'.length));
+  if (existsSync(join(downloads, file))) {
     copyFileSync(join(downloads, file), join(dist, 'telecharger', file));
   }
 }

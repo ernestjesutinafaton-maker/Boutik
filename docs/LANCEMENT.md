@@ -24,7 +24,11 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
 - [ ] Choisir l'identifiant définitif (`com.boutik.app`) : il ne pourra plus changer.
 - [ ] Garder précieusement la clé de signature (EAS la conserve ; en télécharger une copie de secours :
       `npx eas-cli@latest credentials`).
-- [ ] Fabriquer l'APK final, le mettre sur le site (`/boutik.apk`) et mettre à jour `public/version.json`.
+- [x] APK final fabriqué le 31/10/2026 (EAS, profil `production`, version 1.0.0) et publié sur GitHub :
+      dépôt public `Boutik-presentation` → « Releases » (le fichier, 131 Mo, dépasse la limite de 100 Mo
+      d'un envoi sur Vercel). Le site, l'appli web et `public/version.json` pointent vers
+      `…/releases/latest/download/boutik.apk`, qui donne toujours la dernière version. Pour une
+      nouvelle version : `gh release create vX.Y.Z downloads/boutik.apk --repo ernestjesutinafaton-maker/Boutik-presentation`.
 - [ ] Renseigner `EXPO_PUBLIC_VERSION_URL` (adresse de `version.json` sur le site) dans `eas.json`
       pour que l'appli annonce les nouvelles versions de l'APK.
 - [ ] Tester sur 2 ou 3 téléphones bon marché (Android 10 et plus), dont un sans Google Play.
