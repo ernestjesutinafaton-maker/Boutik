@@ -257,6 +257,32 @@ describe('Modifier une vente', () => {
     expect(moneyIn('cash')).toBe(4500);
   });
 
+  it('une livraison pas encore faite suit la vente corrigée', async () => {
+    const { saleId } = await firstSale();
+    const now = new Date().toISOString();
+    await db.execute(
+      `INSERT INTO deliveries (id, shop_id, sale_id, address, status, amount_to_collect, created_at, updated_at)
+       VALUES ('livraison', ?, ?, 'Cadjehoun', 'pending', 0, ?, ?)`,
+      [SHOP, saleId, now, now]
+    );
+    const result = await replaceSale(db, context, {
+      originalSaleId: saleId,
+      deviceNumber: 1,
+      lines: [ciment(1), cable(10)],
+      discount: 0,
+      payments: [],
+      customer: null,
+      note: null,
+      forceExpired: false,
+      refundMethodId: 'cash',
+      reason: 'Un sac en moins',
+    });
+    const [delivery] = db.query<{ sale_id: string }>(
+      "SELECT sale_id FROM deliveries WHERE id = 'livraison'"
+    );
+    expect(delivery.sale_id).toBe(result.saleId);
+  });
+
   it('une vente déjà modifiée ne peut pas l’être une seconde fois', async () => {
     const { saleId } = await firstSale();
     const change = {

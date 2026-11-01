@@ -50,6 +50,16 @@ export const AUDIT_ACTIONS = [
   'report.account',
   'settings.update',
   'payment_method.update',
+  'delivery.create',
+  'delivery.update',
+  'delivery.take',
+  'delivery.release',
+  'delivery.complete',
+  'delivery.fail',
+  'delivery.cancel',
+  'delivery.handover',
+  'delivery.expense',
+  'delivery.expense_review',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];

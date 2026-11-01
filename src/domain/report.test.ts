@@ -147,7 +147,12 @@ describe('Rapport (clôture ou compte)', () => {
     });
     expect(report.credit).toEqual({ given: 4000, repaid: 2000, writtenOff: 0, oldDebts: 0 });
     // L'achat de marchandise payé par la caisse n'est pas une dépense
-    expect(report.cash).toEqual({ stockPurchases: 15_000, withdrawals: 10_000, deposits: 0 });
+    expect(report.cash).toEqual({
+      stockPurchases: 15_000,
+      withdrawals: 10_000,
+      deposits: 0,
+      handovers: 0,
+    });
   });
 
   it('le stock, les écarts de caisse, les meilleures ventes et les débiteurs', () => {
@@ -177,6 +182,8 @@ describe('Fiche archivée sans coûts (clôture faite par un membre de l’équi
     expect(costsKnown).toBe(false);
     expect(data.stock).toEqual({ receivedValue: 0, valueAtEnd: 0 });
     expect(data.cash.stockPurchases).toBe(0);
+    // Une fiche d'avant les livraisons : pas de remises des livreurs
+    expect(data.cash.handovers).toBe(0);
     expect(data.sales.total).toBe(16_500);
   });
 
@@ -185,7 +192,7 @@ describe('Fiche archivée sans coûts (clôture faite par un membre de l’équi
       costOfGoods: 10_000,
       grossProfit: 6500,
       stock: { receivedValue: 50_000, valueAtEnd: 40_000 },
-      cash: { stockPurchases: 20_000, withdrawals: 0, deposits: 0 },
+      cash: { stockPurchases: 20_000, withdrawals: 0, deposits: 0, handovers: 0 },
     });
     expect(costsKnown).toBe(true);
     expect(data.grossProfit).toBe(6500);

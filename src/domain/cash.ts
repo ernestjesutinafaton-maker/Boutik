@@ -5,11 +5,11 @@
  *         + ventes et remboursements de crédit encaissés
  *         − argent rendu aux clients (retours, annulations)
  *         − dépenses, achats payés par la caisse, retraits du propriétaire
- *         + argent ajouté dans la caisse
+ *         + argent ajouté dans la caisse, et argent remis par les livreurs
  * À la clôture, on compte ce qu'il y a vraiment : la différence est l'écart de caisse.
  */
 
-export type CashMovementType = 'expense' | 'stock_purchase' | 'withdrawal' | 'deposit';
+export type CashMovementType = 'expense' | 'stock_purchase' | 'withdrawal' | 'deposit' | 'handover';
 
 /** Les catégories de dépenses proposées. */
 export const EXPENSE_CATEGORIES = [
@@ -27,7 +27,8 @@ export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 
 /** + si l'argent entre dans la caisse, − s'il en sort. */
 export function cashMovementSign(type: CashMovementType): 1 | -1 {
-  return type === 'deposit' ? 1 : -1;
+  // Ajout d'argent, et remise de l'argent encaissé par un livreur : l'argent entre
+  return type === 'deposit' || type === 'handover' ? 1 : -1;
 }
 
 /** Ce qui devrait se trouver dans la caisse, pour chaque mode de paiement. */

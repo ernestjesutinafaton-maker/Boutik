@@ -1,5 +1,6 @@
 import { frCash } from './fr-cash';
 import { frCustomers } from './fr-customers';
+import { frDeliveries } from './fr-deliveries';
 import { frDashboard } from './fr-dashboard';
 import { frProductErrors, frProducts } from './fr-products';
 import { frPublish } from './fr-publish';
@@ -46,6 +47,7 @@ export const fr = {
     customers: 'Clients',
     dashboard: 'Tableau de bord',
     dashboardShort: 'Bilan',
+    deliveries: 'Livraisons',
     more: 'Plus',
   },
   comingSoon: {
@@ -75,6 +77,7 @@ export const fr = {
     printerHelp: 'Imprimante Bluetooth 58 ou 80 mm',
     cashHelp: 'Fond de caisse, dépenses, clôture de la journée',
     reportsHelp: 'Clôtures, « Faire un compte », archives par jour, semaine, mois',
+    deliveriesHelp: 'À faire, en cours, terminées ; qui livre, ce qu’il faut encaisser',
     version: 'Version {{version}}',
   },
   auth: {
@@ -178,6 +181,7 @@ export const fr = {
   ...frSales,
   ...frCustomers,
   ...frCash,
+  ...frDeliveries,
   ...frDashboard,
   ...frSettings,
   ...frPublish,

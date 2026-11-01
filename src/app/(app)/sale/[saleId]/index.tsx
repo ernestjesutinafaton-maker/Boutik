@@ -16,6 +16,7 @@ import { useActionContext } from '@/data/use-action-context';
 import { formatMoment } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
 import { formatQuantity, pluralUnit } from '@/domain/quantity';
+import { SaleDeliveryCard } from '@/deliveries/sale-delivery-card';
 import { SaleDocuments } from '@/invoices/sale-documents';
 import { useCart } from '@/sales/cart-provider';
 import { cancelSale } from '@/sales/sale-actions';
@@ -244,6 +245,7 @@ export default function SaleScreen() {
       </Card>
 
       <SaleDocuments sale={sale} />
+      <SaleDeliveryCard sale={sale} />
 
       <BigButton
         icon="cart-plus"

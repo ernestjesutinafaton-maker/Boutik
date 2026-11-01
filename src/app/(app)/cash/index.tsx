@@ -14,7 +14,7 @@ import { TextField } from '@/components/text-field';
 import { openCashSession } from '@/cash/cash-actions';
 import { useSessionMovements, useSessionTotals } from '@/cash/cash-data';
 import { useActionContext } from '@/data/use-action-context';
-import { expectedByMethod } from '@/domain/cash';
+import { cashMovementSign, expectedByMethod } from '@/domain/cash';
 import { formatMoment, formatTime } from '@/domain/dates';
 import { formatMoney, parseMoney } from '@/domain/money';
 import { EXPENSE_LABELS } from '@/reports/report-html';
@@ -184,6 +184,11 @@ export default function CashScreen() {
           </BigButton>
         ) : null}
       </View>
+      {can('delivery.handover') ? (
+        <BigButton icon="moped" variant="outline" onPress={() => router.push('/delivery/cash')}>
+          {t('deliveries.cash.title')}
+        </BigButton>
+      ) : null}
 
       <Card mode="outlined">
         <Card.Title title={t('cash.movementsTitle')} titleVariant="titleLarge" />
@@ -196,7 +201,11 @@ export default function CashScreen() {
           <View key={movement.id}>
             {index > 0 ? <Divider /> : null}
             <List.Item
-              title={`${t(`cash.types.${movement.type}`)} · ${movement.type === 'deposit' ? '+' : '−'}${formatMoney(movement.amount, currency)}`}
+              title={`${
+                movement.type === 'handover' && movement.courierName
+                  ? t('deliveries.handoverOf', { name: movement.courierName })
+                  : t(`cash.types.${movement.type}`)
+              } · ${cashMovementSign(movement.type) > 0 ? '+' : '−'}${formatMoney(movement.amount, currency)}`}
               titleStyle={styles.bold}
               description={[
                 formatTime(movement.occurredAt),

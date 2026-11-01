@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 
+import { useDeliveriesInUse } from '@/deliveries/delivery-data';
 import type { Permission } from '@/domain/permissions';
 import type { TranslationKey } from '@/i18n/keys';
 import { useActiveMember } from '@/team/active-member-provider';
@@ -14,14 +15,23 @@ type QuickAction = {
   label: TranslationKey;
   icon: Icon3DName;
   href: Href;
-  /** Le droit nécessaire (absent : tout le monde) */
-  permission?: Permission;
+  /** Le droit nécessaire (absent : tout le monde ; une liste : l'un d'eux suffit) */
+  permission?: Permission | readonly Permission[];
+  /** Seulement si la boutique utilise les livraisons (un livreur, ou déjà une livraison) */
+  deliveries?: boolean;
 };
 
 /** Les actions de tous les jours, dans l'ordre où on s'en sert le plus. */
 const ACTIONS: QuickAction[] = [
   { label: 'quick.sell', icon: 'cart', href: '/', permission: 'sale.create' },
   { label: 'quick.sales', icon: 'receipt', href: '/sale', permission: 'sale.create' },
+  {
+    label: 'quick.deliveries',
+    icon: 'scooter',
+    href: '/delivery',
+    permission: ['delivery.create', 'delivery.handover', 'delivery.review'],
+    deliveries: true,
+  },
   { label: 'quick.receive', icon: 'truck', href: '/stock/receive', permission: 'stock.receive' },
   { label: 'quick.newProduct', icon: 'package', href: '/product/new', permission: 'catalog.edit' },
   {
@@ -48,11 +58,14 @@ export function QuickActions() {
   const { t } = useTranslation();
   const theme = useAppTheme();
   const { can } = useActiveMember();
+  const deliveriesInUse = useDeliveriesInUse();
   const { colors, effects, depth, radius, spacing } = theme.app;
-  const visible = ACTIONS.filter((action) => !action.permission || can(action.permission)).slice(
-    0,
-    MAX_ACTIONS
-  );
+  const allowed = (permission: QuickAction['permission']) =>
+    !permission ||
+    (typeof permission === 'string' ? can(permission) : permission.some((one) => can(one)));
+  const visible = ACTIONS.filter(
+    (action) => allowed(action.permission) && (!action.deliveries || deliveriesInUse)
+  ).slice(0, MAX_ACTIONS);
 
   return (
     <View style={{ gap: spacing.sm }}>

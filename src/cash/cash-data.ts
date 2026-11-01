@@ -35,6 +35,8 @@ export type CashMovementLine = {
   occurredAt: string;
   methodLabel: string;
   memberName: string | null;
+  /** Remise d'un livreur : son nom */
+  courierName: string | null;
 };
 
 type MovementRow = {
@@ -46,16 +48,18 @@ type MovementRow = {
   occurred_at: string;
   method_label: string | null;
   member_name: string | null;
+  courier_name: string | null;
 };
 
 /** Les dépenses et sorties d'une caisse, les plus récentes d'abord. */
 export function useSessionMovements(sessionId: string | null): CashMovementLine[] {
   const { data } = useQuery<MovementRow>(
     `SELECT c.id, c.type, c.category, c.amount, c.note, c.occurred_at, pm.label AS method_label,
-            m.display_name AS member_name
+            m.display_name AS member_name, k.display_name AS courier_name
        FROM cash_movements c
        LEFT JOIN payment_methods pm ON pm.id = c.payment_method_id
        LEFT JOIN shop_members m ON m.id = c.created_by
+       LEFT JOIN shop_members k ON k.id = c.courier_id
       WHERE c.cash_session_id = ?
       ORDER BY c.occurred_at DESC`,
     [sessionId ?? '']
@@ -69,5 +73,6 @@ export function useSessionMovements(sessionId: string | null): CashMovementLine[
     occurredAt: row.occurred_at,
     methodLabel: row.method_label ?? '',
     memberName: row.member_name,
+    courierName: row.courier_name,
   }));
 }

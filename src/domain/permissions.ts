@@ -40,6 +40,10 @@ export const PERMISSIONS = [
   'team.manage', // gérer l'équipe et les codes PIN
   'settings.manage', // modifier les paramètres de la boutique
   'data.delete', // supprimer un client, un produit, une personne, une vente (propriétaire seul)
+  'delivery.create', // créer, modifier, confier ou annuler une livraison
+  'delivery.handle', // prendre une livraison, la livrer, encaisser, noter ses dépenses (livreur)
+  'delivery.handover', // recevoir à la caisse l'argent encaissé par un livreur
+  'delivery.review', // rembourser ou refuser les dépenses des livreurs
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
@@ -62,13 +66,21 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
         'sale.edit_late',
       ].includes(permission)
   ),
-  cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
-  seller: ['sale.create', 'credit.repayment', 'customers.edit'],
+  cashier: [
+    'sale.create',
+    'credit.repayment',
+    'customers.edit',
+    'cash.session',
+    'cash.expense',
+    'delivery.create',
+    'delivery.handover',
+  ],
+  seller: ['sale.create', 'credit.repayment', 'customers.edit', 'delivery.create'],
   stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
   stock_counter: ['stock.count'],
-  // Livreur : encaisse à la livraison (remboursement de la dette du client). Ses écrans de
-  // livraison arrivent avec l'étape « Livraisons ».
-  delivery: ['credit.repayment'],
+  // Livreur : prend et livre les commandes, encaisse à la livraison (remboursement de la dette
+  // du client) et note ses dépenses avec la photo du reçu
+  delivery: ['credit.repayment', 'delivery.handle'],
 };
 
 /** Tous les droits d'une personne : la réunion des droits de ses rôles. */
@@ -99,6 +111,25 @@ export function canSeeCustomers(roles: readonly Role[]): boolean {
     granted.has('credit.repayment') ||
     granted.has('reports.account')
   );
+}
+
+/** Voir les livraisons : pour les créer, les livrer, ou suivre l'argent et les dépenses des livreurs. */
+export function canSeeDeliveries(roles: readonly Role[]): boolean {
+  const granted = permissionsFor(roles);
+  return (
+    granted.has('delivery.create') ||
+    granted.has('delivery.handle') ||
+    granted.has('delivery.handover') ||
+    granted.has('delivery.review')
+  );
+}
+
+/**
+ * Un livreur « seulement » (sans le droit de vendre) : son premier onglet est « Livraisons »
+ * à la place de « Vendre ».
+ */
+export function isCourierOnly(roles: readonly Role[]): boolean {
+  return can(roles, 'delivery.handle') && !can(roles, 'sale.create');
 }
 
 /** Vérifie qu'un texte venu de la base est bien un rôle connu. */

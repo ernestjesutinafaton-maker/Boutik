@@ -448,6 +448,16 @@ const local_photo_uploads = new Table(
   { localOnly: true }
 );
 
+/** Photos des reçus des livreurs prises sur cet appareil, en attente d'envoi (stockage privé). */
+const local_proof_uploads = new Table(
+  {
+    path: column.text, // <boutique>/<livreur>/<dépense>.jpg, déjà noté dans la dépense
+    data: column.text, // l'image JPEG en base64
+    created_at: column.text,
+  },
+  { localOnly: true }
+);
+
 /** La file « À envoyer » : factures et reçus à envoyer plus tard par WhatsApp. */
 const local_outbox = new Table(
   {
@@ -489,6 +499,7 @@ export const AppSchema = new Schema({
   delivery_expenses,
   local_rejected_changes,
   local_photo_uploads,
+  local_proof_uploads,
   local_outbox,
 });
 

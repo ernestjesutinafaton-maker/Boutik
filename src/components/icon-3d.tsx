@@ -29,6 +29,7 @@ const SOURCES = {
   phone: require('@/assets/images/3d/phone.webp'),
   printer: require('@/assets/images/3d/printer.webp'),
   receipt: require('@/assets/images/3d/receipt.webp'),
+  scooter: require('@/assets/images/3d/scooter.webp'),
   scroll: require('@/assets/images/3d/scroll.webp'),
   shield: require('@/assets/images/3d/shield.webp'),
   store: require('@/assets/images/3d/store.webp'),

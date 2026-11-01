@@ -8,6 +8,7 @@ import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
 import { QuickActions } from '@/components/quick-actions';
+import { CourierCard } from '@/deliveries/courier-card';
 import { isLowStock } from '@/domain/catalog';
 import { formatTime, today } from '@/domain/dates';
 import { DEFAULT_EXPIRY_ALERT_DAYS } from '@/domain/expiry';
@@ -36,13 +37,15 @@ export function RoleDashboard() {
   const showSales = can('sale.create');
   const showCash = can('cash.session');
   const showStock = can('stock.count') || can('stock.receive');
+  const showDeliveries = can('delivery.handle');
 
-  if (!showSales && !showCash && !showStock) {
+  if (!showSales && !showCash && !showStock && !showDeliveries) {
     return <Notice tone="info" message={t('dashboard.forbidden')} />;
   }
   return (
     <>
       <QuickActions />
+      {showDeliveries ? <CourierCard /> : null}
       {showSales ? <MySalesCard /> : null}
       {showCash ? <MyCashCard /> : null}
       {showStock ? <StockCard /> : null}

@@ -105,6 +105,8 @@ export async function recordRepayment(
     methodId: string;
     cashReceived: number | null;
     changeGiven: number | null;
+    /** Argent encaissé à une livraison (par le livreur) */
+    deliveryId?: string | null;
   },
   options: WhenOptions = {}
 ): Promise<string> {
@@ -118,8 +120,8 @@ export async function recordRepayment(
     await tx.execute(
       `INSERT INTO payments
          (id, shop_id, kind, customer_id, payment_method_id, amount, cash_received, change_given,
-          cash_session_id, occurred_at, created_by, device_id, created_at)
-       VALUES (?, ?, 'repayment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          cash_session_id, delivery_id, occurred_at, created_by, device_id, created_at)
+       VALUES (?, ?, 'repayment', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         paymentId,
         context.shopId,
@@ -129,6 +131,7 @@ export async function recordRepayment(
         input.cashReceived,
         input.changeGiven,
         session?.id ?? null,
+        input.deliveryId ?? null,
         now,
         context.memberId,
         context.deviceId,
@@ -162,6 +165,7 @@ export async function recordRepayment(
         amount: input.amount,
         balanceBefore: input.customer.balance,
         balanceAfter: input.customer.balance - input.amount,
+        delivery: input.deliveryId ?? null,
       },
       now
     );

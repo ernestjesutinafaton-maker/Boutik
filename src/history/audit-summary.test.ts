@@ -23,6 +23,9 @@ describe('Journal des actions', () => {
 
   it('range les actions par groupe', () => {
     expect(auditGroup('sale.cancel')).toBe('sales');
+    expect(auditGroup('delivery.take')).toBe('sales');
+    expect(auditGroup('delivery.handover')).toBe('cash');
+    expect(auditGroup('delivery.expense_review')).toBe('cash');
     expect(auditGroup('credit.repayment')).toBe('credit');
     expect(auditGroup('customer.update')).toBe('credit');
     expect(auditGroup('product.price_change')).toBe('stock');

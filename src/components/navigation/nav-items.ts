@@ -24,6 +24,14 @@ export const NAV_ITEMS = [
     shortLabelKey: 'nav.sell',
   },
   {
+    // À la place de « Caisse » pour le livreur seul (voir visibleNavItems)
+    name: 'deliveries',
+    href: '/deliveries',
+    icon: 'moped',
+    labelKey: 'nav.deliveries',
+    shortLabelKey: 'nav.deliveries',
+  },
+  {
     name: 'products',
     href: '/products',
     icon: 'package-variant-closed',
@@ -52,3 +60,13 @@ export const NAV_ITEMS = [
     shortLabelKey: 'nav.more',
   },
 ] as const satisfies readonly NavItem[];
+
+/**
+ * Les rubriques affichées : tout le monde a « Caisse », sauf le livreur seul (sans le droit de
+ * vendre), qui a « Livraisons » à la place.
+ */
+export function visibleNavItems(courierOnly: boolean) {
+  return NAV_ITEMS.filter((item) =>
+    item.name === 'sell' ? !courierOnly : item.name === 'deliveries' ? courierOnly : true
+  );
+}

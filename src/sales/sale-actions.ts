@@ -647,6 +647,13 @@ export async function replaceSale(
     );
     result = { ...created, refunded: refund };
 
+    // Une livraison pas encore faite suit la vente corrigée (sinon elle livrerait l'ancienne)
+    await tx.execute(
+      `UPDATE deliveries SET sale_id = ?, updated_at = ?
+        WHERE sale_id = ? AND status NOT IN ('delivered', 'cancelled')`,
+      [created.saleId, nowIso(), original.id]
+    );
+
     await logAction(
       tx,
       context,

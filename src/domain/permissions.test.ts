@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import {
   can,
   canSeeCustomers,
+  canSeeDeliveries,
+  isCourierOnly,
   isRole,
   maxDiscountPercent,
   PERMISSIONS,
@@ -101,11 +103,19 @@ describe('Vérification complète : le tableau des droits', () => {
           'sale.edit_late',
         ].includes(p)
     ),
-    cashier: ['sale.create', 'credit.repayment', 'customers.edit', 'cash.session', 'cash.expense'],
-    seller: ['sale.create', 'credit.repayment', 'customers.edit'],
+    cashier: [
+      'sale.create',
+      'credit.repayment',
+      'customers.edit',
+      'cash.session',
+      'cash.expense',
+      'delivery.create',
+      'delivery.handover',
+    ],
+    seller: ['sale.create', 'credit.repayment', 'customers.edit', 'delivery.create'],
     stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
     stock_counter: ['stock.count'],
-    delivery: ['credit.repayment'],
+    delivery: ['credit.repayment', 'delivery.handle'],
   };
 
   it('chaque rôle a exactement ses droits, ni plus ni moins', () => {
@@ -144,5 +154,21 @@ describe('Vérification complète : le tableau des droits', () => {
     expect(canSeeCustomers(['stock_manager'])).toBe(false);
     expect(canSeeCustomers(['stock_counter'])).toBe(false);
     expect(canSeeCustomers(['stock_counter', 'seller'])).toBe(true);
+  });
+
+  it('les livraisons : la boutique les crée, le livreur les livre ; le stock n’y a pas accès', () => {
+    expect(canSeeDeliveries(['seller'])).toBe(true);
+    expect(canSeeDeliveries(['delivery'])).toBe(true);
+    expect(canSeeDeliveries(['stock_counter'])).toBe(false);
+    expect(canSeeDeliveries(['stock_manager'])).toBe(false);
+    // Le livreur seul voit « Livraisons » à la place de « Vendre » ; un vendeur-livreur garde « Vendre »
+    expect(isCourierOnly(['delivery'])).toBe(true);
+    expect(isCourierOnly(['delivery', 'seller'])).toBe(false);
+    expect(isCourierOnly(['seller'])).toBe(false);
+    // Recevoir l'argent d'un livreur : caisse et responsables ; rembourser ses dépenses : responsables
+    expect(can(['cashier'], 'delivery.handover')).toBe(true);
+    expect(can(['delivery'], 'delivery.handover')).toBe(false);
+    expect(can(['cashier'], 'delivery.review')).toBe(false);
+    expect(can(['manager'], 'delivery.review')).toBe(true);
   });
 });

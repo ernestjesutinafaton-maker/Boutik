@@ -78,7 +78,8 @@ export type ReportData = {
   netProfit: number;
   payments: { byMethod: { label: string; amount: number }[]; total: number };
   credit: { given: number; repaid: number; writtenOff: number; oldDebts: number };
-  cash: { stockPurchases: number; withdrawals: number; deposits: number };
+  /** handovers : argent encaissé par les livreurs et remis à la caisse (pas un revenu de plus) */
+  cash: { stockPurchases: number; withdrawals: number; deposits: number; handovers: number };
   stock: { receivedValue: number; valueAtEnd: number };
   cashDifferences: { total: number; sessions: number };
   topProducts: { name: string; baseUnit: string; quantity: number; revenue: number }[];
@@ -195,6 +196,7 @@ export function buildReport(input: ReportInput): ReportData {
       stockPurchases: cashOf('stock_purchase'),
       withdrawals: cashOf('withdrawal'),
       deposits: cashOf('deposit'),
+      handovers: cashOf('handover'),
     },
     stock: { receivedValue: costOf('receipt'), valueAtEnd: input.stockValue },
     cashDifferences: {
@@ -231,7 +233,12 @@ export function withCostDefaults(stored: Partial<ReportData> & Pick<ReportData, 
     data: {
       ...COST_DEFAULTS,
       ...stored,
-      cash: { ...stored.cash, stockPurchases: stored.cash.stockPurchases ?? 0 },
+      // Les fiches d'avant les livraisons n'ont pas les remises des livreurs
+      cash: {
+        ...stored.cash,
+        stockPurchases: stored.cash.stockPurchases ?? 0,
+        handovers: stored.cash.handovers ?? 0,
+      },
     } as ReportData,
     costsKnown,
   };

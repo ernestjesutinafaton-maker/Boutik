@@ -110,6 +110,9 @@ export function ReportView({ report, currency, showProfit, showCosts }: ReportVi
         {report.cash.deposits > 0 ? (
           <Row label={t('report.deposits')} value={money(report.cash.deposits)} />
         ) : null}
+        {report.cash.handovers > 0 ? (
+          <Row label={t('report.handovers')} value={money(report.cash.handovers)} />
+        ) : null}
       </Section>
 
       {showProfit && showCosts ? (

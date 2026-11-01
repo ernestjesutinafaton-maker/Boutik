@@ -26,6 +26,7 @@ export const frCash = {
       stock_purchase: 'Achat de marchandise',
       withdrawal: 'Retrait du propriétaire',
       deposit: 'Ajout d’argent',
+      handover: 'Remise d’un livreur',
     },
     typeHelp: {
       expense: 'Argent dépensé pour la boutique : il diminue le bénéfice.',
@@ -33,6 +34,7 @@ export const frCash = {
         'Marchandise payée avec l’argent de la caisse. Ce n’est pas une dépense : pense à faire la réception de la marchandise.',
       withdrawal: 'Le propriétaire prend de l’argent dans la caisse.',
       deposit: 'De l’argent est ajouté dans la caisse (monnaie, fond…).',
+      handover: 'Un livreur remet à la caisse l’argent encaissé à ses livraisons.',
     },
     category: 'Catégorie',
     amount: 'Montant',
@@ -106,6 +108,7 @@ export const frCash = {
     stockPurchases: 'Achats de marchandise payés par la caisse',
     withdrawals: 'Retraits du propriétaire',
     deposits: 'Argent ajouté dans la caisse',
+    handovers: 'Argent remis par les livreurs',
     costOfGoods: 'Coût d’achat des marchandises vendues',
     grossProfit: 'Bénéfice brut',
     losses: 'Pertes (casse, périmés, vols)',

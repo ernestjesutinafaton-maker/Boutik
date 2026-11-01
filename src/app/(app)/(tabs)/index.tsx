@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
@@ -32,7 +32,7 @@ import {
   searchProducts,
 } from '@/domain/catalog';
 import { type CurrencyCode, formatMoney, parseMoney } from '@/domain/money';
-import { maxDiscountPercent } from '@/domain/permissions';
+import { isCourierOnly, maxDiscountPercent } from '@/domain/permissions';
 import { cartSubtotal, discountAmount, type DiscountInput, maxDiscount } from '@/domain/sale';
 import { useCatalog } from '@/products/catalog-provider';
 import { ProductListItem } from '@/products/product-list-item';
@@ -82,6 +82,10 @@ export default function SellScreen() {
   const currency = settings?.currencyCode ?? 'XOF';
 
   if (!can('sale.create')) {
+    // Le livreur seul n'a pas d'onglet « Caisse » : il arrive sur ses livraisons
+    if (isCourierOnly(member?.roles ?? [])) {
+      return <Redirect href="/deliveries" />;
+    }
     return (
       <Screen title={t('nav.sell')}>
         <Notice message={t('sell.forbidden')} />

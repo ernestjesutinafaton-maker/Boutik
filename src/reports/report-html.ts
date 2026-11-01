@@ -111,6 +111,9 @@ export function reportHtml(input: {
       : []),
     row('Retraits du propriétaire', money(report.cash.withdrawals)),
     row('Argent ajouté dans la caisse', money(report.cash.deposits)),
+    ...(report.cash.handovers > 0
+      ? [row('Argent remis par les livreurs', money(report.cash.handovers))]
+      : []),
   ])}
   ${profit}
   ${section(

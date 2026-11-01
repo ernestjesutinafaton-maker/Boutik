@@ -62,6 +62,7 @@ export const frDashboard = {
     alerts: 'Alertes',
     reports: 'Comptes',
     guide: 'Guide',
+    deliveries: 'Livraisons',
   },
   demo: {
     title: 'Boutique de démonstration',

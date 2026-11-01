@@ -4,16 +4,19 @@ import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { isCourierOnly } from '@/domain/permissions';
+import { useActiveMember } from '@/team/active-member-provider';
 import { useAppTheme } from '@/theme/paper-theme';
 
 import { NavButton } from './nav-button';
-import { NAV_ITEMS } from './nav-items';
+import { visibleNavItems } from './nav-items';
 
 /** Menu sur le côté gauche (grande tablette, ordinateur). */
 export function SideNav() {
   const theme = useAppTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const { member } = useActiveMember();
   const { colors, spacing, layout, fontSize } = theme.app;
 
   return (
@@ -38,7 +41,7 @@ export function SideNav() {
         {t('app.tagline')}
       </Text>
 
-      {NAV_ITEMS.map((item) => (
+      {visibleNavItems(isCourierOnly(member?.roles ?? [])).map((item) => (
         <TabTrigger key={item.name} name={item.name} asChild>
           <NavButton icon={item.icon} label={t(item.labelKey)} placement="side" />
         </TabTrigger>

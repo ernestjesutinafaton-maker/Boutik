@@ -9,7 +9,9 @@ export type AuditGroup = 'sales' | 'credit' | 'stock' | 'cash' | 'team';
 
 /** Le groupe d'une action, pour filtrer le journal. */
 export function auditGroup(action: string): AuditGroup {
-  if (action.startsWith('sale.')) return 'sales';
+  // L'argent des livreurs va avec la caisse ; le reste des livraisons, avec les ventes
+  if (action === 'delivery.handover' || action.startsWith('delivery.expense')) return 'cash';
+  if (action.startsWith('sale.') || action.startsWith('delivery.')) return 'sales';
   if (action.startsWith('credit.') || action.startsWith('customer.')) return 'credit';
   if (
     action.startsWith('stock.') ||
@@ -94,6 +96,20 @@ export function auditSummary(
       return money(details.revenue);
     case 'member.create':
       return text(details.name);
+    case 'delivery.create':
+    case 'delivery.update':
+      return join(text(details.address), money(details.amountToCollect));
+    case 'delivery.complete':
+      return money(details.collected);
+    case 'delivery.fail':
+    case 'delivery.cancel':
+      return text(details.reason);
+    case 'delivery.handover':
+      return join(text(details.courier), money(details.amount));
+    case 'delivery.expense':
+      return money(details.amount);
+    case 'delivery.expense_review':
+      return join(text(details.courier), money(details.amount), text(details.reason));
     default:
       return null;
   }

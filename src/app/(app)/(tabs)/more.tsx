@@ -17,6 +17,7 @@ import { useOutbox } from '@/invoices/outbox';
 import { useIsPlatformAdmin, usePendingPaymentsCount } from '@/subscription/subscription-data';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
+import { canSeeDeliveries } from '@/domain/permissions';
 import { useAppTheme } from '@/theme/paper-theme';
 import { ThemePicker } from '@/theme/theme-picker';
 
@@ -27,7 +28,7 @@ export default function MoreScreen() {
   const db = usePowerSync();
   const { session, signOut } = useAuth();
   const { shop, device } = useShop();
-  const { can } = useActiveMember();
+  const { can, member } = useActiveMember();
   const outbox = useOutbox();
   const isPlatformAdmin = useIsPlatformAdmin();
   // Paiements d'abonnement à vérifier : visibles d'un coup d'œil dans le menu
@@ -98,6 +99,29 @@ export default function MoreScreen() {
               left={(props) => <Icon3D name="bar-chart" style={props.style} />}
               right={(props) => <List.Icon {...props} icon="chevron-right" />}
               onPress={() => router.push('/report')}
+            />
+          ) : null}
+        </Card>
+      ) : null}
+
+      {canSeeDeliveries(member?.roles ?? []) ? (
+        <Card mode="outlined">
+          <List.Item
+            title={t('deliveries.title')}
+            titleStyle={{ fontWeight: '700' }}
+            description={t('more.deliveriesHelp')}
+            left={(props) => <Icon3D name="scooter" style={props.style} />}
+            right={(props) => <List.Icon {...props} icon="chevron-right" />}
+            onPress={() => router.push('/delivery')}
+          />
+          {can('delivery.handover') || can('delivery.review') ? (
+            <List.Item
+              title={t('deliveries.cash.title')}
+              titleStyle={{ fontWeight: '700' }}
+              description={t('deliveries.cash.menuHelp')}
+              left={(props) => <Icon3D name="coin" style={props.style} />}
+              right={(props) => <List.Icon {...props} icon="chevron-right" />}
+              onPress={() => router.push('/delivery/cash')}
             />
           ) : null}
         </Card>

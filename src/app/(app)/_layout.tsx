@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { PinLockScreen } from '@/components/pin-lock-screen';
 import { isBlocked } from '@/domain/subscription';
 import { CatalogProvider } from '@/products/catalog-provider';
+import { useProofUploader } from '@/deliveries/delivery-proofs';
 import { usePhotoUploader } from '@/products/photos';
 import { CartProvider } from '@/sales/cart-provider';
 import { SubscriptionBlockedScreen } from '@/subscription/blocked-screen';
@@ -36,6 +37,8 @@ function AppStack() {
   const pathname = usePathname();
   // Les photos de produits prises hors ligne partent dès qu'internet revient
   usePhotoUploader();
+  // Les photos des reçus des livreurs aussi (stockage privé)
+  useProofUploader();
 
   if (!isReady || subscription.isLoading) {
     return null; // on ne sait pas encore qui est actif ni si la boutique est ouverte
