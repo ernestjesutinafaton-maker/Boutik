@@ -1,6 +1,6 @@
 {
   "cleanUrls": true,
-  "rewrites": [{ "source": "/app/:path*", "destination": "/app/index.html" }],
+  "rewrites": [{ "source": "/app/:path*", "destination": "/app" }],
   "headers": [
     {
       "source": "/app/sw.js",

@@ -52,5 +52,7 @@ example
 /android
 downloads/
 dist-desktop/
+# Code préparé par « npm run update:android » (eas update), à part du site (dist/)
+dist-update/
 src-tauri/target/
 src-tauri/gen/
