@@ -11,7 +11,7 @@
 #   • owner (propriétaire) : tout, y compris les codes PIN de l'équipe (tablette partagée) ;
 #   • costs (gérant, responsable du stock) : tout, SAUF les codes PIN ;
 #   • team (vendeur, caissier, compteur, livreur) : ni prix d'achat, ni coûts, ni comptes,
-#     ni journal des actions, ni codes PIN.
+#     ni journal des actions, ni codes PIN — et des dépenses de livraison, seulement LES SIENNES.
 # Une personne a UN seul niveau par boutique : elle ne reçoit donc jamais une même ligne de deux
 # façons différentes. Les colonnes absentes restent vides dans son téléphone.
 #
@@ -56,6 +56,9 @@ streams:
       - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
       - SELECT * FROM cash_movements WHERE shop_id IN my_shops
       - SELECT * FROM reports WHERE shop_id IN my_shops
+      # Les livraisons et les dépenses des livreurs
+      - SELECT * FROM deliveries WHERE shop_id IN my_shops
+      - SELECT * FROM delivery_expenses WHERE shop_id IN my_shops
       # La traçabilité
       - SELECT * FROM audit_log WHERE shop_id IN my_shops
 
@@ -86,6 +89,8 @@ streams:
       - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
       - SELECT * FROM cash_movements WHERE shop_id IN my_shops
       - SELECT * FROM reports WHERE shop_id IN my_shops
+      - SELECT * FROM deliveries WHERE shop_id IN my_shops
+      - SELECT * FROM delivery_expenses WHERE shop_id IN my_shops
       - SELECT * FROM audit_log WHERE shop_id IN my_shops
 
   # --- Équipe (vendeur, caissier, compteur, livreur) : ni coûts, ni comptes, ni journal, ni codes PIN ---
@@ -93,6 +98,8 @@ streams:
     auto_subscribe: true
     with:
       my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true AND access_level = 'team'
+      # Les profils de la personne (un par boutique) : un livreur ne reçoit que SES dépenses
+      my_profiles: SELECT id FROM shop_members WHERE user_id = auth.user_id() AND active = true AND access_level = 'team'
     queries:
       - SELECT * FROM shops WHERE id IN my_shops
       - SELECT id, shop_id, user_id, display_name, max_discount_percent, active, access_level, created_at, updated_at FROM shop_members WHERE shop_id IN my_shops
@@ -116,4 +123,7 @@ streams:
       - SELECT * FROM payments WHERE shop_id IN my_shops
       - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
       - SELECT * FROM cash_movements WHERE shop_id IN my_shops
+      - SELECT * FROM deliveries WHERE shop_id IN my_shops
+      # Seulement SES dépenses de livraison (celles des autres restent au propriétaire et aux responsables)
+      - SELECT * FROM delivery_expenses WHERE shop_id IN my_shops AND courier_id IN my_profiles
       # Pas de « reports » (comptes et clôtures contiennent les bénéfices), pas de journal « audit_log »

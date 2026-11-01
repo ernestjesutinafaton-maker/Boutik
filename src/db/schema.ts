@@ -301,10 +301,11 @@ const payments = new Table(
     cash_received: column.integer,
     change_given: column.integer,
     cash_session_id: column.text,
+    delivery_id: column.text, // argent encaissé à la livraison (remboursement du client)
     occurred_at: column.text,
     ...tracking,
   },
-  { indexes: { sale: ['sale_id'], customer: ['customer_id'] } }
+  { indexes: { sale: ['sale_id'], customer: ['customer_id'], delivery: ['delivery_id'] } }
 );
 
 const customer_ledger = new Table(
@@ -322,7 +323,10 @@ const customer_ledger = new Table(
   { indexes: { customer: ['customer_id'] } }
 );
 
-/** Dépenses, achats payés par la caisse, retraits et ajouts d'argent (étape 15). */
+/**
+ * Dépenses, achats payés par la caisse, retraits et ajouts d'argent (étape 15),
+ * remises d'argent des livreurs (handover) et remboursements de leurs dépenses.
+ */
 const cash_movements = new Table(
   {
     shop_id: column.text,
@@ -332,10 +336,12 @@ const cash_movements = new Table(
     payment_method_id: column.text,
     amount: column.integer,
     note: column.text,
+    courier_id: column.text, // remise à la caisse : le livreur qui apporte l'argent
+    delivery_expense_id: column.text, // remboursement de cette dépense de livreur
     occurred_at: column.text,
     ...tracking,
   },
-  { indexes: { session: ['cash_session_id'] } }
+  { indexes: { session: ['cash_session_id'], courier: ['courier_id'] } }
 );
 
 /** Les rapports archivés : clôtures de journée et comptes (étape 15). */
@@ -362,6 +368,58 @@ const audit_log = new Table({
   occurred_at: column.text,
   created_at: column.text,
 });
+
+// --- 6. Les livraisons ---
+
+/** Les livraisons : depuis une vente, pour un livreur précis ou ouvertes à tous les livreurs. */
+const deliveries = new Table(
+  {
+    shop_id: column.text,
+    sale_id: column.text,
+    customer_id: column.text,
+    contact_name: column.text,
+    contact_phone: column.text,
+    address: column.text,
+    landmark: column.text, // repère : « derrière la pharmacie »
+    requested_at: column.text, // date et heure souhaitées (vide : dès que possible)
+    amount_to_collect: column.integer, // argent à encaisser à la livraison
+    assigned_to: column.text, // le livreur ; vide = ouverte à tous les livreurs
+    status: column.text, // pending, in_progress, delivered, failed, cancelled
+    started_at: column.text,
+    delivered_at: column.text,
+    failed_reason: column.text,
+    cancelled_at: column.text,
+    cancel_reason: column.text,
+    note: column.text,
+    ...tracking,
+    updated_at: column.text,
+  },
+  { indexes: { sale: ['sale_id'], courier: ['assigned_to'], status: ['status'] } }
+);
+
+/**
+ * Les dépenses des livreurs (carburant, transport…), avec la photo du reçu.
+ * Un livreur ne reçoit que les siennes ; le propriétaire et les responsables, toutes.
+ */
+const delivery_expenses = new Table(
+  {
+    shop_id: column.text,
+    courier_id: column.text,
+    delivery_id: column.text,
+    category: column.text, // transport, fuel, repairs, other
+    amount: column.integer,
+    note: column.text,
+    proof_path: column.text, // photo du reçu : stockage privé « delivery-proofs »
+    status: column.text, // pending (à décider), reimbursed (remboursée), rejected (refusée)
+    reviewed_by: column.text,
+    reviewed_at: column.text,
+    review_note: column.text,
+    occurred_at: column.text,
+    ...tracking,
+    updated_at: column.text,
+  },
+  { indexes: { courier: ['courier_id'], delivery: ['delivery_id'] } }
+);
 
 // --- Tables qui restent DANS L'APPAREIL (jamais envoyées au serveur) ---
 
@@ -427,6 +485,8 @@ export const AppSchema = new Schema({
   cash_movements,
   reports,
   audit_log,
+  deliveries,
+  delivery_expenses,
   local_rejected_changes,
   local_photo_uploads,
   local_outbox,
