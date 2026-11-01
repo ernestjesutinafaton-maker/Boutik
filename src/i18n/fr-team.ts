@@ -7,6 +7,7 @@ export const frTeam = {
     seller: 'Vendeur',
     stock_manager: 'Gestionnaire de stock',
     stock_counter: 'Compteur d’inventaire',
+    delivery: 'Livreur',
   },
   roleHelp: {
     owner: 'Tous les droits.',
@@ -15,6 +16,7 @@ export const frTeam = {
     seller: 'Vend, encaisse et enregistre les remboursements de crédit.',
     stock_manager: 'Reçoit la marchandise, déclare les pertes, fait et valide l’inventaire.',
     stock_counter: 'Compte le stock pendant l’inventaire, sans voir le stock calculé.',
+    delivery: 'Livre les commandes et encaisse l’argent du client à la livraison.',
   },
   team: {
     title: 'Équipe et codes PIN',

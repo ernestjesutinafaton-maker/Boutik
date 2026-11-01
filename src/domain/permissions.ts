@@ -12,6 +12,7 @@ export const ROLES = [
   'seller',
   'stock_manager',
   'stock_counter',
+  'delivery',
 ] as const;
 
 export type Role = (typeof ROLES)[number];
@@ -65,6 +66,9 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
   seller: ['sale.create', 'credit.repayment', 'customers.edit'],
   stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
   stock_counter: ['stock.count'],
+  // Livreur : encaisse à la livraison (remboursement de la dette du client). Ses écrans de
+  // livraison arrivent avec l'étape « Livraisons ».
+  delivery: ['credit.repayment'],
 };
 
 /** Tous les droits d'une personne : la réunion des droits de ses rôles. */

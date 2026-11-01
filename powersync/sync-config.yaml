@@ -3,22 +3,33 @@
 # =============================================================================
 # Ce fichier se copie-colle dans le tableau de bord de PowerSync (rubrique « Sync Streams »).
 #
-# Règle unique : chaque appareil reçoit UNIQUEMENT les données des boutiques dont
-# la personne connectée est membre actif. « my_shops » = la liste de ces boutiques.
-# Une boutique ne reçoit donc jamais les données d'une autre.
+# Chaque appareil reçoit UNIQUEMENT les données des boutiques dont la personne connectée est
+# membre actif : une boutique ne reçoit jamais les données d'une autre.
 #
-# ⚠️ Toute nouvelle table à synchroniser doit être ajoutée ICI, et aussi dans la
-# « publication » Supabase (voir supabase/migrations/…_powersync_publication.sql).
+# Et selon le NIVEAU D'ACCÈS de la personne (shop_members.access_level, calculé par le serveur
+# à partir de ses rôles — migration …_comptes_equipe.sql), trois façons de recevoir :
+#   • owner (propriétaire) : tout, y compris les codes PIN de l'équipe (tablette partagée) ;
+#   • costs (gérant, responsable du stock) : tout, SAUF les codes PIN ;
+#   • team (vendeur, caissier, compteur, livreur) : ni prix d'achat, ni coûts, ni comptes,
+#     ni journal des actions, ni codes PIN.
+# Une personne a UN seul niveau par boutique : elle ne reçoit donc jamais une même ligne de deux
+# façons différentes. Les colonnes absentes restent vides dans son téléphone.
+#
+# ⚠️ Toute nouvelle table à synchroniser doit être ajoutée ICI (dans les trois flux, ou exclue
+# exprès du flux « team »), et aussi dans la « publication » Supabase
+# (voir supabase/migrations/…_powersync_publication.sql). Un test vérifie ce fichier
+# (tests/sync-config.test.ts).
 # =============================================================================
 
 config:
   edition: 3
 
 streams:
-  shop_data:
+  # --- Propriétaire : tout ---
+  shop_owner:
     auto_subscribe: true
     with:
-      my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true
+      my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true AND access_level = 'owner'
     queries:
       # La boutique et les personnes
       - SELECT * FROM shops WHERE id IN my_shops
@@ -47,3 +58,62 @@ streams:
       - SELECT * FROM reports WHERE shop_id IN my_shops
       # La traçabilité
       - SELECT * FROM audit_log WHERE shop_id IN my_shops
+
+  # --- Gérant, responsable du stock : les coûts, sans les codes PIN ---
+  shop_costs:
+    auto_subscribe: true
+    with:
+      my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true AND access_level = 'costs'
+    queries:
+      - SELECT * FROM shops WHERE id IN my_shops
+      - SELECT id, shop_id, user_id, display_name, max_discount_percent, active, access_level, created_at, updated_at FROM shop_members WHERE shop_id IN my_shops
+      - SELECT * FROM shop_member_roles WHERE shop_id IN my_shops
+      - SELECT * FROM devices WHERE shop_id IN my_shops
+      - SELECT * FROM customers WHERE shop_id IN my_shops
+      - SELECT * FROM payment_methods WHERE shop_id IN my_shops
+      - SELECT * FROM categories WHERE shop_id IN my_shops
+      - SELECT * FROM products WHERE shop_id IN my_shops
+      - SELECT * FROM product_units WHERE shop_id IN my_shops
+      - SELECT * FROM stock_receipts WHERE shop_id IN my_shops
+      - SELECT * FROM stock_lots WHERE shop_id IN my_shops
+      - SELECT * FROM stock_movements WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_counts WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_lines WHERE shop_id IN my_shops
+      - SELECT * FROM cash_sessions WHERE shop_id IN my_shops
+      - SELECT * FROM sales WHERE shop_id IN my_shops
+      - SELECT * FROM sale_items WHERE shop_id IN my_shops
+      - SELECT * FROM payments WHERE shop_id IN my_shops
+      - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
+      - SELECT * FROM cash_movements WHERE shop_id IN my_shops
+      - SELECT * FROM reports WHERE shop_id IN my_shops
+      - SELECT * FROM audit_log WHERE shop_id IN my_shops
+
+  # --- Équipe (vendeur, caissier, compteur, livreur) : ni coûts, ni comptes, ni journal, ni codes PIN ---
+  shop_team:
+    auto_subscribe: true
+    with:
+      my_shops: SELECT shop_id FROM shop_members WHERE user_id = auth.user_id() AND active = true AND access_level = 'team'
+    queries:
+      - SELECT * FROM shops WHERE id IN my_shops
+      - SELECT id, shop_id, user_id, display_name, max_discount_percent, active, access_level, created_at, updated_at FROM shop_members WHERE shop_id IN my_shops
+      - SELECT * FROM shop_member_roles WHERE shop_id IN my_shops
+      - SELECT * FROM devices WHERE shop_id IN my_shops
+      - SELECT * FROM customers WHERE shop_id IN my_shops
+      - SELECT * FROM payment_methods WHERE shop_id IN my_shops
+      - SELECT * FROM categories WHERE shop_id IN my_shops
+      - SELECT * FROM products WHERE shop_id IN my_shops
+      # Sans le prix d'achat
+      - SELECT id, shop_id, product_id, name, factor, sale_price, barcode, is_default, sort_order, archived_at, created_at, updated_at FROM product_units WHERE shop_id IN my_shops
+      - SELECT * FROM stock_receipts WHERE shop_id IN my_shops
+      # Sans le coût des lots ni celui des mouvements (le serveur calcule le coût de leurs sorties)
+      - SELECT id, shop_id, product_id, receipt_id, expiry_date, initial_quantity, supplier_name, received_at, created_by, device_id, created_at, updated_at FROM stock_lots WHERE shop_id IN my_shops
+      - SELECT id, shop_id, product_id, lot_id, type, quantity, loss_reason, receipt_id, sale_id, sale_item_id, inventory_count_id, note, occurred_at, created_by, device_id, created_at FROM stock_movements WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_counts WHERE shop_id IN my_shops
+      - SELECT * FROM inventory_lines WHERE shop_id IN my_shops
+      - SELECT * FROM cash_sessions WHERE shop_id IN my_shops
+      - SELECT * FROM sales WHERE shop_id IN my_shops
+      - SELECT * FROM sale_items WHERE shop_id IN my_shops
+      - SELECT * FROM payments WHERE shop_id IN my_shops
+      - SELECT * FROM customer_ledger WHERE shop_id IN my_shops
+      - SELECT * FROM cash_movements WHERE shop_id IN my_shops
+      # Pas de « reports » (comptes et clôtures contiennent les bénéfices), pas de journal « audit_log »

@@ -48,6 +48,8 @@ const shop_members = new Table({
   pin_salt: column.text,
   max_discount_percent: column.integer,
   active: column.integer,
+  // Ce que reçoit le téléphone de la personne (owner / costs / team), calculé par le serveur
+  access_level: column.text,
   created_at: column.text,
   updated_at: column.text,
 });

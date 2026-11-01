@@ -105,6 +105,7 @@ describe('Vérification complète : le tableau des droits', () => {
     seller: ['sale.create', 'credit.repayment', 'customers.edit'],
     stock_manager: ['stock.receive', 'stock.count', 'stock.adjust', 'stock.view_costs'],
     stock_counter: ['stock.count'],
+    delivery: ['credit.repayment'],
   };
 
   it('chaque rôle a exactement ses droits, ni plus ni moins', () => {
@@ -128,7 +129,10 @@ describe('Vérification complète : le tableau des droits', () => {
     ] as const) {
       expect(can(['owner'], permission)).toBe(true);
       expect(
-        can(['manager', 'cashier', 'seller', 'stock_manager', 'stock_counter'], permission)
+        can(
+          ['manager', 'cashier', 'seller', 'stock_manager', 'stock_counter', 'delivery'],
+          permission
+        )
       ).toBe(false);
     }
   });
