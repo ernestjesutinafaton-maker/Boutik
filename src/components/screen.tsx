@@ -35,7 +35,15 @@ export function Screen({ title, stack = false, scroll = true, children }: Screen
   const { spacing, layout } = theme.app;
 
   const content = (
-    <View style={[styles.inner, { maxWidth: layout.contentMaxWidth, gap: spacing.md }]}>
+    <View
+      style={[
+        styles.inner,
+        // Sans défilement global, le contenu prend exactement la hauteur de l'écran : la liste
+        // qu'il contient défile alors d'elle-même. Sinon, dans un navigateur, elle s'allongeait
+        // au-delà de la fenêtre et plus rien ne défilait (bouton « Encaisser » inatteignable).
+        !scroll && styles.fill,
+        { maxWidth: layout.contentMaxWidth, gap: spacing.md },
+      ]}>
       <UpdateBanner />
       <SyncStatusBanner />
       <SubscriptionBanner />

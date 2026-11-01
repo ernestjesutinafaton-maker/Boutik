@@ -92,6 +92,8 @@ export default function CashMovementScreen() {
             {allowed.map((item) => (
               <Chip
                 key={item.type}
+                style={styles.chip}
+                textStyle={styles.chipText}
                 selected={item.type === type}
                 onPress={() => setType(item.type)}>
                 {t(`cash.types.${item.type}`)}
@@ -109,6 +111,8 @@ export default function CashMovementScreen() {
                 {EXPENSE_CATEGORIES.map((candidate) => (
                   <Chip
                     key={candidate}
+                    style={styles.chip}
+                    textStyle={styles.chipText}
                     selected={candidate === category}
                     onPress={() => setCategory(candidate)}>
                     {EXPENSE_LABELS[candidate]}
@@ -129,6 +133,8 @@ export default function CashMovementScreen() {
             {methods.map((candidate) => (
               <Chip
                 key={candidate.id}
+                style={styles.chip}
+                textStyle={styles.chipText}
                 selected={candidate.id === method?.id}
                 onPress={() => setMethodId(candidate.id)}>
                 {candidate.label}
@@ -150,5 +156,13 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+  },
+  // Une étiquette trop longue pour l'écran (petit téléphone, nom de mode de paiement très long)
+  // est raccourcie avec « … » au lieu de sortir de l'écran
+  chip: {
+    maxWidth: '100%',
+  },
+  chipText: {
+    flexShrink: 1,
   },
 });
