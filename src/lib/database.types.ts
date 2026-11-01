@@ -1803,6 +1803,13 @@ export type Database = {
         }
         Returns: string
       }
+      create_team_invite: {
+        Args: { p_email: string; p_member_id: string }
+        Returns: {
+          invite_code: string
+          invite_expires_at: string
+        }[]
+      }
       declare_subscription_payment: {
         Args: {
           p_message: string
@@ -1817,13 +1824,6 @@ export type Database = {
         Returns: {
           payment_id: string
           provisional_until: string
-        }[]
-      }
-      create_team_invite: {
-        Args: { p_email: string; p_member_id: string }
-        Returns: {
-          invite_code: string
-          invite_expires_at: string
         }[]
       }
       get_team_invite: {
@@ -1863,15 +1863,11 @@ export type Database = {
         Args: { p_confirmation: string; p_shop_id: string }
         Returns: undefined
       }
-      revoke_team_invite: { Args: { p_member_id: string }; Returns: undefined }
       review_subscription_payment: {
         Args: { p_accept: boolean; p_note: string; p_payment_id: string }
         Returns: undefined
       }
-      update_my_member_profile: {
-        Args: { p_display_name: string; p_pin_hash: string; p_pin_salt: string }
-        Returns: undefined
-      }
+      revoke_team_invite: { Args: { p_member_id: string }; Returns: undefined }
       subscription_quote: {
         Args: { p_shop_id: string }
         Returns: {
@@ -1879,6 +1875,10 @@ export type Database = {
           monthly_price: number
           reason: string
         }[]
+      }
+      update_my_member_profile: {
+        Args: { p_display_name: string; p_pin_hash: string; p_pin_salt: string }
+        Returns: undefined
       }
     }
     Enums: {
