@@ -15,8 +15,9 @@ type LotRow = {
   id: string;
   expiry_date: string | null;
   received_at: string;
-  cost_price: number;
-  cost_quantity: number;
+  /** Vides sur le téléphone d'un membre « équipe » : il ne reçoit pas les coûts */
+  cost_price: number | null;
+  cost_quantity: number | null;
   supplier_name: string | null;
   remaining: number;
 };
@@ -33,8 +34,9 @@ function toLot(row: LotRow): ProductLot {
     id: row.id,
     expiryDate: row.expiry_date ? row.expiry_date.slice(0, 10) : null,
     receivedAt: row.received_at,
-    costPrice: row.cost_price,
-    costQuantity: row.cost_quantity,
+    // Sans les coûts (membre « équipe ») : coût 0 ici, le serveur calcule le vrai coût de ses sorties
+    costPrice: row.cost_price ?? 0,
+    costQuantity: row.cost_quantity ?? 1000,
     supplierName: row.supplier_name,
     remaining: row.remaining,
   };

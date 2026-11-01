@@ -373,8 +373,9 @@ type NetMovementRow = {
 /** Ce qui est encore sorti du stock pour une vente (ventes − retours déjà faits), lot par lot. */
 async function netSaleMovements(tx: Transaction, saleId: string): Promise<NetMovementRow[]> {
   return tx.getAll<NetMovementRow>(
+    // COALESCE : le téléphone d'un membre « équipe » n'a pas les coûts (le serveur les calcule)
     `SELECT product_id, lot_id, sale_item_id, SUM(quantity) AS quantity,
-            SUM(cost_amount) AS cost_amount
+            COALESCE(SUM(cost_amount), 0) AS cost_amount
        FROM stock_movements
       WHERE sale_id = ? AND type IN ('sale', 'return')
       GROUP BY product_id, lot_id, sale_item_id

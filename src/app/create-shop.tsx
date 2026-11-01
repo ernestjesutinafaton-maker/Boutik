@@ -58,6 +58,8 @@ export default function CreateShopScreen() {
 
   return (
     <AuthLayout title={t('createShop.title')} subtitle={t('createShop.subtitle')}>
+      {/* Un membre invité dont le lien n'a pas abouti ne doit pas créer une boutique par erreur */}
+      <Notice tone="info" message={t('createShop.invitedHint')} />
       <TextField
         label={t('createShop.shopName')}
         placeholder={t('createShop.shopNamePlaceholder')}

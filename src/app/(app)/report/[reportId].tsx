@@ -43,12 +43,15 @@ export default function ReportScreen() {
   }
 
   const title = t(`report.kinds.${report.kind}`);
+  // Une clôture faite par un membre « équipe » n'a ni coûts ni bénéfices (retirés par le serveur)
+  const showCosts = report.costsKnown && can('stock.view_costs');
   const html = reportHtml({
     report: report.data,
     title,
     shopName: settings.name,
     currency: settings.currencyCode,
     showProfit,
+    showCosts,
   });
   const run = (action: () => Promise<void>) =>
     action().catch((actionError: unknown) => {
@@ -89,7 +92,13 @@ export default function ReportScreen() {
         </Card.Content>
       </Card>
       {error ? <Notice message={error} /> : null}
-      <ReportView report={report.data} currency={settings.currencyCode} showProfit={showProfit} />
+      {!report.costsKnown ? <Notice tone="info" message={t('report.withoutCosts')} /> : null}
+      <ReportView
+        report={report.data}
+        currency={settings.currencyCode}
+        showProfit={showProfit}
+        showCosts={showCosts}
+      />
     </Screen>
   );
 }

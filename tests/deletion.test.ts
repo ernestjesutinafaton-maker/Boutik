@@ -29,9 +29,9 @@ describe('Supprimer un client', () => {
     )[0];
     expect(customer.archived_at).not.toBeNull();
     expect(
-      db.query<{ action: string }>('SELECT action FROM audit_log ORDER BY created_at').map(
-        (row) => row.action
-      )
+      db
+        .query<{ action: string }>('SELECT action FROM audit_log ORDER BY created_at')
+        .map((row) => row.action)
     ).toEqual(['credit.write_off', 'customer.update']);
   });
 

@@ -1,6 +1,6 @@
 import { useQuery } from '@powersync/react';
 
-import type { ReportData } from '@/domain/report';
+import { type ReportData, withCostDefaults } from '@/domain/report';
 import { useShop } from '@/shop/shop-provider';
 
 /** Lecture des rapports archivés (base LOCALE). */
@@ -15,6 +15,8 @@ export type ArchivedReport = {
   notes: string | null;
   createdByName: string | null;
   data: ReportData;
+  /** Faux pour une clôture faite par un membre « équipe » : ni coûts ni bénéfices dans la fiche */
+  costsKnown: boolean;
 };
 
 type ReportRow = {
@@ -28,6 +30,7 @@ type ReportRow = {
 };
 
 function toReport(row: ReportRow): ArchivedReport {
+  const { data, costsKnown } = withCostDefaults(JSON.parse(row.data) as ReportData);
   return {
     id: row.id,
     kind: row.kind,
@@ -35,7 +38,8 @@ function toReport(row: ReportRow): ArchivedReport {
     periodEnd: row.period_end,
     notes: row.notes,
     createdByName: row.created_by_name,
-    data: JSON.parse(row.data) as ReportData,
+    data,
+    costsKnown,
   };
 }
 

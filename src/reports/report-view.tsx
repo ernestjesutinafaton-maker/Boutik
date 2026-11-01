@@ -17,10 +17,15 @@ type ReportViewProps = {
   currency: CurrencyCode;
   /** Les bénéfices ne sont montrés qu'au propriétaire */
   showProfit: boolean;
+  /**
+   * Les parties calculées avec les prix d'achat (achats, valeur du stock, bénéfices) : seulement
+   * si la fiche les contient et que la personne a le droit de voir les coûts
+   */
+  showCosts: boolean;
 };
 
 /** La fiche de rapport à l'écran : ventes, caisse, paiements, crédit, dépenses, bénéfice, stock. */
-export function ReportView({ report, currency, showProfit }: ReportViewProps) {
+export function ReportView({ report, currency, showProfit, showCosts }: ReportViewProps) {
   const theme = useAppTheme();
   const { t } = useTranslation();
   const money = (amount: number) => formatMoney(amount, currency);
@@ -98,14 +103,16 @@ export function ReportView({ report, currency, showProfit }: ReportViewProps) {
           <Row key={category} label={EXPENSE_LABELS[category] ?? category} value={money(amount)} />
         ))}
         <Row label={t('report.expensesTotal')} value={money(report.expenses.total)} bold />
-        <Row label={t('report.stockPurchases')} value={money(report.cash.stockPurchases)} />
+        {showCosts ? (
+          <Row label={t('report.stockPurchases')} value={money(report.cash.stockPurchases)} />
+        ) : null}
         <Row label={t('report.withdrawals')} value={money(report.cash.withdrawals)} />
         {report.cash.deposits > 0 ? (
           <Row label={t('report.deposits')} value={money(report.cash.deposits)} />
         ) : null}
       </Section>
 
-      {showProfit ? (
+      {showProfit && showCosts ? (
         <Section title={t('report.sections.profit')}>
           <Row label={t('report.revenue')} value={money(report.sales.revenue)} />
           <Row label={t('report.costOfGoods')} value={`− ${money(report.costOfGoods)}`} />
@@ -130,9 +137,13 @@ export function ReportView({ report, currency, showProfit }: ReportViewProps) {
       ) : null}
 
       <Section title={t('report.sections.stock')}>
-        <Row label={t('report.received')} value={money(report.stock.receivedValue)} />
-        <Row label={t('report.losses')} value={money(report.losses)} />
-        <Row label={t('report.stockValue')} value={money(report.stock.valueAtEnd)} bold />
+        {showCosts ? (
+          <>
+            <Row label={t('report.received')} value={money(report.stock.receivedValue)} />
+            <Row label={t('report.losses')} value={money(report.losses)} />
+            <Row label={t('report.stockValue')} value={money(report.stock.valueAtEnd)} bold />
+          </>
+        ) : null}
         <Row
           label={t('report.cashDifferences', { count: report.cashDifferences.sessions })}
           value={money(report.cashDifferences.total)}

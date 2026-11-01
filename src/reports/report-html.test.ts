@@ -24,8 +24,25 @@ const report = buildReport({
 describe('Fiche de rapport en HTML', () => {
   it('le bénéfice n’apparaît que pour la personne qui a le droit de le voir', () => {
     const base = { report, title: 'Compte', shopName: 'Chez Maman', currency: 'XOF' as const };
-    expect(reportHtml({ ...base, showProfit: true })).toContain('Bénéfice net');
-    expect(reportHtml({ ...base, showProfit: false })).not.toContain('Bénéfice net');
+    expect(reportHtml({ ...base, showProfit: true, showCosts: true })).toContain('Bénéfice net');
+    expect(reportHtml({ ...base, showProfit: false, showCosts: true })).not.toContain(
+      'Bénéfice net'
+    );
+  });
+
+  it('sans les coûts (clôture faite par l’équipe) : ni bénéfice, ni achats, ni valeur du stock', () => {
+    const html = reportHtml({
+      report,
+      title: 'Clôture',
+      shopName: 'Chez Maman',
+      currency: 'XOF',
+      showProfit: true,
+      showCosts: false,
+    });
+    expect(html).not.toContain('Bénéfice net');
+    expect(html).not.toContain('Achats de marchandise');
+    expect(html).not.toContain('Valeur du stock');
+    expect(html).toContain('Carburant');
   });
 
   it('montre les dépenses par catégorie et protège les noms', () => {
@@ -35,6 +52,7 @@ describe('Fiche de rapport en HTML', () => {
       shopName: 'Chez Maman',
       currency: 'XOF',
       showProfit: false,
+      showCosts: true,
     });
     expect(html).toContain('Carburant');
     expect(html).toContain('Awa &lt;B&gt;');

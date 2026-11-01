@@ -98,6 +98,8 @@ export const fr = {
   createShop: {
     title: 'Créons ta boutique',
     subtitle: 'Quelques informations, et c’est parti.',
+    invitedHint:
+      'Tu as reçu un lien d’invitation d’une boutique ? Rouvre ce lien pour la rejoindre : ne crée pas une nouvelle boutique.',
     shopName: 'Nom de la boutique',
     shopNamePlaceholder: 'Ex. Boutique Chez Maman',
     ownerName: 'Ton nom',
@@ -113,6 +115,10 @@ export const fr = {
     title: 'Impossible de charger ta boutique',
     description: 'Vérifie ta connexion internet, puis réessaie.',
     retry: 'Réessayer',
+  },
+  accessRemoved: {
+    title: 'Accès retiré',
+    text: 'Le propriétaire de la boutique t’a retiré(e) de l’équipe : tu ne vois plus ses données. Si c’est une erreur, demande-lui de te réactiver.',
   },
   account: {
     title: 'Mon compte',

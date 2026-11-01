@@ -206,3 +206,33 @@ export function buildReport(input: ReportInput): ReportData {
     totalDebt: sum(debtors.map((debtor) => debtor.balance)),
   };
 }
+
+/** Les parties d'une fiche calculées à partir des coûts (prix d'achat). */
+const COST_DEFAULTS = {
+  costOfGoods: 0,
+  grossProfit: 0,
+  netProfit: 0,
+  losses: 0,
+  adjustments: 0,
+  stock: { receivedValue: 0, valueAtEnd: 0 },
+} as const;
+
+/**
+ * Une fiche archivée, lue telle quelle. Une clôture faite par un membre « équipe » n'a pas les
+ * coûts : le serveur les retire (son téléphone ne les a pas). On complète alors ces parties à 0
+ * pour que l'affichage ne casse pas, et costsKnown = false dit de ne PAS les montrer.
+ */
+export function withCostDefaults(stored: Partial<ReportData> & Pick<ReportData, 'cash'>): {
+  data: ReportData;
+  costsKnown: boolean;
+} {
+  const costsKnown = typeof stored.costOfGoods === 'number' && stored.stock !== undefined;
+  return {
+    data: {
+      ...COST_DEFAULTS,
+      ...stored,
+      cash: { ...stored.cash, stockPurchases: stored.cash.stockPurchases ?? 0 },
+    } as ReportData,
+    costsKnown,
+  };
+}

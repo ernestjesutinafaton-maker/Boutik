@@ -24,9 +24,10 @@ export type CurrentShop = {
 
 /**
  * loading = chargement en cours ; ready = boutique trouvée ;
- * none = pas encore de boutique (il faut la créer) ; error = chargement impossible.
+ * none = pas encore de boutique (il faut la créer) ; error = chargement impossible ;
+ * removed = la personne a été retirée de l'équipe par le propriétaire.
  */
-export type ShopStatus = 'loading' | 'ready' | 'none' | 'error';
+export type ShopStatus = 'loading' | 'ready' | 'none' | 'error' | 'removed';
 
 type ShopResult = { status: Exclude<ShopStatus, 'loading'>; shop: CurrentShop | null };
 
@@ -65,7 +66,9 @@ async function fetchShop(userId: string): Promise<ShopResult> {
 
   const membership = data[0];
   if (!membership?.shops) {
-    return { status: 'none', shop: null };
+    // Pas de boutique active : jamais eu… ou retiré(e) de l'équipe par le propriétaire ?
+    const { data: membershipStatus } = await supabase.rpc('my_membership_status');
+    return { status: membershipStatus === 'removed' ? 'removed' : 'none', shop: null };
   }
 
   const shop: CurrentShop = {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { closingDifferences, expectedByMethod } from './cash';
-import { buildReport, type ReportInput } from './report';
+import { buildReport, type ReportInput, withCostDefaults } from './report';
 
 describe('Caisse du jour', () => {
   it('calcule l’argent attendu, mode par mode', () => {
@@ -158,5 +158,37 @@ describe('Rapport (clôture ou compte)', () => {
     ]);
     expect(report.debtors.map((debtor) => debtor.name)).toEqual(['Koffi', 'Awa']);
     expect(report.totalDebt).toBe(14_000);
+  });
+});
+
+describe('Fiche archivée sans coûts (clôture faite par un membre de l’équipe)', () => {
+  it('complète les parties manquantes à 0 et dit de ne pas les montrer', () => {
+    const { data, costsKnown } = withCostDefaults({
+      sales: {
+        count: 3,
+        cancelledCount: 0,
+        total: 16_500,
+        discounts: 0,
+        returns: 0,
+        revenue: 16_500,
+      },
+      cash: { withdrawals: 0, deposits: 0 } as never,
+    });
+    expect(costsKnown).toBe(false);
+    expect(data.stock).toEqual({ receivedValue: 0, valueAtEnd: 0 });
+    expect(data.cash.stockPurchases).toBe(0);
+    expect(data.sales.total).toBe(16_500);
+  });
+
+  it('une fiche complète garde ses coûts', () => {
+    const { data, costsKnown } = withCostDefaults({
+      costOfGoods: 10_000,
+      grossProfit: 6500,
+      stock: { receivedValue: 50_000, valueAtEnd: 40_000 },
+      cash: { stockPurchases: 20_000, withdrawals: 0, deposits: 0 },
+    });
+    expect(costsKnown).toBe(true);
+    expect(data.grossProfit).toBe(6500);
+    expect(data.cash.stockPurchases).toBe(20_000);
   });
 });

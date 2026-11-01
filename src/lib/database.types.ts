@@ -1235,6 +1235,7 @@ export type Database = {
       }
       shop_members: {
         Row: {
+          access_level: string
           active: boolean
           created_at: string
           display_name: string
@@ -1247,6 +1248,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          access_level?: string
           active?: boolean
           created_at?: string
           display_name: string
@@ -1259,6 +1261,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          access_level?: string
           active?: boolean
           created_at?: string
           display_name?: string
@@ -1680,11 +1683,77 @@ export type Database = {
           },
         ]
       }
+      team_invites: {
+        Row: {
+          code_hash: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          expires_at: string
+          id: string
+          member_id: string
+          revoked_at: string | null
+          shop_id: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code_hash: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          expires_at: string
+          id?: string
+          member_id: string
+          revoked_at?: string | null
+          shop_id: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code_hash?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          expires_at?: string
+          id?: string
+          member_id?: string
+          revoked_at?: string | null
+          shop_id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_invites_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      accept_team_invite: {
+        Args: {
+          p_code: string
+          p_display_name: string
+          p_pin_hash: string
+          p_pin_salt: string
+        }
+        Returns: string
+      }
       admin_overview: {
         Args: never
         Returns: {
@@ -1750,6 +1819,37 @@ export type Database = {
           provisional_until: string
         }[]
       }
+      create_team_invite: {
+        Args: { p_email: string; p_member_id: string }
+        Returns: {
+          invite_code: string
+          invite_expires_at: string
+        }[]
+      }
+      get_team_invite: {
+        Args: { p_code: string }
+        Returns: {
+          invite_status: string
+          member_name: string
+          member_roles: string[]
+          shop_name: string
+          suggested_email: string
+        }[]
+      }
+      invite_team_member: {
+        Args: {
+          p_display_name: string
+          p_email: string
+          p_roles: string[]
+          p_shop_id: string
+        }
+        Returns: {
+          invite_code: string
+          invite_expires_at: string
+          member_id: string
+        }[]
+      }
+      my_membership_status: { Args: never; Returns: string }
       register_device: {
         Args: {
           p_device_id: string
@@ -1763,8 +1863,13 @@ export type Database = {
         Args: { p_confirmation: string; p_shop_id: string }
         Returns: undefined
       }
+      revoke_team_invite: { Args: { p_member_id: string }; Returns: undefined }
       review_subscription_payment: {
         Args: { p_accept: boolean; p_note: string; p_payment_id: string }
+        Returns: undefined
+      }
+      update_my_member_profile: {
+        Args: { p_display_name: string; p_pin_hash: string; p_pin_salt: string }
         Returns: undefined
       }
       subscription_quote: {

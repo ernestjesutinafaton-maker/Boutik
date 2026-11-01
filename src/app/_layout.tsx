@@ -5,11 +5,12 @@ import { Nunito_500Medium } from '@expo-google-fonts/nunito/500Medium';
 import { Nunito_700Bold } from '@expo-google-fonts/nunito/700Bold';
 import { Nunito_800ExtraBold } from '@expo-google-fonts/nunito/800ExtraBold';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 
 import { AuthProvider, useAuth } from '@/auth/auth-provider';
+import { AccessRemovedScreen } from '@/components/access-removed-screen';
 import { ShopErrorScreen } from '@/components/shop-error-screen';
 import { PowerSyncProvider } from '@/db/powersync-provider';
 import { ShopProvider, useShop } from '@/shop/shop-provider';
@@ -76,10 +77,14 @@ export default function RootLayout() {
  *   - pas connecté               → connexion / inscription
  *   - connecté, sans boutique    → création de la boutique
  *   - connecté, avec sa boutique → l'application (Caisse, Produits…)
+ *   - retiré(e) de l'équipe       → « Accès retiré »
+ * La page d'un lien d'invitation reste ouverte dans tous les cas.
  */
 function RootNavigator({ fontsSettled }: { fontsSettled: boolean }) {
   const { session, isLoading } = useAuth();
   const { status } = useShop();
+  const pathname = usePathname();
+  const isInvitation = pathname.startsWith('/invitation/');
   const isSignedIn = session !== null;
   const isReady = fontsSettled && !isLoading && (!isSignedIn || status !== 'loading');
 
@@ -92,8 +97,11 @@ function RootNavigator({ fontsSettled }: { fontsSettled: boolean }) {
   if (!isReady) {
     return null; // l'écran de démarrage est encore affiché
   }
-  if (isSignedIn && status === 'error') {
+  if (isSignedIn && status === 'error' && !isInvitation) {
     return <ShopErrorScreen />;
+  }
+  if (isSignedIn && status === 'removed' && !isInvitation) {
+    return <AccessRemovedScreen />;
   }
 
   // L'écran où envoyer la personne selon sa situation. On le dit explicitement à chaque
@@ -112,8 +120,9 @@ function RootNavigator({ fontsSettled }: { fontsSettled: boolean }) {
       <Stack.Protected guard={!isSignedIn} redirectTo={home}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
-      {/* Page publique, accessible connecté ou non */}
+      {/* Pages publiques, accessibles connecté ou non */}
       <Stack.Screen name="telecharger" />
+      <Stack.Screen name="invitation/[code]" />
     </Stack>
   );
 }

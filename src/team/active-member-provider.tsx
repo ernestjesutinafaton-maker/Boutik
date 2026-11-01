@@ -5,6 +5,7 @@ import { AppState } from 'react-native';
 import { useAuth } from '@/auth/auth-provider';
 import { type Permission, permissionsFor, type Role } from '@/domain/permissions';
 import { lockedUntil, MAX_PIN_ATTEMPTS, verifyPin } from '@/domain/pin';
+import { asksWhoIsThere } from '@/domain/shared-device';
 import { supabase } from '@/lib/supabase';
 import { useShop } from '@/shop/shop-provider';
 
@@ -74,8 +75,19 @@ export function ActiveMemberProvider({ children }: { children: ReactNode }) {
   const lastActiveAt = useRef(0);
 
   const activeMembers = members.filter((member) => member.active);
-  const usesPin = activeMembers.length > 1;
   const lockableMembers = activeMembers.filter((member) => member.hasPin);
+  const accountMember = activeMembers.find((candidate) => candidate.id === shop?.memberId);
+  // Avant la première synchronisation, on utilise les rôles reçus avec la boutique
+  const accountRoles = accountMember?.roles.length
+    ? accountMember.roles
+    : (shop?.memberRoles ?? []);
+  // « Qui êtes-vous ? » seulement sur l'appareil de la boutique (compte du propriétaire) ;
+  // sur le téléphone personnel d'un membre, il entre directement dans son interface
+  const usesPin = asksWhoIsThere({
+    accountRoles,
+    accountMemberId: shop?.memberId ?? null,
+    membersWithPin: lockableMembers.map((member) => member.id),
+  });
 
   // Au démarrage : reprendre la dernière personne active si elle est partie depuis peu
   useEffect(() => {
@@ -115,7 +127,6 @@ export function ActiveMemberProvider({ children }: { children: ReactNode }) {
 
   // La personne active : choisie avec son PIN… ou, sans équipe, le compte connecté
   const chosen = activeMembers.find((candidate) => candidate.id === activeId) ?? null;
-  const accountMember = activeMembers.find((candidate) => candidate.id === shop?.memberId);
   let member: ActiveMember | null = null;
   if (usesPin) {
     member = chosen;
@@ -123,8 +134,7 @@ export function ActiveMemberProvider({ children }: { children: ReactNode }) {
     member = {
       id: shop.memberId,
       name: accountMember?.name ?? shop.memberName,
-      // Avant la première synchronisation, on utilise les rôles reçus avec la boutique
-      roles: accountMember?.roles.length ? accountMember.roles : shop.memberRoles,
+      roles: accountRoles,
       maxDiscountPercent: accountMember?.maxDiscountPercent ?? null,
     };
   }

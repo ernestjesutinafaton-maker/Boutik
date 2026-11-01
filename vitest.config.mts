@@ -14,5 +14,10 @@ export default defineConfig({
   },
   test: {
     include: ['src/**/*.test.ts', 'supabase/tests/**/*.test.ts', 'tests/**/*.test.ts'],
+    // Chaque test de la base (supabase/tests) recrée une base PostgreSQL en mémoire et rejoue
+    // toutes les migrations : quand tous les tests tournent ensemble, l'ordinateur est chargé.
+    // On leur laisse donc plus de temps que les 5 et 10 secondes par défaut.
+    testTimeout: 30_000,
+    hookTimeout: 60_000,
   },
 });

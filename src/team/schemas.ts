@@ -38,3 +38,25 @@ export const pinSchema = z
 export type MemberInput = z.input<typeof memberSchema>;
 export type MemberValues = z.output<typeof memberSchema>;
 export type PinInput = z.input<typeof pinSchema>;
+
+/**
+ * Inviter un membre avec un lien : les rôles (au moins un) ; le nom et l'e-mail sont facultatifs
+ * (le membre écrira son nom et choisira son e-mail en ouvrant le lien).
+ */
+export const inviteSchema = z.object({
+  name: z.string().trim().max(60, message('errors.memberNameTooLong')),
+  email: z
+    .string()
+    .trim()
+    .refine((value) => value === '' || z.email().safeParse(value).success, {
+      error: message('errors.emailInvalid'),
+    }),
+  roles: z.array(z.enum(ROLES)).min(1, message('errors.rolesRequired')),
+});
+
+export type InviteInput = z.infer<typeof inviteSchema>;
+
+/** Rejoindre avec un lien : le nom est facultatif (le profil en a déjà un). */
+export const joinNameSchema = z.object({
+  name: z.string().trim().max(60, message('errors.memberNameTooLong')),
+});

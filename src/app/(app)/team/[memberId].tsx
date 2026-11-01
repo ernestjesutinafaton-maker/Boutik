@@ -16,13 +16,17 @@ import { errorMessageKey } from '@/lib/error-messages';
 import { type FieldErrors, firstErrorPerField } from '@/lib/validation';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
+import { MemberAccountCard } from '@/team/member-account-card';
 import { MemberFields } from '@/team/member-fields';
 import { type MemberInput, memberSchema, type PinInput, pinSchema } from '@/team/schemas';
 import { setMemberPin, updateMember } from '@/team/team-actions';
 import { type TeamMember, useTeamMembers } from '@/team/team-data';
 import { useAppTheme } from '@/theme/paper-theme';
 
-/** Fiche d'une personne de l'équipe : nom, rôles, remise maximale, code PIN, active ou non. */
+/**
+ * Fiche d'une personne de l'équipe : nom, rôles, remise maximale, compte personnel (lien
+ * d'invitation), code PIN, active ou non.
+ */
 export default function MemberScreen() {
   const { t } = useTranslation();
   const { memberId } = useLocalSearchParams<{ memberId: string }>();
@@ -159,6 +163,8 @@ function MemberEditor({ member }: { member: TeamMember }) {
           </BigButton>
         </Card.Content>
       </Card>
+
+      {!isAccountOwner && member.active ? <MemberAccountCard member={member} /> : null}
 
       <Card mode="outlined">
         <Card.Title title={t('team.changePin')} titleVariant="titleLarge" />

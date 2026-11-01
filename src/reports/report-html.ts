@@ -27,6 +27,8 @@ export function reportHtml(input: {
   shopName: string;
   currency: CurrencyCode;
   showProfit: boolean;
+  /** Achats, valeur du stock et bénéfices : seulement si la fiche a les coûts et la personne le droit */
+  showCosts: boolean;
 }): string {
   const { report, currency } = input;
   const money = (amount: number) => escapeHtml(formatMoney(amount, currency));
@@ -36,17 +38,18 @@ export function reportHtml(input: {
   const section = (title: string, rows: string[]) =>
     rows.length ? `<h2>${title}</h2><table>${rows.join('')}</table>` : '';
 
-  const profit = input.showProfit
-    ? section('Bénéfice', [
-        row('Chiffre d’affaires', money(report.sales.revenue)),
-        row('Coût d’achat des marchandises vendues', `− ${money(report.costOfGoods)}`),
-        row('Bénéfice brut', money(report.grossProfit), 'bold'),
-        row('Dépenses', `− ${money(report.expenses.total)}`),
-        row('Pertes (casse, périmés, vols)', `− ${money(report.losses)}`),
-        row('Écarts d’inventaire', money(report.adjustments)),
-        row('Bénéfice net', money(report.netProfit), 'grand'),
-      ])
-    : '';
+  const profit =
+    input.showProfit && input.showCosts
+      ? section('Bénéfice', [
+          row('Chiffre d’affaires', money(report.sales.revenue)),
+          row('Coût d’achat des marchandises vendues', `− ${money(report.costOfGoods)}`),
+          row('Bénéfice brut', money(report.grossProfit), 'bold'),
+          row('Dépenses', `− ${money(report.expenses.total)}`),
+          row('Pertes (casse, périmés, vols)', `− ${money(report.losses)}`),
+          row('Écarts d’inventaire', money(report.adjustments)),
+          row('Bénéfice net', money(report.netProfit), 'grand'),
+        ])
+      : '';
 
   const closing = report.closing
     ? section('Caisse : attendu et compté', [
@@ -103,16 +106,23 @@ export function reportHtml(input: {
       row(text(EXPENSE_LABELS[category] ?? category), money(amount))
     ),
     row('Total des dépenses', money(report.expenses.total), 'bold'),
-    row('Achats de marchandise payés par la caisse', money(report.cash.stockPurchases)),
+    ...(input.showCosts
+      ? [row('Achats de marchandise payés par la caisse', money(report.cash.stockPurchases))]
+      : []),
     row('Retraits du propriétaire', money(report.cash.withdrawals)),
     row('Argent ajouté dans la caisse', money(report.cash.deposits)),
   ])}
   ${profit}
-  ${section('Stock', [
-    row('Marchandise reçue (prix d’achat)', money(report.stock.receivedValue)),
-    row('Pertes', money(report.losses)),
-    row('Valeur du stock à la fin', money(report.stock.valueAtEnd), 'bold'),
-  ])}
+  ${section(
+    'Stock',
+    input.showCosts
+      ? [
+          row('Marchandise reçue (prix d’achat)', money(report.stock.receivedValue)),
+          row('Pertes', money(report.losses)),
+          row('Valeur du stock à la fin', money(report.stock.valueAtEnd), 'bold'),
+        ]
+      : []
+  )}
   ${section('Écarts de caisse', [
     row(
       `Caisses clôturées : ${report.cashDifferences.sessions}`,

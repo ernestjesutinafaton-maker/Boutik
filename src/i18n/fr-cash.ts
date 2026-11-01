@@ -73,6 +73,8 @@ export const frCash = {
     empty: 'Aucun rapport archivé pour le moment.',
     period: 'Du {{start}} au {{end}}',
     madeBy: 'Fait par {{name}}',
+    withoutCosts:
+      'Clôture faite par un membre de l’équipe : elle ne contient ni les coûts ni les bénéfices (son téléphone ne les reçoit pas).',
     sections: {
       sales: 'Ventes',
       closing: 'Caisse : attendu et compté',

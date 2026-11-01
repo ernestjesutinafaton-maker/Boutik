@@ -289,3 +289,34 @@ describe('Modifier une vente', () => {
     expect(whileModifying).toEqual([]);
   });
 });
+
+describe('Téléphone d’un membre « équipe » (il ne reçoit pas les coûts)', () => {
+  it('vendre puis corriger la vente marche, avec un coût 0 en attendant le serveur', async () => {
+    // Ce que reçoit le téléphone d'un vendeur : les lots et les mouvements, sans leurs coûts
+    await db.execute('UPDATE stock_lots SET cost_price = NULL, cost_quantity = NULL');
+    await db.execute('UPDATE stock_movements SET cost_amount = NULL');
+
+    const { saleId } = await firstSale();
+    const result = await replaceSale(db, context, {
+      originalSaleId: saleId,
+      deviceNumber: 1,
+      lines: [ciment(1), cable(10)],
+      discount: 0,
+      payments: [],
+      customer: null,
+      note: null,
+      forceExpired: false,
+      refundMethodId: 'cash',
+      reason: 'Erreur de saisie',
+    });
+
+    expect(stockOf('ciment')).toBe(19_000);
+    const costs = db.query<{ cost_amount: number | null }>(
+      'SELECT cost_amount FROM stock_movements WHERE sale_id IN (?, ?)',
+      [saleId, result.saleId]
+    );
+    expect(costs.length).toBeGreaterThan(0);
+    // Aucun coût inventé : 0 partout (le serveur calculera le vrai coût à l'envoi)
+    expect(costs.every((row) => row.cost_amount === 0)).toBe(true);
+  });
+});
