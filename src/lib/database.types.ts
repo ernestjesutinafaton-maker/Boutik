@@ -80,8 +80,10 @@ export type Database = {
           amount: number
           cash_session_id: string | null
           category: string | null
+          courier_id: string | null
           created_at: string
           created_by: string | null
+          delivery_expense_id: string | null
           device_id: string | null
           id: string
           note: string | null
@@ -94,8 +96,10 @@ export type Database = {
           amount: number
           cash_session_id?: string | null
           category?: string | null
+          courier_id?: string | null
           created_at?: string
           created_by?: string | null
+          delivery_expense_id?: string | null
           device_id?: string | null
           id?: string
           note?: string | null
@@ -108,8 +112,10 @@ export type Database = {
           amount?: number
           cash_session_id?: string | null
           category?: string | null
+          courier_id?: string | null
           created_at?: string
           created_by?: string | null
+          delivery_expense_id?: string | null
           device_id?: string | null
           id?: string
           note?: string | null
@@ -127,10 +133,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "cash_movements_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "cash_movements_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cash_movements_delivery_expense_id_fkey"
+            columns: ["delivery_expense_id"]
+            isOneToOne: false
+            referencedRelation: "delivery_expenses"
             referencedColumns: ["id"]
           },
           {
@@ -429,6 +449,227 @@ export type Database = {
           },
         ]
       }
+      deliveries: {
+        Row: {
+          address: string
+          amount_to_collect: number
+          assigned_to: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          delivered_at: string | null
+          device_id: string | null
+          failed_reason: string | null
+          id: string
+          landmark: string | null
+          note: string | null
+          requested_at: string | null
+          sale_id: string | null
+          shop_id: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          amount_to_collect?: number
+          assigned_to?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          device_id?: string | null
+          failed_reason?: string | null
+          id?: string
+          landmark?: string | null
+          note?: string | null
+          requested_at?: string | null
+          sale_id?: string | null
+          shop_id: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          amount_to_collect?: number
+          assigned_to?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          delivered_at?: string | null
+          device_id?: string | null
+          failed_reason?: string | null
+          id?: string
+          landmark?: string | null
+          note?: string | null
+          requested_at?: string | null
+          sale_id?: string | null
+          shop_id?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deliveries_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deliveries_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      delivery_expenses: {
+        Row: {
+          amount: number
+          category: string
+          courier_id: string
+          created_at: string
+          created_by: string | null
+          delivery_id: string | null
+          device_id: string | null
+          id: string
+          note: string | null
+          occurred_at: string
+          proof_path: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          shop_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          courier_id: string
+          created_at?: string
+          created_by?: string | null
+          delivery_id?: string | null
+          device_id?: string | null
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          proof_path: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shop_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          courier_id?: string
+          created_at?: string
+          created_by?: string | null
+          delivery_id?: string | null
+          device_id?: string | null
+          id?: string
+          note?: string | null
+          occurred_at?: string
+          proof_path?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          shop_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "delivery_expenses_courier_id_fkey"
+            columns: ["courier_id"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_expenses_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_expenses_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_expenses_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "shop_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "delivery_expenses_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       devices: {
         Row: {
           created_at: string
@@ -649,6 +890,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_id: string | null
+          delivery_id: string | null
           device_id: string | null
           id: string
           kind: string
@@ -665,6 +907,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          delivery_id?: string | null
           device_id?: string | null
           id?: string
           kind: string
@@ -681,6 +924,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          delivery_id?: string | null
           device_id?: string | null
           id?: string
           kind?: string
@@ -709,6 +953,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_delivery_id_fkey"
+            columns: ["delivery_id"]
+            isOneToOne: false
+            referencedRelation: "deliveries"
             referencedColumns: ["id"]
           },
           {
