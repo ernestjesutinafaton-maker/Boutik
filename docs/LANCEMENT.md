@@ -29,6 +29,14 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
       d'un envoi sur Vercel). Le site, l'appli web et `public/version.json` pointent vers
       `…/releases/latest/download/boutik.apk`, qui donne toujours la dernière version. Pour une
       nouvelle version : `gh release create vX.Y.Z downloads/boutik.apk --repo ernestjesutinafaton-maker/Boutik-presentation`.
+- [x] Version 1.0.1 (38 Mo au lieu de 131) publiée le 01/11/2026 : Release `v1.0.1`.
+- [x] Mises à jour sans réinstaller (EAS Update) : `npm run update:android -- --message "…"`
+      (jamais `eas update` seul : il viderait `dist/`, le dossier du site). Depuis Expo 55, cette
+      commande ne lit PLUS le fichier `.env` : les trois réglages du serveur (`EXPO_PUBLIC_SUPABASE_URL`,
+      `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_POWERSYNC_URL`) sont enregistrés sur EAS,
+      environnement « production » (01/11/2026). Ils existent donc à trois endroits : `.env` (PC et
+      appli web), `eas.json` (APK) et EAS (mises à jour). Si l'un change, changer les trois
+      (`npx eas-cli@latest env:set production --name … --value … --visibility plaintext`).
 - [ ] Renseigner `EXPO_PUBLIC_VERSION_URL` (adresse de `version.json` sur le site) dans `eas.json`
       pour que l'appli annonce les nouvelles versions de l'APK.
 - [ ] Tester sur 2 ou 3 téléphones bon marché (Android 10 et plus), dont un sans Google Play.

@@ -80,7 +80,7 @@
     "web": "expo start --web",
     "build:web": "node scripts/clean-dist.mjs && expo export --platform web --output-dir dist/app && node scripts/fix-web-assets.mjs dist/app && workbox generateSW workbox-config.js && node scripts/build-site.mjs",
     "deploy:web": "npm run build:web && npx vercel@latest deploy dist --prod",
-    "update:android": "npx eas-cli@latest update --channel production --platform android --input-dir dist-update --non-interactive",
+    "update:android": "npx eas-cli@latest update --channel production --platform android --environment production --input-dir dist-update --non-interactive",
     "build:desktop-web": "cross-env BOUTIK_DESKTOP=1 expo export --platform web --output-dir dist-desktop",
     "desktop": "tauri dev",
     "build:desktop": "tauri build",
