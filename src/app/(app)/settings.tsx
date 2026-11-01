@@ -14,6 +14,7 @@ import {
   Text,
 } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
@@ -165,6 +166,8 @@ function SettingsForm({ settings }: { settings: ShopSettings }) {
             <View style={[styles.wrap, { gap: spacing.sm }]}>
               {RETURN_WINDOW_CHOICES.map((hours) => (
                 <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
                   key={hours}
                   selected={values.returnWindowHours === hours}
                   onPress={() => setValues({ ...values, returnWindowHours: hours })}>
@@ -294,6 +297,8 @@ function PaymentMethodsCard() {
               <View style={[styles.wrap, { gap: theme.app.spacing.sm }]}>
                 {KINDS.map((candidate) => (
                   <Chip
+                    style={fitChip.chip}
+                    textStyle={fitChip.text}
                     key={candidate}
                     selected={candidate === kind}
                     onPress={() => setKind(candidate)}>

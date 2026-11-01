@@ -37,8 +37,9 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
       environnement « production » (01/11/2026). Ils existent donc à trois endroits : `.env` (PC et
       appli web), `eas.json` (APK) et EAS (mises à jour). Si l'un change, changer les trois
       (`npx eas-cli@latest env:set production --name … --value … --visibility plaintext`).
-- [ ] Renseigner `EXPO_PUBLIC_VERSION_URL` (adresse de `version.json` sur le site) dans `eas.json`
-      pour que l'appli annonce les nouvelles versions de l'APK.
+- [x] L'appli annonce les nouvelles versions de l'APK : elle lit `/app/version.json` sur le site
+      (adresse par défaut dans `src/config/downloads.ts`). Pour une nouvelle version : publier l'APK
+      (Release GitHub), PUIS mettre son numéro dans `public/version.json` et republier le site.
 - [ ] Tester sur 2 ou 3 téléphones bon marché (Android 10 et plus), dont un sans Google Play.
 
 ### Site et version web

@@ -14,6 +14,7 @@ import {
   TextInput,
 } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
@@ -186,11 +187,17 @@ export default function SellScreen() {
               showsHorizontalScrollIndicator={false}
               keyboardShouldPersistTaps="handled">
               <View style={[styles.chips, { gap: spacing.sm }]}>
-                <Chip selected={category === null} onPress={() => setCategory(null)}>
+                <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
+                  selected={category === null}
+                  onPress={() => setCategory(null)}>
                   {t('products.all', { count: products.length })}
                 </Chip>
                 {categories.map((item) => (
                   <Chip
+                    style={fitChip.chip}
+                    textStyle={fitChip.text}
                     key={item.id}
                     selected={category === item.id}
                     onPress={() => setCategory(item.id)}>

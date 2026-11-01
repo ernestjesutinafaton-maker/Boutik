@@ -1,5 +1,20 @@
 /** Textes de l'équipe, des rôles et du verrouillage par code PIN (étape 7). */
 export const frTeam = {
+  profile: {
+    title: 'Mon profil',
+    button: 'Mon profil (nom, code PIN)',
+    help: 'Ton nom et ton code PIN : le code sert sur l’appareil partagé de la boutique. Tes rôles sont choisis par le propriétaire.',
+    roles: 'Tes rôles : {{roles}}',
+    name: 'Ton nom',
+    newPin: 'Nouveau code PIN (facultatif)',
+    pinConfirmation: 'Confirme le nouveau code PIN',
+    save: 'Enregistrer',
+    saved: 'Profil enregistré.',
+    offline: 'Il faut internet pour enregistrer ton profil.',
+    failed: 'Impossible d’enregistrer : réessaie.',
+    notMine:
+      'Ce profil n’a pas son propre compte : le propriétaire change son nom et son code PIN dans Plus → Équipe.',
+  },
   roles: {
     owner: 'Propriétaire',
     manager: 'Gérant',

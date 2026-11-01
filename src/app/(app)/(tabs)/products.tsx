@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, Text, TextInput } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
 import { CardList } from '@/components/card-list';
@@ -137,10 +138,16 @@ export default function ProductsScreen() {
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={[styles.chips, { gap: spacing.sm }]}>
-          <Chip selected={filter === null} onPress={() => setFilter(null)}>
+          <Chip
+            style={fitChip.chip}
+            textStyle={fitChip.text}
+            selected={filter === null}
+            onPress={() => setFilter(null)}>
             {t('products.all', { count: products.length })}
           </Chip>
           <Chip
+            style={fitChip.chip}
+            textStyle={fitChip.text}
             icon="alert"
             selected={filter === LOW_STOCK_FILTER}
             onPress={() => setFilter(LOW_STOCK_FILTER)}>
@@ -148,6 +155,8 @@ export default function ProductsScreen() {
           </Chip>
           {categories.map((category) => (
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               key={category.id}
               selected={filter === category.id}
               onPress={() => setFilter(category.id)}>

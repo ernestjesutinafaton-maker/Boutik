@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Chip } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { TextField } from '@/components/text-field';
 import { type CatalogUnit, sortUnits } from '@/domain/catalog';
 import { useAppTheme } from '@/theme/paper-theme';
@@ -28,6 +29,8 @@ export function UnitQuantityField(props: UnitQuantityFieldProps) {
         <View style={[styles.wrap, { gap: theme.app.spacing.sm }]}>
           {units.map((unit) => (
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               key={unit.id}
               selected={unit.id === props.unitId}
               onPress={() => props.onUnitChange(unit)}>

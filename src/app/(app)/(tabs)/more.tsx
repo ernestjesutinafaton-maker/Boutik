@@ -73,6 +73,14 @@ export default function MoreScreen() {
               ? t('account.device', { name: deviceName, number: device.number })
               : t('account.deviceNotRegistered', { name: deviceName })}
           </Text>
+          {member && shop && member.id === shop.memberId ? (
+            <BigButton
+              variant="outline"
+              icon="account-edit"
+              onPress={() => router.push('/profile')}>
+              {t('profile.button')}
+            </BigButton>
+          ) : null}
           <BigButton variant="outline" icon="logout" onPress={requestSignOut}>
             {t('account.signOut')}
           </BigButton>

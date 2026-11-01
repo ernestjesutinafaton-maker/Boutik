@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, Divider, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
@@ -123,8 +124,8 @@ export default function DeliveryExpenseScreen() {
             {COURIER_EXPENSE_CATEGORIES.map((candidate) => (
               <Chip
                 key={candidate}
-                style={styles.chip}
-                textStyle={styles.chipText}
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 selected={category === candidate}
                 onPress={() => setCategory(candidate)}>
                 {t(`deliveries.expense.categories.${candidate}`)}
@@ -142,14 +143,18 @@ export default function DeliveryExpenseScreen() {
             <>
               <Text variant="titleMedium">{t('deliveries.expense.delivery')}</Text>
               <View style={[styles.wrap, { gap: spacing.sm }]}>
-                <Chip selected={deliveryId === null} onPress={() => setDeliveryId(null)}>
+                <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
+                  selected={deliveryId === null}
+                  onPress={() => setDeliveryId(null)}>
                   {t('deliveries.expense.noDelivery')}
                 </Chip>
                 {recent.map((delivery) => (
                   <Chip
                     key={delivery.id}
-                    style={styles.chip}
-                    textStyle={styles.chipText}
+                    style={fitChip.chip}
+                    textStyle={fitChip.text}
                     selected={deliveryId === delivery.id}
                     onPress={() => setDeliveryId(delivery.id)}>
                     {delivery.address}
@@ -215,13 +220,6 @@ const styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-  },
-  // Une étiquette trop longue (adresse) est raccourcie avec « … » au lieu de sortir de l'écran
-  chip: {
-    maxWidth: '100%',
-  },
-  chipText: {
-    flexShrink: 1,
   },
   photo: {
     width: '100%',

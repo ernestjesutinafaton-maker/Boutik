@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
@@ -125,6 +126,8 @@ export default function RepayScreen() {
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {methods.map((candidate) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={candidate.id}
                 selected={candidate.id === method?.id}
                 onPress={() => setMethodId(candidate.id)}>

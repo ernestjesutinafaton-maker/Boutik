@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, Divider, IconButton, List, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
@@ -92,11 +93,17 @@ export default function HistoryScreen() {
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={[styles.row, { gap: spacing.sm }]}>
-          <Chip selected={group === null} onPress={() => setGroup(null)}>
+          <Chip
+            style={fitChip.chip}
+            textStyle={fitChip.text}
+            selected={group === null}
+            onPress={() => setGroup(null)}>
             {t('audit.allActions')}
           </Chip>
           {GROUPS.map((candidate) => (
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               key={candidate}
               selected={group === candidate}
               onPress={() => setGroup(candidate)}>
@@ -109,6 +116,8 @@ export default function HistoryScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={[styles.row, { gap: spacing.sm }]}>
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               icon="account-multiple"
               selected={memberId === null}
               onPress={() => setMemberId(null)}>
@@ -116,6 +125,8 @@ export default function HistoryScreen() {
             </Chip>
             {members.map(([id, name]) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={id}
                 icon="account"
                 selected={memberId === id}

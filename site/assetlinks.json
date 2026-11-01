@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.boutik.app",
+      "sha256_cert_fingerprints": [
+        "97:DD:05:A4:B2:AA:2E:58:B0:70:61:51:07:D2:02:07:C3:9C:6D:64:51:CB:94:94:A8:D6:31:E8:15:7A:B8:4D"
+      ]
+    }
+  }
+]

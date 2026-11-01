@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Button, Chip, Dialog, IconButton, Portal, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { TextField } from '@/components/text-field';
 import { type CatalogProduct, sellableUnits } from '@/domain/catalog';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
@@ -71,6 +72,8 @@ export function CartLineRow({ line, product, currency, onChange, onRemove }: Car
         <View style={[styles.wrap, { gap: spacing.xs }]}>
           {units.map((unit) => (
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               key={unit.id}
               compact
               selected={unit.id === line.unitId}

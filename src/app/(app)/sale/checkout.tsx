@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button, Chip, Divider, List, Switch, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
@@ -293,6 +294,8 @@ export default function CheckoutScreen() {
                   : []
               ).map((methodId) => (
                 <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
                   key={methodId}
                   selected={methodId === refundMethod}
                   onPress={() => setRefundMethodId(methodId)}>
@@ -311,6 +314,8 @@ export default function CheckoutScreen() {
             <View style={[styles.wrap, { gap: spacing.sm }]}>
               {REASONS.map((key) => (
                 <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
                   key={key}
                   selected={reasonKey === key}
                   onPress={() => setReasonKey(reasonKey === key ? null : key)}>
@@ -376,6 +381,8 @@ export default function CheckoutScreen() {
                 <View style={[styles.wrap, { gap: spacing.sm }]}>
                   {quickCashAmounts(amountToPay).map((amount) => (
                     <Chip
+                      style={fitChip.chip}
+                      textStyle={fitChip.text}
                       key={amount}
                       icon="cash"
                       onPress={() =>

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
@@ -150,11 +151,17 @@ function LossForm({
         <Card.Content style={{ gap: spacing.md }}>
           <Text variant="titleMedium">{t('losses.lot')}</Text>
           <View style={[styles.wrap, { gap: spacing.sm }]}>
-            <Chip selected={lotId === null} onPress={() => setLotId(null)}>
+            <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
+              selected={lotId === null}
+              onPress={() => setLotId(null)}>
               {t('losses.automaticLot')}
             </Chip>
             {lots.map((lot) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={lot.id}
                 selected={lot.id === lotId}
                 icon={isExpired(lot, day) ? 'calendar-remove' : undefined}
@@ -184,6 +191,8 @@ function LossForm({
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {REASONS.map((candidate) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={candidate}
                 selected={candidate === reason}
                 onPress={() => setReason(candidate)}>

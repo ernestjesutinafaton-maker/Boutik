@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, View } from 'react-native';
 import { Button, Chip, Dialog, Divider, Portal, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { MoneyText } from '@/components/money-text';
@@ -420,6 +421,8 @@ function CompleteDialog(props: {
             <View style={[styles.wrap, { gap: 8 }]}>
               {methods.map((method) => (
                 <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
                   key={method.id}
                   selected={methodId === method.id}
                   onPress={() => setMethodId(method.id)}>
@@ -499,6 +502,8 @@ function AssignDialog(props: {
       <Dialog.Content style={[styles.wrap, { gap: 8 }]}>
         {choices.map((choice) => (
           <Chip
+            style={fitChip.chip}
+            textStyle={fitChip.text}
             key={choice.id ?? 'open'}
             selected={chosen === choice.id}
             onPress={() => setChosen(choice.id)}>

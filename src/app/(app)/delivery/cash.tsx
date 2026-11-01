@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button, Chip, Dialog, Divider, Portal, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { MoneyText } from '@/components/money-text';
 import { Notice } from '@/components/notice';
@@ -284,6 +285,8 @@ function MoneyDialog(props: {
         <View style={[styles.wrap, { gap: 8 }]}>
           {props.methods.map((method) => (
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               key={method.id}
               selected={methodId === method.id}
               onPress={() => setChosenMethod(method.id)}>

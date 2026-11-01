@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
@@ -253,11 +254,17 @@ function DeliveryForm(props: {
         <Card.Content style={{ gap: spacing.md }}>
           <Text variant="titleMedium">{t('deliveries.new.when')}</Text>
           <View style={[styles.wrap, { gap: spacing.sm }]}>
-            <Chip selected={values.when === 'asap'} onPress={() => chooseDay('asap')}>
+            <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
+              selected={values.when === 'asap'}
+              onPress={() => chooseDay('asap')}>
               {t('deliveries.new.whenAsap')}
             </Chip>
             {days.map((candidate) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={candidate}
                 selected={values.when === candidate}
                 onPress={() => chooseDay(candidate)}>
@@ -282,12 +289,16 @@ function DeliveryForm(props: {
           <Text variant="titleMedium">{t('deliveries.new.courierLabel')}</Text>
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
               selected={values.courierId === null}
               onPress={() => setValues((current) => ({ ...current, courierId: null }))}>
               {t('deliveries.openToAll')}
             </Chip>
             {couriers.map((courier) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={courier.id}
                 selected={values.courierId === courier.id}
                 onPress={() => setValues((current) => ({ ...current, courierId: courier.id }))}>

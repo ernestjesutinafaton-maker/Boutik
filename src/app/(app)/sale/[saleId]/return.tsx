@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { Chip, Divider, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
@@ -158,6 +159,8 @@ function ReturnForm({ sale }: { sale: SaleDetail }) {
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
             {methods.map((method) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={method.id}
                 selected={method.id === refundMethodId}
                 onPress={() => setMethodId(method.id)}>

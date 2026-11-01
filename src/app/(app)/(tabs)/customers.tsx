@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { Chip, List, Text, TextInput } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { CardList } from '@/components/card-list';
@@ -117,7 +118,12 @@ export default function CustomersScreen() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View style={[styles.row, { gap: spacing.sm }]}>
           {(['all', 'debtors', 'over30', 'over60'] as const).map((value) => (
-            <Chip key={value} selected={filter === value} onPress={() => setFilter(value)}>
+            <Chip
+              style={fitChip.chip}
+              textStyle={fitChip.text}
+              key={value}
+              selected={filter === value}
+              onPress={() => setFilter(value)}>
               {t(`customers.filters.${value}`, { count: count(value) })}
             </Chip>
           ))}

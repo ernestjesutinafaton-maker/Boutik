@@ -51,7 +51,7 @@ describe('Facture HTML', () => {
   it('contient le numéro, les lignes, les totaux et le reste dû', () => {
     const html = invoiceHtml(data, 'a4');
     expect(html).toContain('Facture N° F2-000123');
-    expect(html).toContain('Sac 50 kg');
+    expect(html).toContain('2 Sacs 50 kg');
     expect(html).toContain('1,5 kg');
     expect(html).toContain(fcfa('64 000 FCFA'));
     expect(html).toContain('Reste dû (crédit)');
@@ -75,7 +75,7 @@ describe('Facture en message WhatsApp', () => {
     const text = invoiceText(data);
     expect(text).toContain('*Chez Maman*');
     expect(text).toContain('Facture N° F2-000123');
-    expect(text).toContain(`• Riz parfumé : 2 Sac 50 kg × ${fcfa('32 000 FCFA')}`);
+    expect(text).toContain(`• Riz parfumé : 2 Sacs 50 kg × ${fcfa('32 000 FCFA')}`);
     expect(text).toContain(`*Reste dû : ${fcfa('14 000 FCFA')}*`);
   });
 });

@@ -14,6 +14,7 @@ import {
   TextInput,
 } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BarcodeScanner } from '@/components/barcode-scanner';
 import { BigButton } from '@/components/big-button';
@@ -193,19 +194,27 @@ export function ProductForm(props: ProductFormProps) {
             <Text variant="titleMedium">{t('productForm.category')}</Text>
             <View style={[styles.wrap, { gap: spacing.sm }]}>
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 selected={values.categoryId === null}
                 onPress={() => onChange({ ...values, categoryId: null })}>
                 {t('common.none')}
               </Chip>
               {categories.map((category) => (
                 <Chip
+                  style={fitChip.chip}
+                  textStyle={fitChip.text}
                   key={category.id}
                   selected={values.categoryId === category.id}
                   onPress={() => onChange({ ...values, categoryId: category.id })}>
                   {category.name}
                 </Chip>
               ))}
-              <Chip icon="plus" onPress={() => setIsCategoryDialogOpen(true)}>
+              <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
+                icon="plus"
+                onPress={() => setIsCategoryDialogOpen(true)}>
                 {t('productForm.newCategory')}
               </Chip>
             </View>
@@ -237,6 +246,8 @@ export function ProductForm(props: ProductFormProps) {
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {BASE_UNIT_SUGGESTIONS.map((suggestion) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={suggestion}
                 compact
                 selected={values.baseUnit === suggestion}

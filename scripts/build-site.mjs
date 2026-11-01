@@ -105,6 +105,9 @@ for (const asset of readdirSync(join(site, 'assets'))) {
 copyFileSync(join(site, 'vercel.json'), join(dist, 'vercel.json'));
 // Jamais publiés, même s'ils traînent dans dist/ : fichiers de clés (« vercel link » en crée un)
 writeFileSync(join(dist, '.vercelignore'), ['.env*', '.gitignore'].join('\n') + '\n');
+// Les liens du site qui ouvrent l'appli Android (App Links) : Android vérifie ce fichier
+mkdirSync(join(dist, '.well-known'), { recursive: true });
+copyFileSync(join(site, 'assetlinks.json'), join(dist, '.well-known', 'assetlinks.json'));
 // Mêmes règles pour l'essai sur le PC (npx serve dist)
 writeFileSync(
   join(dist, 'serve.json'),

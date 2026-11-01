@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { Notice } from '@/components/notice';
@@ -130,6 +131,8 @@ export default function ExportScreen() {
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {KINDS.map((candidate) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={candidate}
                 selected={candidate === kind}
                 onPress={() => setKind(candidate)}>
@@ -143,6 +146,8 @@ export default function ExportScreen() {
               <View style={[styles.wrap, { gap: spacing.sm }]}>
                 {PERIODS.map((candidate) => (
                   <Chip
+                    style={fitChip.chip}
+                    textStyle={fitChip.text}
                     key={candidate}
                     selected={candidate === period}
                     onPress={() => setPeriod(candidate)}>

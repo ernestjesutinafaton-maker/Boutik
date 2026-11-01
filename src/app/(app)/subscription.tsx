@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Button, Chip, Divider, List, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { MoneyText } from '@/components/money-text';
@@ -251,7 +252,12 @@ export default function SubscriptionScreen() {
           <Text variant="titleMedium">{t('subscription.duration')}</Text>
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {DURATIONS.map((value) => (
-              <Chip key={value} selected={value === months} onPress={() => setMonths(value)}>
+              <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
+                key={value}
+                selected={value === months}
+                onPress={() => setMonths(value)}>
                 {t('subscription.months', { count: value })}
               </Chip>
             ))}
@@ -260,6 +266,8 @@ export default function SubscriptionScreen() {
           <View style={[styles.wrap, { gap: spacing.sm }]}>
             {SUBSCRIPTION_OPERATORS.map((item) => (
               <Chip
+                style={fitChip.chip}
+                textStyle={fitChip.text}
                 key={item.code}
                 selected={item.code === operator}
                 onPress={() => setOperator(item.code)}>

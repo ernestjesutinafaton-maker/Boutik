@@ -1,6 +1,6 @@
 import { formatMoment } from '@/domain/dates';
 import { formatMoney } from '@/domain/money';
-import { formatQuantity } from '@/domain/quantity';
+import { formatQuantity, pluralUnit } from '@/domain/quantity';
 import type { InvoiceData } from '@/invoices/invoice-html';
 import type { ReceiptData } from '@/invoices/receipt';
 
@@ -32,7 +32,7 @@ export function invoiceTicketLines(data: InvoiceData): TicketLine[] {
       { kind: 'text', text: item.name, bold: true },
       {
         kind: 'columns',
-        left: `${formatQuantity(item.quantity)} ${item.unitName} x ${money(item.unitPrice)}`,
+        left: `${formatQuantity(item.quantity)} ${pluralUnit(item.unitName, item.quantity)} x ${money(item.unitPrice)}`,
         right: money(item.lineTotal),
       }
     );

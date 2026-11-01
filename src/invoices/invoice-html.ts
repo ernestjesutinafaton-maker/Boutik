@@ -1,6 +1,6 @@
 import { formatMoment } from '@/domain/dates';
 import { type CurrencyCode, formatMoney } from '@/domain/money';
-import { formatQuantity } from '@/domain/quantity';
+import { formatQuantity, pluralUnit } from '@/domain/quantity';
 import { palette } from '@/theme/tokens';
 
 /**
@@ -75,10 +75,10 @@ export function invoiceHtml(data: InvoiceData, format: InvoiceFormat): string {
     .map((item) =>
       isTicket
         ? `<tr><td colspan="2" class="name">${text(item.name)}</td></tr>
-           <tr><td>${text(formatQuantity(item.quantity))} ${text(item.unitName)} × ${money(item.unitPrice)}</td>
+           <tr><td>${text(formatQuantity(item.quantity))} ${text(pluralUnit(item.unitName, item.quantity))} × ${money(item.unitPrice)}</td>
                <td class="num">${money(item.lineTotal)}</td></tr>`
         : `<tr><td>${text(item.name)}</td>
-               <td class="num">${text(formatQuantity(item.quantity))} ${text(item.unitName)}</td>
+               <td class="num">${text(formatQuantity(item.quantity))} ${text(pluralUnit(item.unitName, item.quantity))}</td>
                <td class="num">${money(item.unitPrice)}</td>
                <td class="num">${money(item.lineTotal)}</td></tr>`
     )
@@ -149,7 +149,7 @@ export function invoiceText(data: InvoiceData): string {
     '',
     ...data.items.map(
       (item) =>
-        `• ${item.name} : ${formatQuantity(item.quantity)} ${item.unitName} × ${money(item.unitPrice)} = ${money(item.lineTotal)}`
+        `• ${item.name} : ${formatQuantity(item.quantity)} ${pluralUnit(item.unitName, item.quantity)} × ${money(item.unitPrice)} = ${money(item.lineTotal)}`
     ),
     '',
     data.discount > 0 ? `Remise : − ${money(data.discount)}` : null,

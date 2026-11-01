@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { Chip, IconButton, Text } from 'react-native-paper';
 
+import { fitChip } from '@/components/fit-chip';
 import { Card } from '@/components/card';
 import { BigButton } from '@/components/big-button';
 import { MoneyText } from '@/components/money-text';
@@ -294,6 +295,8 @@ function ReceiveForm({
               <View style={[styles.wrap, { gap: spacing.sm }]}>
                 {sortUnits(line.product.units).map((candidate) => (
                   <Chip
+                    style={fitChip.chip}
+                    textStyle={fitChip.text}
                     key={candidate.id}
                     selected={candidate.id === line.unitId}
                     onPress={() => changeUnit(line, candidate)}>

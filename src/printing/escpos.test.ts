@@ -137,10 +137,10 @@ describe('Ticket d’une vente', () => {
     const text = ascii(invoiceTicketBytes(data, 58));
     // En 58 mm, la ligne ne tient pas : le montant passe à la ligne, à droite
     expect(text).toContain(
-      '2 Sac 50 kg x 32 000 FCFA' + String.fromCharCode(10) + ' '.repeat(21) + '64 000 FCFA'
+      '2 Sacs 50 kg x 32 000 FCFA' + String.fromCharCode(10) + ' '.repeat(21) + '64 000 FCFA'
     );
     expect(text).toContain('Facture F2-000123');
-    expect(text).toContain('2 Sac 50 kg x 32 000 FCFA');
+    expect(text).toContain('2 Sacs 50 kg x 32 000 FCFA');
     expect(text).toContain('64 000 FCFA');
     expect(text).toContain('RESTE D');
     expect(text).toContain('14 000 FCFA');
