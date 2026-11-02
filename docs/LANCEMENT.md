@@ -30,6 +30,9 @@ et les deux choix qui reviennent à Ernest (logiciel Windows, abonnement).
       `…/releases/latest/download/boutik.apk`, qui donne toujours la dernière version. Pour une
       nouvelle version : `gh release create vX.Y.Z downloads/boutik.apk --repo ernestjesutinafaton-maker/Boutik-presentation`.
 - [x] Version 1.0.1 (38 Mo au lieu de 131) publiée le 01/11/2026 : Release `v1.0.1`.
+- [x] Version 1.0.2 publiée le 01/11/2026 (Release `v1.0.2`) : les liens du site (`/app/…`) ouvrent
+      l'appli Android (App Links : `site/assetlinks.json` avec l'empreinte de la clé de signature EAS ;
+      si la clé change un jour, mettre la nouvelle empreinte dans ce fichier).
 - [x] Mises à jour sans réinstaller (EAS Update) : `npm run update:android -- --message "…"`
       (jamais `eas update` seul : il viderait `dist/`, le dossier du site). Depuis Expo 55, cette
       commande ne lit PLUS le fichier `.env` : les trois réglages du serveur (`EXPO_PUBLIC_SUPABASE_URL`,
