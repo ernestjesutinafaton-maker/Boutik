@@ -1,7 +1,9 @@
 import { getRandomBytes } from 'expo-crypto';
 
 import { hashPin, saltFromBytes } from '@/domain/pin';
+import { errorMessageKey } from '@/lib/error-messages';
 import { supabase } from '@/lib/supabase';
+import type { TranslationKey } from '@/i18n/keys';
 
 export type ProfileResult = 'ok' | 'offline' | 'failed';
 
@@ -28,4 +30,13 @@ export async function updateMyProfile(
   }
   // Pas de code d'erreur PostgreSQL : la demande n'est pas arrivée au serveur (réseau)
   return error.code ? 'failed' : 'offline';
+}
+
+/**
+ * Change le mot de passe du compte connecté (internet nécessaire ; pas d'e-mail à attendre).
+ * Renvoie null si c'est fait, sinon le message d'erreur à montrer.
+ */
+export async function changeMyPassword(password: string): Promise<TranslationKey | null> {
+  const { error } = await supabase.auth.updateUser({ password });
+  return error ? errorMessageKey(error) : null;
 }

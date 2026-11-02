@@ -161,6 +161,9 @@ export const fr = {
     invalidCredentials: 'E-mail ou mot de passe incorrect.',
     emailAlreadyUsed: 'Un compte existe déjà avec cette adresse e-mail : connecte-toi.',
     weakPassword: 'Ce mot de passe est trop facile à deviner : choisis-en un plus long.',
+    samePassword: 'C’est déjà ton mot de passe : choisis-en un autre.',
+    reauthenticationNeeded:
+      'Pour changer ton mot de passe, déconnecte-toi puis reconnecte-toi d’abord.',
     emailNotConfirmed: 'Confirme d’abord ton adresse : ouvre l’e-mail reçu à l’inscription.',
     tooManyAttempts: 'Trop de tentatives. Attends quelques minutes, puis réessaie.',
     signupDisabled: 'Les inscriptions sont fermées pour le moment.',

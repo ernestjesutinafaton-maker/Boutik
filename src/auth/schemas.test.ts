@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { firstErrorPerField } from '@/lib/validation';
 
-import { createShopSchema, signInSchema, signUpSchema } from './schemas';
+import { createShopSchema, newPasswordSchema, signInSchema, signUpSchema } from './schemas';
 
 describe('Formulaire de connexion', () => {
   it('accepte un e-mail et un mot de passe, en enlevant les espaces autour de l’e-mail', () => {
@@ -72,6 +72,26 @@ describe('Formulaire de création de boutique', () => {
       shopName: 'errors.shopNameTooShort',
       ownerName: 'errors.ownerNameTooShort',
       countryCode: 'errors.countryRequired',
+    });
+  });
+
+  it('nouveau mot de passe (« Mon profil ») : 8 caractères au moins, deux fois le même', () => {
+    expect(
+      newPasswordSchema.safeParse({
+        password: 'nouveau-2026',
+        passwordConfirmation: 'nouveau-2026',
+      }).success
+    ).toBe(true);
+    const short = newPasswordSchema.safeParse({ password: 'court', passwordConfirmation: 'court' });
+    expect(short.success ? null : firstErrorPerField(short.error)).toEqual({
+      password: 'errors.passwordTooShort',
+    });
+    const different = newPasswordSchema.safeParse({
+      password: 'nouveau-2026',
+      passwordConfirmation: 'nouveau-2025',
+    });
+    expect(different.success ? null : firstErrorPerField(different.error)).toEqual({
+      passwordConfirmation: 'errors.passwordsDontMatch',
     });
   });
 });

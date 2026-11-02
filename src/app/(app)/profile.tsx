@@ -6,15 +6,19 @@ import { BigButton } from '@/components/big-button';
 import { Card } from '@/components/card';
 import { Notice } from '@/components/notice';
 import { Screen } from '@/components/screen';
+import { PasswordField } from '@/components/password-field';
 import { TextField } from '@/components/text-field';
+import { newPasswordSchema } from '@/auth/schemas';
+import type { TranslationKey } from '@/i18n/keys';
 import { type FieldErrors, firstErrorPerField } from '@/lib/validation';
 import { useShop } from '@/shop/shop-provider';
 import { useActiveMember } from '@/team/active-member-provider';
-import { type ProfileResult, updateMyProfile } from '@/team/my-profile';
+import { changeMyPassword, type ProfileResult, updateMyProfile } from '@/team/my-profile';
 import { joinNameSchema, pinSchema } from '@/team/schemas';
 import { useAppTheme } from '@/theme/paper-theme';
 
 type Fields = { name: string; pin: string; pinConfirmation: string };
+type PasswordFields = { password: string; passwordConfirmation: string };
 
 /**
  * « Mon profil » : chacun change son nom et son code PIN (celui qui sert sur l'appareil
@@ -33,6 +37,14 @@ export default function ProfileScreen() {
   const [errors, setErrors] = useState<FieldErrors<Fields>>({});
   const [result, setResult] = useState<ProfileResult | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [password, setPassword] = useState<PasswordFields>({
+    password: '',
+    passwordConfirmation: '',
+  });
+  const [passwordErrors, setPasswordErrors] = useState<FieldErrors<PasswordFields>>({});
+  // « ok » : changé ; sinon le message d'erreur du serveur
+  const [passwordResult, setPasswordResult] = useState<'ok' | TranslationKey | null>(null);
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
   const { spacing } = theme.app;
   // Seulement son propre profil : sur l'appareil partagé, un profil à code PIN sans compte
   // se modifie dans Équipe, par le propriétaire
@@ -72,6 +84,23 @@ export default function ProfileScreen() {
       }
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function savePassword() {
+    setPasswordResult(null);
+    const parsed = newPasswordSchema.safeParse(password);
+    setPasswordErrors(parsed.success ? {} : firstErrorPerField(parsed.error));
+    if (!parsed.success) return;
+    setIsChangingPassword(true);
+    try {
+      const problem = await changeMyPassword(parsed.data.password);
+      setPasswordResult(problem ?? 'ok');
+      if (!problem) {
+        setPassword({ password: '', passwordConfirmation: '' });
+      }
+    } finally {
+      setIsChangingPassword(false);
     }
   }
 
@@ -123,6 +152,41 @@ export default function ProfileScreen() {
       {result === 'failed' ? <Notice message={t('profile.failed')} /> : null}
       <BigButton icon="content-save" loading={isSaving} disabled={isSaving} onPress={save}>
         {t('profile.save')}
+      </BigButton>
+
+      <Card mode="outlined">
+        <Card.Title title={t('profile.passwordTitle')} titleVariant="titleLarge" />
+        <Card.Content style={{ gap: spacing.sm }}>
+          <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
+            {t('profile.passwordHelp')}
+          </Text>
+          <PasswordField
+            label={t('profile.newPassword')}
+            value={password.password}
+            onChangeText={(value) => setPassword((current) => ({ ...current, password: value }))}
+            errorMessage={passwordErrors.password ? t(passwordErrors.password) : null}
+          />
+          <PasswordField
+            label={t('profile.passwordConfirmation')}
+            value={password.passwordConfirmation}
+            onChangeText={(value) =>
+              setPassword((current) => ({ ...current, passwordConfirmation: value }))
+            }
+            errorMessage={
+              passwordErrors.passwordConfirmation ? t(passwordErrors.passwordConfirmation) : null
+            }
+          />
+        </Card.Content>
+      </Card>
+      {passwordResult === 'ok' ? <Notice tone="info" message={t('profile.passwordSaved')} /> : null}
+      {passwordResult && passwordResult !== 'ok' ? <Notice message={t(passwordResult)} /> : null}
+      <BigButton
+        icon="lock-reset"
+        variant="outline"
+        loading={isChangingPassword}
+        disabled={isChangingPassword}
+        onPress={savePassword}>
+        {t('profile.passwordSave')}
       </BigButton>
     </Screen>
   );

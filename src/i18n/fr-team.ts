@@ -12,6 +12,12 @@ export const frTeam = {
     saved: 'Profil enregistré.',
     offline: 'Il faut internet pour enregistrer ton profil.',
     failed: 'Impossible d’enregistrer : réessaie.',
+    passwordTitle: 'Mot de passe',
+    passwordHelp: 'Au moins 8 caractères. Il sert à te connecter sur un nouvel appareil.',
+    newPassword: 'Nouveau mot de passe',
+    passwordConfirmation: 'Confirme le nouveau mot de passe',
+    passwordSave: 'Changer le mot de passe',
+    passwordSaved: 'Mot de passe changé : utilise-le à ta prochaine connexion.',
     notMine:
       'Ce profil n’a pas son propre compte : le propriétaire change son nom et son code PIN dans Plus → Équipe.',
   },

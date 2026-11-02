@@ -15,6 +15,11 @@ export function errorMessageKey(error: unknown): TranslationKey {
       return 'errors.emailAlreadyUsed';
     case 'weak_password':
       return 'errors.weakPassword';
+    case 'same_password':
+      return 'errors.samePassword';
+    case 'reauthentication_needed':
+    case 'reauthentication_not_valid':
+      return 'errors.reauthenticationNeeded';
     case 'email_address_invalid':
       return 'errors.emailInvalid';
     case 'email_not_confirmed':

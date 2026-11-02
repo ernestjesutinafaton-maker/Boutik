@@ -35,6 +35,17 @@ export const signUpSchema = z
     path: ['passwordConfirmation'],
   });
 
+/** Nouveau mot de passe (« Mon profil ») : mêmes règles qu'à l'inscription. */
+export const newPasswordSchema = z
+  .object({
+    password: z.string().min(8, message('errors.passwordTooShort')),
+    passwordConfirmation: z.string(),
+  })
+  .refine((values) => values.password === values.passwordConfirmation, {
+    error: message('errors.passwordsDontMatch'),
+    path: ['passwordConfirmation'],
+  });
+
 export const createShopSchema = z.object({
   shopName: z
     .string()
