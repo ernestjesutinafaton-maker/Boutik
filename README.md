@@ -1,8 +1,8 @@
 # Boutik
 
-Application de gestion de **stock**, de **caisse** et de **ventes à crédit** pour les boutiques
+Application de gestion de  **stock**, de **caisse** et de **ventes à crédit** pour les boutiques
 en Afrique (lancement au Bénin, FCFA). Elle fonctionne **sans internet** : tout est enregistré dans
-l'appareil, puis synchronisé avec le serveur dès que le réseau revient.
+l'appareil, puis synchronisé avec le serveur  dès que le réseau revient.
 
 Un seul code pour Android (prioritaire), iPhone (version web installable) et ordinateur.
 
