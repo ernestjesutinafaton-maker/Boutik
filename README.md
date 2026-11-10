@@ -5,7 +5,7 @@ en Afrique (lancement au Bénin, FCFA). Elle fonctionne **sans internet** : tout
 l'appareil, puis synchronisé avec le serveur  dès que le réseau revient.
 
 Un seul code pour Android (prioritaire), iPhone (version web installable) et ordinateur.
-
+ 
 - **La documentation technique** (commandes, procédures, architecture, fonctionnalités, base de données) : [docs/DOCUMENTATION-TECHNIQUE.md](docs/DOCUMENTATION-TECHNIQUE.md)
 - Le plan, les décisions et l'avancement : [docs/PLAN.md](docs/PLAN.md)
 - Les besoins d'origine : [docs/CAHIER_DES_CHARGES.md](docs/CAHIER_DES_CHARGES.md)
