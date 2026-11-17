@@ -92,3 +92,8 @@ src/db/          base locale et synchronisation   src/i18n/  tous les textes (fr
 src/theme/       couleurs et tailles (un seul fichier : tokens.ts)
 supabase/        migrations et tests de sécurité   powersync/ règles de synchronisation
 ```
+
+## Contributeurs
+
+- [Ernest AFATON](https://github.com/ernestjesutinafaton-maker) : conception et développement
+- [winnerflazy-ui](https://github.com/winnerflazy-ui) : contributions au projet
